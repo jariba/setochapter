@@ -1,0 +1,93 @@
+% \usepackage{fullpage}
+\usepackage[pdftex]{graphicx}
+\usepackage{floatflt}
+\usepackage{float}
+\usepackage{epsf}
+\usepackage{epsfig}
+% \usepackage{subfigure}
+\usepackage{subfig}
+\usepackage{latexsym}
+%\usepackage{algorithm}
+%\usepackage[noend]{algorithmic}
+\usepackage{color}
+\usepackage{wrapfig}
+\usepackage{topcapt}
+\usepackage{multirow}
+\usepackage{tabularx}
+
+\usepackage{amsmath, amsfonts, amssymb}
+\usepackage{algorithmic}
+\usepackage[hmargin=1in,vmargin=2.5cm]{geometry}
+\usepackage{url}
+\usepackage{multirow}
+\usepackage[ruled,noline,linesnumbered]{algorithm2e}
+\usepackage{soul}
+%\usepackage[caption=false]{caption}
+
+\widowpenalty=1000
+\clubpenalty=1000
+
+\def\etal{{et al.\/}}
+\def\eg{e.g., }
+\def\ie{{i.e.,\ }}
+\def\etc{{etc.\ }}
+\def\situ{{in situ \/}}
+\def\PN{{\emph{PN} }}
+\input{epsf}
+
+\usepackage[normalem]{ulem}
+
+%\usepackage{mathptmx}
+%\usepackage{multirow}
+
+\newcommand{\rtime}[1]{\par\noindent\rlap{#1} \hspace*{2.15cm}}
+\newcommand{\iblank}{\par \noindent \hspace*{2.4cm} \hangindent 2.6cm}
+\newcommand{\m}[1]{\ensuremath{\mathbf{#1}}}
+\newcommand{\mc}[1]{\ensuremath{\mathcal{#1}}}
+\newcommand{\mb}[1]{\mbox{\boldmath$#1$\unboldmath}}
+%\newcommand{\norm}[1]{\left| \left| #1 \right| \right| ^2}
+\newcommand{\snr}{\hbox{SNR}}
+\newcommand{\mse}{\hbox{MSE}}
+\newcommand{\E}{{\mathbb E}}
+\newcommand{\cn}{{\mathcal{CN}}}
+\newcommand{\ba}{\begin{align*}}
+\newcommand{\ea}{\end{align*}}
+
+\newtheorem{Prop}{Proposition}
+\newtheorem{Theorem}{Theorem}
+\newtheorem{Lemma}{Lemma}
+\newtheorem{Corrolary}{Corollary}
+
+\def\be{\begin{equation}}
+\def\ee{\end{equation}}
+
+\newlength{\doublespacelength}
+\setlength{\doublespacelength}{\baselineskip}
+\addtolength{\doublespacelength}{0.5\baselineskip}
+\newcommand{\doublespace}{\setlength{\baselineskip}{\doublespacelength}}
+
+\newlength{\singlespacelength}
+\setlength{\singlespacelength}{\baselineskip}
+\newcommand{\singlespace}{\setlength{\baselineskip}{\singlespacelength}}
+
+
+\newlength{\savedspacing}
+\newcommand{\savespacing}{\setlength{\savedspacing}{\baselineskip}}
+\newcommand{\restorespacing}{\setlength{\baselineskip}{\savedspacing}}
+
+\setlength{\parskip}{0pt}
+\setlength{\parsep}{0pt}
+\setlength{\headsep}{0pt}
+\setlength{\topskip}{0pt}
+\setlength{\topmargin}{0pt}
+\setlength{\topsep}{0pt}
+\setlength{\partopsep}{0pt}
+
+\newcommand{\kcomment}[1]{{\color{red}{KR: #1}}}
+\newcommand{\acomment}[1]{{\color{green}{AO: #1}}}
+\newcommand{\jcomment}[1]{{\color{cyan}{JD: #1}}}
+\newcommand{\fcomment}[1]{{\color{red}{Fp: #1}}}
+\newcommand{\comment}[1]{{\color{blue}{#1}}}
+
+%\linespread{0.95}
+ % \linespread{2.00}
