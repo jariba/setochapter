@@ -20,13 +20,12 @@ Moss Landing,  CA, 95039\\
 \begin{abstract}
 
   We describe a general purpose Artificial Intelligence based control
-  architecture that implements the sense-plan-act paradigm. The
-  Teleo-Reactive EXecutive (T-REX) framework is deliberates about
-  future states, plans for actions and executes activities while
-  monitoring plans for anomalous conditions. It is unusual in being
-  operational and in routine use for operational oceanography,
-  providing a new tool for science to sample and observe the dynamic
-  coastal ocean. Plans are no longer scripted a priori but synthesized
+  architecture that incorporates in-situ decision making for
+  adaptation and control for autonomous underwater vehicles
+  (AUVs). The Teleo-Reactive EXecutive (\texttt{T-REX}) framework
+  deliberates about future states, plans for actions and executes
+  generated activities while monitoring plans for anomalous
+  conditions. Plans are no longer scripted a priori but synthesized
   onboard with high-level directives instead of low level
   commands. Further, the architecture uses multiple control loops for
   a 'divide and conquer' problem solving strategy allowing for
@@ -39,10 +38,12 @@ Moss Landing,  CA, 95039\\
   easily, with little to no changes to the core search engine thereby
   making software engineering sustainable. The representational
   ability to deal with time and resources coupled with Machine
-  Learning techniques for event detection, allows balancing shorter
+  Learning techniques for event detection allows balancing shorter
   term benefits with longer term needs, an important need as AUV
   hardware becomes more robust allowing persistent ocean sampling and
-  observation.
+  observation. \rx is in operational and routine use at MBARI,
+  providing scientists a new tool to sample and observe the dynamic
+  coastal ocean.
   
 %  % Traditional approaches to commanding marine robots have relied on
 %  %  pre-scripted plans with a priori defined waypoints. These have
