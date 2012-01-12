@@ -1,26 +1,31 @@
-\documentclass[12pt]{svmono}
+\documentclass[graybox,12pt]{svmult}
+
+% \documentclass[12pt]{svmono}
 
 \input{preamble}
+\setcounter{secnumdepth}{-1} 
 
-\usepackage{graphicx}
+% \usepackage[agsm]{harvard}
 
-\usepackage[agsm]{harvard}
-
-\title{\textbf{\sc Deliberative Autonomy for Marine Robotics}}
-\author{}
-\date{\small Monterey Bay Aquarium Research Institute \\
-7700 Sandholdt Rd.\\
-Moss Landing,  CA, 95039\\
-{\tt }}
+\title*{\textbf{\sc Deliberative Autonomy for Marine Robotics}}
+\author{\normalsize Kanna~Rajan\inst{1} \and Fr\'ed\'eric Py\inst{1}
+  \and Javier Barreiro\inst{2}}
+\institute{Monterey Bay Aquarium Research Institute, California
+  \texttt{\{Kanna.Rajan,fpy\}@mbari.org}
+  \and
+  NASA Ames Research Center, Moffett Field, California
+  \texttt{javier.barreiro@nasa.gov}}
+% \date{\small Monterey Bay Aquarium Research Institute \\
+% 7700 Sandholdt Rd.\\
+% Moss Landing,  CA, 95039\\
+% {\tt }}
 
 \begin{document}
 
 \maketitle
 
-\begin{abstract}
-
-  We describe a general purpose Artificial Intelligence based control
-  architecture that incorporates in-situ decision making for
+\abstract{We describe a general purpose Artificial Intelligence based
+  control architecture that incorporates in-situ decision making for
   adaptation and control for autonomous underwater vehicles
   (AUVs). The Teleo-Reactive EXecutive (\texttt{T-REX}) framework
   deliberates about future states, plans for actions and executes
@@ -41,42 +46,30 @@ Moss Landing,  CA, 95039\\
   Learning techniques for event detection allows balancing shorter
   term benefits with longer term needs, an important need as AUV
   hardware becomes more robust allowing persistent ocean sampling and
-  observation. \rx is in operational and routine use at MBARI,
+  observation. \rx is in routine operational use at MBARI,
   providing scientists a new tool to sample and observe the dynamic
-  coastal ocean.
-  
-%  % Traditional approaches to commanding marine robots have relied on
-%  %  pre-scripted plans with a priori defined waypoints. These have
-%  %  served the oceanographic community well in enabling robots to
-%  %  cost-effectively perform surveys traditionally undertaken by
-%  %  ship-board observations. However, in dynamic coastal environments
-%  %  where is substantial interaction between atmospheric, oceanographic,
-%  %  estuarine/riverine and land-sea interaction processes requires a
-%  %  robot to be adaptive and receptive to opportunistic
-%  %  science. Sustained use of such autonomous platforms in military
-%  %  applications have also pushed.
-
-\end{abstract}
+  coastal ocean.}
 
 \input{intro.tex}
+
+\input{concepts.tex}
 
 \input{related.tex}
 
 \input{arch.tex}
 
-\input{concepts.tex}
-
 \input{results.tex}
 
 \input{future.tex}
 
-\input{conclde.tex}
+\input{conclude.tex}
 
 \section{Acknowledgements}
 
 The authors are funded by a block grant from the David and Lucile
 Packard Foundation to MBARI. 
 
+\bibliographystyle{IEEEtran}
 \bibliography{references}
 
 \end{document}
