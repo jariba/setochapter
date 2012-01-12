@@ -72,12 +72,15 @@ process as this general sequence :
 \begin{figure}[!htbp]
   \centering
   \includegraphics[width=0.5\columnwidth]{figs/synch-relation}
-  \caption{Ilustration of the synchronization in a reactor. The
+  \caption{Ilustration of the synchronization flaws in a reactor. The
     reactor receive new observations when they are produced by the
-    owner(s) of its internal timlines. Meanwhile at every tick it
-    identifies the potential flaw of himself not having identify its
-    state for the current tick and will try to resolve it according to
-    its model $\mathcal{M}$} 
+    owner(s) of its internal timelines. The line after the last token
+    of each timeline represent the domain of possible values for the
+    end of this token. At every tick $\tau$ the reactor needs to
+    integrate the {\em External} state information it received and --
+    based on its model $\mathcal{M}$ -- resolve its {\em Internal}
+    state that will then be provided by the architecture to other
+    reactors using these state variables.}
   \label{fig:synch:flaw}
 \end{figure}
 
