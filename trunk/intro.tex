@@ -5,3 +5,168 @@
 % been adequate in the past and are no longer so. How can deliberation
 % (i.e. planning help) and how can it contribute to new ways of observing the
 % ocean.
+
+Autonomous platforms in the marine environment have had a substantial
+and immediate impact for both civil and military
+applications. Autonomous Underwater Vehicles (AUVs) in particular have
+altered the way oceanographers are able to reach beyond the surface
+and make observations which are not only at higher resolution but have
+altered both the discipline and impacted the engineering methodologies
+behind Sampling, Control and Robotics itself \comment{need higher
+  level citation here}. Yet challenges remain, principally in making
+such robotic devices more attune to the environment, to sample large
+swaths at the Meso-scale ($> 50$ km\textsuperscript{2}) and doing so
+systematically and adaptively. Further, over the last two decades
+substantial improvements in hardware including propulsion, battery
+technologies and hardware have not been kept abreast of in software
+especially in algorithmic methods in Sampling and Control and in
+systematic engineering and software engineering development.
+
+This is one important reason that periodic calls towards sustained
+exploration and sampling \cite{rudnick03} are issued by scientists for
+whom the scope and scale of observations have become increasingly
+tractable using autonomous platforms both below and on the
+surface. The complexity of oceanic processes and the chronic
+under-sampling of the coastal oceans especially of dynamic features
+spread over large spatial scales (from meters to kilometers in extent)
+with dynamic biological activity across the temporal spectrum (in the
+order of hours to weeks), has made it challenging for robotic
+platforms to autonomously track and sample. A prominent example of
+such a process is coastal algal blooms which are patchy and could
+cover large coastal zones. Persistent observation of such dynamic
+events dictates that our robotic assets track and sample such patches
+which can evolve rapidly due to inherent bio-geochemical activity,
+advection as well as diffusion with the water mass it resides in.
+
+At the Monterey Bay Aquarium Research Institute (MBARI), a unique
+inter-disciplinary collaboration between biologists, ecologists,
+geneticists and roboticists on the CANON (Controlled Agile Novel
+Observation Network) \cite{canon} has driven autonomous system
+exploration and control. Fundamental questions related to sampling
+strategies have driven the use cases for advanced concepts in
+autonomy, specifically to Artificial Intelligence (AI) Planning and
+Execution. Current work is also looking at how other fields in Machine
+Intelligence especially Machine Learning can be leveraged to impact
+the science of engineering systems in marine robotics and as a
+consequence oceanography itself.
+
+In this chapter, we propose an alternative view to decision-making
+using in-situ automated Planning \cite{ghallab04} and more important
+demonstrate that while earlier control paradigms primarily driven by
+\emph{reactive} approaches to control can be augmented to not only
+provide targeted observation and sampling, but also a more nuanced and
+balanced consideration of mission objectives, environmental conditions
+and available resources. Planning (or deliberation or projection in
+action space) is important to balance current needs of a robot with
+future desires or goals. And to do such planning in the context of
+time and available resources in-situ on the robot. Planning without
+time or action planning in of itself is not adequate; dealing with
+time ensures that the balance between now and the future is handled
+systematically. Yet, plans have to be tied to robotic action and in
+the real-world which is not static. Further, plans project future
+state which is not only likely to change, but is based on substantial
+uncertainty\footnote{It is important to remember that these principles
+  are broad much as Dwight Eisenhower is reputed to have said
+  ``\emph{In preparing for battle I have always found that plans are
+    useless, but planning is indispensable}'' and ``\emph{Failing to
+    plan is planning to fail}''}. Modeling of the marine environment
+to provide cues is hampered by poor understanding of the worlds ocean
+and poor predictive skill of ocean models and often little to no
+availability of a priori synoptic views of the survey area. 
+
+AUV control architectures have primarily been driven by reactive
+Subsumption-based approaches \cite{brooks86}. They have been adequate
+to doing routine straight-line survey tracts which have played a
+valuable role in the acceptance of AUVs as a new tool for ocean
+science and DoD applications. However, scaling of problem domains in
+addition to dealing with event-response and discovery in the
+water-column challenges \emph{how} controllers are written in the
+first place, maintained and upgraded over the life-cycle of the
+platform. Dealing with off-nominal endogenous or exogenous conditions
+including sensor failures stretches how AUVs are currently being
+utilized; one consequence for instance, is any off-nominal condition
+results in a \emph{fail-safe} surface mode to radio for help. Further
+these approaches, words to the contrary are not only hard to maintain,
+are not 'adaptive' enough. Despite vigorous defense by Brooks early on
+\cite{Brooks91intelligencewithoutrea,Brooks91intelligencewithoutrep}
+require a model if not of the world then of the \emph{physics} of the
+vehicle when it interacts with the world.
+
+Persistent and early legitimate criticism of deliberation on the other
+hand also well articulated by Brooks
+\cite{Brooks91intelligencewithoutrea,Brooks91intelligencewithoutrep}
+was targeting the performance of in-situ deliberation. Terrestrial
+robotic platforms were well-known to frequently stop and ``plan''. In
+the marine robotics world, such a situation would simply not be
+permissible given the need to make continuous observations without
+stopping an under-articulated robotic platform such as an AUV. However
+algorithmic and implementational advances by the AI community over the
+years has produced a range of planners with demonstrated embedded
+capabilities \comment{cite}. Our work has been influenced by and in
+turn influenced a wide range of activities in the field of AI Planning
+and Plan Execution with demonstrated real-world and highly visible
+capabilities in the Space domain \cite{mus98, rajan00, ai-chang04,
+  bresina05} for NASA. Lessons learned have been applied to the world
+of marine robotics which we bring together in this chapter. Important
+lessons that were derived from this rich legacy involved the following:
+
+\begin{itemize}
+
+\item Projecting plans (or using \emph{deliberation}) can and should
+  balance near-term objectives with end-term or even evolving goals.
+
+\item Dealing with time and resources is essential in real-world
+  planning.
+
+\item A rich representation that can deal with co-temporal events for
+  modeling complex systems is a must.
+
+\item Fast solvers for incremental causal reasoning can be built as a
+  basis for dealing with dynamic controllable events where replanning
+  is tightly integrated.
+
+\item Planning should be tightly inter-leaved with execution to enable
+  responsiveness to events which impact plan failure. This is also an
+  important factor leading to platform adaptivity.
+
+\item A model-based approach separating control formulation of the
+  platform which describes operational characteristics from the
+  domain. The controller can then be rigorously tested and certified
+  even as the domain model evolves to fit diverse applications.
+
+\end{itemize}
+
+We have developed, tested and deployed the Teleo-Reactive EXecutive
+(\texttt{T-REX}) an on-board adaptive control system that integrates
+AI based planning and probabilistic state estimation in a hybrid
+executive \cite{mcgann08a,mcgann08b,Py10}.  Probabilistic state
+estimation integrates a number of science observations to produce a
+likelihood that the vehicle sensors perceive a feature of
+interest. Onboard planning and execution enables adaptation of
+navigation and instrument control based on the probability of having
+detected such a phenomenon. It further enables goal-directed
+commanding within the context of projected mission state and allows
+for replanning for off-nominal situations and opportunistic science
+events. The framework in addition to being used on an AUV, is general
+enough be used for controlling a personal robot \cite{mcgann2009} and
+is deployed on a European planetary rover testbed
+\cite{goac11}. Probabilistic state estimation is discussed elsewhere
+\cite{mcgann08d} and out of scope for this chapter. Deliberation and
+reaction are integrated systematically over different temporal and
+functional scopes within a single agent and a single model that covers
+the needs of high-level mission management, low-level navigation,
+instrument control, and detection of unstructured and poorly
+understood phenomena. \rx is deployed on MBARI's Dorado AUV shown in
+Fig. \ref{fig:auv-fig}, which to the best of our knowledge is the only
+operational marine platform anywhere being used for routine scientific
+surveys with onboard plan synthesis.
+
+\begin{figure}[t]
+  \centering
+  \vskip-5pt
+  \includegraphics[scale=0.325]{figs/MBARI-AUV.jpg}
+  \caption{\small The MBARI \emph{Dorado} AUV on its support vessel
+    the R/V \emph{Zephyr}.}
+  \label{fig:auv-fig}
+  \vskip-0.3cm
+\end{figure}
