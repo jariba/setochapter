@@ -1,0 +1,52 @@
+1. EUROPA
+
+EUROPA is a general purpose AI planning toolkit developed at NASA Ames.  Automated Planning can be reformulated as a constraint satisfaction problem (TODO: ref). EUROPA is an extension of that idea, however, unlike other approaches where the entire planning problem is translated into a CSP and then solved using traditional CSP methods, EUROPA uses a constraint reasoning engine as a fundamental building block, and enriches it with other architectural components that allow a more direct mapping for scheduling and planning problems, which in turn allows easier development of efficient solving methods. 
+
+TODO: motivate with a few examples of problems that can be solved in CSP, Scheduling and Planning.
+
+We begin with a brief overview of Constraint Satisfaction Programming.
+
+1.1 Constraint Satisfaction Programming
+TODO: talk about variables, domains, constraints, arc consistency and possibly computational complexity.
+
+
+1.2 EUROPA's Architecture
+
+The following figure displays the main architectural components in EUROPA and their relationships:
+
+(TODO: add figure)
+
+- The Constraint Reasoning Engine (CRE): manages variables, the domains from which they can take values, and constraints that define relationships among variables. It also provides an efficient arc consistency mechanism (TODO: ref to AC-3). The CRE is designed so that specialized reasoning algorithms for specific constraints can be easily and efficiently plugged in.
+
+- The Plan Database (PDB): manages object types and objects, which are a mechanism to group variables to more naturally model the real world in much the same way that object oriented programming does. Also manages tokens, which are a mechanism to group variables to represent temporally scoped state. Objects and tokens can be used to model planning domains in a much more natural and extensible way that a pure CSP approach can (TODO: provide snippet?)
+
+- The Rules Engine (RE): manages causal dependencies in a planning model (TODO: explain)
+
+- The language modules: NDDL, ANML, and other higher level modeling languages can me used to create domain models and problem instances (TODO: point advantages over pure programming API approaches, provide snippets)
+
+- API Layer: makes all the services available so that EUROPA can be used to build applications.
+
+- Extension Modules bundled with EUROPA: Temporal Network, NDDL, ANML.
+
+1.3 Modeling
+
+TODO: introduce model for Shopping or Rover example, link to architectural components.
+
+1.4 Inference
+
+TODO: explain how inference is used to detect violations and flaws.
+- overview of the types of flaws and violations EUROPA detects.
+
+1.5 Search
+
+TODO: 
+- explain how EUROPA's built-in solver uses flaws to search for a plan.
+- explain how other solvers can be built, maybe use NQueens or RCPSP example to illustrate. Or maybe build a little specialized solver for shopping or rover examples.
+
+1.6 Future Work?
+explain where EUROPA is going? (ANML, incorporation of classical planning algorithms, soft constraints, better search, etc).
+
+
+
+
+ 
