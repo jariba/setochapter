@@ -4,10 +4,23 @@ EUROPA is a general purpose AI planning toolkit developed at NASA Ames.  Automat
 
 TODO: motivate with a few examples of problems that can be solved in CSP, Scheduling and Planning.
 
-We begin with a brief overview of Constraint Satisfaction Programming.
+We begin with a brief overview of Constraint Programming.
 
-1.1 Constraint Satisfaction Programming
-TODO: talk about variables, domains, constraints, arc consistency and possibly computational complexity.
+1.1 Constraint Programming
+
+Constraint Programming (CP) is a discipline that provides a generic framework for representing, solving and making logical inference on constraints. A complete treatment of this discipline is given in [MAR98] and [APT03] and very concise introductions are provided in [BAR99] and [LUS01]. 
+
+	A constraint programming problem consists of a set of variables V={x1,..,xN}, where each variable takes values from a domain d1,..,dN. Domains are most often discrete and finite, but there are numerous CP implementations associated with continuous domains. Given a defined conjunctive set of constraints on the variables: C={c1(x1,..,xN), ..., cK(x1,..,xN)}, the objective is to find one or more value assignments to V where all constraints are satisfied.
+
+To solve a problem, CP uses logical inference to perform 2 operations:
+
+	- Bounds propagation: To infer upper and lower variable bounds. For example, from the constraints x1 + x2 <= 2, xi>=0, we can infer [0,2] bounds for x1 and x2
+
+	- Domain reduction: To infer a valid set of values for a variable. For example, for discrete variables, the constraints all_different(x1,x2,x3) and xi>=0, xi <=4. if x1 =1 and x2=3 we can infer that the valid domain for x3 is reduced to {2,4} 
+
+CP is normally implemented as part of a programming language and constraints are normally represented as objects [PUG95]. Any constraint can be introduced and, as long as the bounds propagation and domain reduction protocols specified by the host CP system are enforced, it will be indistinguishable from any other ÒprimitiveÓ CP constraint, such as <= or >=.
+
+TODO: talk about arc consistency algorithms, computational complexity and solvers.
 
 
 1.2 EUROPA's Architecture
@@ -26,26 +39,104 @@ The following figure displays the main architectural components in EUROPA and th
 
 - API Layer: makes all the services available so that EUROPA can be used to build applications.
 
-- Extension Modules bundled with EUROPA: Temporal Network, NDDL, ANML.
+
+- Extension Modules bundled with EUROPA: Temporal Network, Resources, NDDL, ANML.
 
 1.3 Modeling
 
 TODO: introduce model for Shopping or Rover example, link to architectural components.
+explain variable, object, predicate and action types and instances, constraints, goals and facts.
 
 1.4 Inference
 
-TODO: explain how inference is used to detect violations and flaws.
+TODO: explain how inference is used to detect perform bounds propagation, domain reduction and to detect constraint violations.
 - overview of the types of flaws and violations EUROPA detects.
 
 1.5 Search
 
+Now we have all the elements in place so that an automated problem solver can be created. Let's recap what those elements are:
+
+- A domain model that describes the variable, object, predicate and action types that are relevant for the problem.
+- A problem instance (also called initial state) that consists of:
+	- Variable and Object instances that exist for the entire planning horizon.
+	- Temporally scoped predicate and action instances.
+	- Temporally scoped goals.
+	
+All this information is kept in EUROPA's  Plan Database so that inference and search mechanisms can be used to look for a problem solution.
+
+EUROPA provides a built-in solver that performs Plan Space Planning (TODO: ref), in this approach, the initial state is considered a partial plan that needs to be refined toward a solution plan that achieves the goals. The operations to refine the partial plan PP at any time are:
+	1- Find the flaws of PP, that is the conditions that prevent it from being a solution plan (flaw types are explained below).
+	2- Select one such flaw
+	3- Select a resolver for the flaw
+	4- Refine PP by applying the resolver
+	5- If an inconsistency is found, try another resolver.
+	6- If all possible resolvers for a particular flaw fail, return failure, otherwise continue until resolving all the flaws.
+	
+This Plan Space Planning algorithm is translated into EUROPA's representation as follows:
+
+The initial partial plan is the state of EUROPA's Plan Database after the initial state has been instantiated, this results in a set of variable, object and token instances. Inference then takes place to detect flaws in the partial plan, there are 3 kinds of flaws that can be detected:
+
+	1. Unbound Variable: a variable in the partial plan whose domain is not a singleton. Unbound Variables are resolved by specification of a value from the domain of the variable.
+	2. Open Condition: an open condition is an inactive token. Inactive tokens can be generated by explicitly posted goals, or when a token is activated, rules may fire that create inactive slave tokens (TODO: point to more detailed decription above in Rules Engine section).
+	3. Threat: once a token has been placed in the partial plan it may impact other tokens indirectly through possible overlapping requirements on objects. Recall for example that a token may belong to objects (e.g. Timelines) which require a total order over their tokens. If any 2 tokens could possibly overlap (though not necessarily), then they pose a threat to each other in terms of achieving an extension of the current partial plan which is complete and consistent. Similarly, threats may arise where tokens share a common resource and their current state might yield extensions of the current partial plan which are inconsistent. Threats are resolved by imposing ordering constraints among tokens. 
+
+Open Conditions and Threats allow flaw detection and resolution at a higher-level of abstraction (i.e. in terms of objects and tokens) than that of simply binding variables as is common in Constraint Satisfaction Problems. This is advantageous when one applies heuristics for ordering choices since it provides a richer context in which to make decisions. Furthermore, it aids in reducing the amount of work done by a solver so that only the necessary refinements are made, otherwise leaving the partial plan with maximum flexibility. For example, one can omit unbound variables which are time-points of tokens since threats will force a solver to impose restrictions on these variables based on the semantics of the objects to which their tokens apply. Thus the planning process may yield partially-ordered plans for which all possible extensions are provably valid. 
+
+The Plan Space Planning algorithm described above can be implemented in many different ways depending on the approach chosen for flaw and resolver selection and for backtracking. EUROPA's built-in solver implements a chronological backtracking algorithm that is summarized in the figure below.
+
+// Function to solve a partial plan by successive refinement
+// until all flaws are resolved.
+bool solve(PartialPlan plan)
+{
+	// Propagate the constraints to test for inconsistency. If found to be
+	// inconsistent, then we can return false since this is a dead-end i.e. no refinements
+	// to p can yield a consistent plan.
+	
+	if(isInconsistent(plan))
+		return false;
+
+	// Non-deterministically choose a flaw from the set of available flaws.
+	Flaw flaw = chooseFlaw(plan);
+
+	// If there are no flaws, then p is complete and we can terminate with success.
+	if(flaw == NULL)
+		return true;
+
+	// Otherwise we formulate a decision point which is a branch in the search space. Each
+	// choice is a particular refinement operation and the DecisionPoint collects all possible
+	// refinement operations for the given flaw.
+	DecisionPoint decision = makeDecisionPoint(flaw, plan);
+
+	// Continue as long as we have something to try
+	while(decision.hasNext()) {
+		// A new partial plan is obtained by application of a refinement operator. Note that the ordering
+    		// over refinement operators to select is a non-deterministic step.
+		PartialPlan pp = decision.executeNext();
+
+		// Recursive call to solve the new planning problem. If successful, then we are done.
+		if(solve(pp))
+			return true;
+		else // Otherwise, retract the last refinement operation
+			d.undo();
+  	}
+
+	// If we arrive here, then we have exhausted all options to resolve the flaw, including the case where
+  	// no options were available initially. Thus the problem cannot be solved.
+  	return false;
+}
+
+The algorithm takes as input a partial plan p and returns true if a complete and consistent refinement of p could be found (or if p is initially complete and consistent), and false otherwise. This algorithm provides for a sound and complete search, assuming that no flaws or available refinement operators are pruned unnecessarily. Dead-ends in the search are discovered through constraint propagation. Constraint propagation is a vehicle for evaluating the consistency of a partial plan and also for filtering infeasible values from consideration prior to commitment, allowing in some cases a strong look-ahead capability which is essential for tractable search. Consistency testing is initiated by the isConsistent procedure. The algorithm permits a heuristically controlled search by applying orderings for chooseFlaw and makeDecisionPoint. It results in a chronologically-backtracking, search. 
+
+It should be emphasized that while this algorithm is commonly employed, it is only one of many that could be implemented. TODO: give examples of local search solvers for scheduling and CSP?
+
+
 TODO: 
-- explain how EUROPA's built-in solver uses flaws to search for a plan.
 - explain how other solvers can be built, maybe use NQueens or RCPSP example to illustrate. Or maybe build a little specialized solver for shopping or rover examples.
 
 1.6 Future Work?
 explain where EUROPA is going? (ANML, incorporation of classical planning algorithms, soft constraints, better search, etc).
 
+The main advantage of CP is the richness of the constraints that can be modeled and the explicit use of logical inference to prune the search space
 
 
 
