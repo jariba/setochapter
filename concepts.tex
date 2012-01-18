@@ -23,7 +23,7 @@ To enable this responsiveness to external observations, the agent has
 to be able to synthesize plans insitu and to re-plan. We use a
 temporal constraint-based planner EUROPA$_2$ with a demonstrated
 legacy of having flown on NASA space missions
-\cite{Jonsson00,bresina05}. Our autonomy architecture brings three key
+\cite{jonsson00,bresina05}. Our autonomy architecture brings three key
 innovations for AUV adaptation: the use of flexible plan
 representations, compositional control with the use of partitioned
 networks and off-line learning to inform insitu environmental state
@@ -31,10 +31,6 @@ estimation. In this section we detail some of the key concepts
 relevant to flexible plan representation. Section \ref{sec:arch} has
 details the \texttt{T-REX} partitioned architecture and estimation
 driven vehicle adaptation.
-
-% \texttt{T-REX} uses EUROPA$_2$ a constraint-based temporal planner
-% \cite{Jonsson00,Frank2003} developed for NASA missions, most recently
-% for the Mars Exploration Rovers \cite{bresina05}.
 
 EUROPA$_2$ uses a domain model written in a declarative language
 (NDDL: New Domain Description Language), together with initial
@@ -59,7 +55,7 @@ execution conditions are occuring. If not, the state of the system is
 declared off-nominal and execution of the sequence of commands is
 interrupted. More recently, executives have been proposed and
 implemented that significantly broaden the way robots can be commanded
-\cite{mus98,Alami:1998p820}. For example, the Remote Agent executive
+\cite{mus98,alami:1998p820}. For example, the Remote Agent executive
 interpreted a \textit{temporally flexible plan} which represents each
 start time as a variable and contains an explicit network of bounded
 delay constraints between such variables.
