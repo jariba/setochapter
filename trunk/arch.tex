@@ -33,7 +33,25 @@ evolution of the state of the world at any single tick, and
 deliberation which focus on providing a plan to the agent in order to
 complete the reactor {\em Internal} goals. These two processes are
 intertwined in the sense that one influences the outcome of the
-other. 
+other. They are represented as two europa solvers modifying the same
+plan database and for which the execution is managed by the T-REX 
+framework rythemed by the time advance during the execuion of the
+system:
+\begin{enumerate}
+\item The synchronization solver is a specialized eurpa solver that
+  will integrate in the plan new information about the evolution of
+  the External state varaible and ensure that the reactor propagate
+  these in order yto both identify its current stetate and inform
+  other reactors of any state change on its internal timelines. This
+  solver is summoned at the beginnning of every single tick.
+\item The deliberation solver is managing the deliberation process of
+  the reactor in order to produce a new plan or alter its current plan
+  as new goals are given to the reactor or the synchronization solver
+  identifying a conflict between the current state of the world and
+  the expectations of the previous plan. This process can  span other
+  multiple tick and therrfore can be interrupted at any single tick in
+  order for the synchronization solver to do its task.
+\end{enumerate}
 
 In  this section we present how both processes are implemented using
 the europa framework. We first present each of them independently by
@@ -143,6 +161,8 @@ planner to find its current {\em Internal} state.
 
 \subsubsection{Deliberation : planning for future state evolution}
 \label{sec:arch:plan}
+
+
 
 
 \subsubsection{Intertwining synchronization and execution }
