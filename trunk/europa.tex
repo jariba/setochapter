@@ -1,4 +1,5 @@
-1. EUROPA
+\section{EUROPA}
+\label{sec:europa}
 
 EUROPA is a general purpose AI planning toolkit developed at NASA Ames.  Automated Planning can be reformulated as a constraint satisfaction problem (TODO: ref). EUROPA is an extension of that idea, however, unlike other approaches where the entire planning problem is translated into a CSP and then solved using traditional CSP methods, EUROPA uses a constraint reasoning engine as a fundamental building block, and enriches it with other architectural components that allow a more direct mapping for scheduling and planning problems, which in turn allows easier development of efficient solving methods.
 
@@ -6,7 +7,8 @@ TODO: motivate with a few examples of problems that can be solved in CSP, Schedu
 
 We begin with a brief overview of Constraint Programming.
 
-1.1 Constraint Programming
+\subsection{Constraint Programming}
+\label{sec:europa:cp}
 
 Constraint Programming (CP) is a discipline that provides a generic framework for representing, solving and making logical inference on constraints. A complete treatment of this discipline is given in [MAR98] and [APT03] and very concise introductions are provided in [BAR99] and [LUS01]. 
 
@@ -23,7 +25,8 @@ CP is normally implemented as part of a programming language and constraints are
 TODO: talk about arc consistency algorithms, computational complexity and solvers.
 
 
-1.2 EUROPA's Architecture
+\subsection{EUROPA's Architecture}
+\label{sec:europa:arch}
 
 The following figure displays the main architectural components in EUROPA and their relationships:
 
@@ -42,17 +45,20 @@ The following figure displays the main architectural components in EUROPA and th
 
 - Extension Modules bundled with EUROPA: Temporal Network, Resources, NDDL, ANML.
 
-1.3 Modeling
+\subsection{Modeling}
+\label{sec:europa:modeling}
 
 TODO: introduce model for Shopping or Rover example, link to architectural components.
 explain variable, object, predicate and action types and instances, constraints, goals and facts.
 
-1.4 Inference
+\subsection{Inference}
+\label{sec:europa:inference}
 
 TODO: explain how inference is used to detect perform bounds propagation, domain reduction and to detect constraint violations.
 - overview of the types of flaws and violations EUROPA detects.
 
-1.5 Search
+\subsection{Search}
+\label{sec:europa:search}
 
 Now we have all the elements in place so that an automated problem solver can be created. Let's recap what those elements are:
 
@@ -89,6 +95,8 @@ The initial partial plan is the state of EUROPA's Plan Database after the initia
 Open Conditions and Threats allow flaw detection and resolution at a higher-level of abstraction (i.e. in terms of objects and tokens) than that of simply binding variables as is common in Constraint Satisfaction Problems. This is advantageous when one applies heuristics for ordering choices since it provides a richer context in which to make decisions. Furthermore, it aids in reducing the amount of work done by a solver so that only the necessary refinements are made, otherwise leaving the partial plan with maximum flexibility. For example, one can omit unbound variables which are time-points of tokens since threats will force a solver to impose restrictions on these variables based on the semantics of the objects to which their tokens apply. Thus the planning process may yield partially-ordered plans for which all possible extensions are provably valid. 
 
 The Plan Space Planning algorithm described above can be implemented in many different ways depending on the approach chosen for flaw and resolver selection and for backtracking. EUROPA's built-in solver implements a chronological backtracking algorithm that is summarized in the figure below.
+
+\begin{verbatim}
 
 // Function to solve a partial plan by successive refinement
 // until all flaws are resolved.
@@ -130,6 +138,8 @@ bool solve(PartialPlan plan)
   	// no options were available initially. Thus the problem cannot be solved.
   	return false;
 }
+
+\end{verbatim}
 
 The algorithm takes as input a partial plan p and returns true if a complete and consistent refinement of p could be found (or if p is initially complete and consistent), and false otherwise. This algorithm provides for a sound and complete search, assuming that no flaws or available refinement operators are pruned unnecessarily. Dead-ends in the search are discovered through constraint propagation. Constraint propagation is a vehicle for evaluating the consistency of a partial plan and also for filtering infeasible values from consideration prior to commitment, allowing in some cases a strong look-ahead capability which is essential for tractable search. Consistency testing is initiated by the isConsistent procedure. The algorithm permits a heuristically controlled search by applying orderings for chooseFlaw and makeDecisionPoint. It results in a chronologically-backtracking, search. 
 
