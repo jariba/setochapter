@@ -4,25 +4,129 @@
 \subsection{The T-REX architecture}
 \label{sec:arch:trex}
 
+% {\em\tiny This section introduces shortly T-REX architecture but move
+%   quickly the focus on a single reactor and gross concepts on the
+%   architecture:
+%   \begin{itemize}
+%   \item For t-trex the whole decision and control problem is reduced
+%     around the state variables (or timeline construct). 
+%   \item This reduce the execution tracking problem for each reactor on a state
+%     identification problem (deduce internal state from the external
+%     state), and the control problem to goal posting which will trigger
+%     deliberation on the owner of the corresponding timeline. 
+%   \item the architecture itself see each reactor as a black box and
+%     therefore each reactor can implement its own mechanism in order to
+%     resolve both synchronization and deliberation. Still we provide a
+%     reactor based on the europa framework that leverage the automated
+%     planning capabilities in order to do model based planning and
+%     execution with a rich representation of resources and time.
+%   \end{itemize}}
+ 
+The T-REX architecture was designed with the objective to bring 
+planning closer to the low-level control of the vehicle while
+maintaining its reactivity. Indeed, in most of the architecture where
+task planning is embedded, this task remains at a failry high level of
+abstraction as the complexity of this task would otherwise impede the
+system reactiveness. As a result the planning problem managed {\em in
+  situ} remains fairly detached from low-level control and most of the 
+reactive adaptation which in contrast is managed by specialized 
+component that relies on different representations for modeling 
+the local behavior they control or even do not have any explicit 
+formal model of this behavior. Taking cues from the IDEA 
+architecture \cite{mus02}, we designed a core framework that provides a
+formal basis \cite{Py:2010ti} on the way each of the sub-component --
+called reactors -- of our agent can interact by exchanging only
+information through {\em state variables} by ensuring that state 
+information can propagate through all the reactors ensuring a
+consistent view of the present state of the world at every single tick
+trough a bottom-up {\em synchronization} flow and collaboration for
+future state evolution by timely exchanges of goals on {\em state
+  variables}. This exchange does not impose to any reactor to be aware
+of the reactors it is connected to but only focus on the state
+variables it relies on (called {\em external}) and the state
+variables it manages and maintains (called {\em internal}). 
 
-{\em This section presents quickly T-REX architecture but move
-  quickly the focus on a single reactor and gross concepts on the
-  architecture:
-  \begin{itemize}
-  \item For t-trex the whole decision and control problem is reduced
-    around the state variables (or timeline construct). 
-  \item This reduce the execution tracking problem for each reactor on a state
-    identification problem (deduce internal state from the external
-    state), and the control problem to goal posting which will trigger
-    deliberation on the owner of the corresponding timeline. 
-  \item the architecture itself see each reactor as a black box and
-    therefore each reactor can implement its own mechanism in order to
-    resolve both synchronization and deliberation. Still we provide a
-    reactor based on the europa framework that leverage the automated
-    planning capabilities in order to do model based planning and
-    execution with a rich representation of resources and time.
-  \end{itemize}}
+Take for example the T-REX agent instance we use in our AUV
+(Fig. \ref{fig:agent}). In this architecture all the reactors
+(symbolized by colored boxes) do not have explicit connection from one
+to another but instead rely on a publish/subscribe model on state
+variables. For Example the \textsf{Pilot} reactor needs the {\em
+  externally} managed state informations from \textsf{Sensor\_Data} 
+and \textsf{Nav\_cmd} states variables in order to maintain {\em
+  internally} the state variables \textsf{Waypoint} and
+\textsf{Nav\_policy}. This relation applies in two way :
+\begin{itemize}
+\item In order to identify its current {\em internal} state values
+  this reactor needs to know the current {\em external} state
+  information it relies on. In this case the current \textsf{Waypoint}
+  the vehicle is heading to can be extracted for example from the
+  current \textsf{Nav\_cmd} executed.
+\item The future objectives a reactor has on its future \textsf{Internal}
+  state will probably imply sub-objectives to be reported to the
+  owner of its {\em external} depending on their current values. Again
+  if this reactor wants to go ato a specific \textsf{Waypoint} --
+  depending on its current position provided by \textsf{Sensor\_Data}
+  it can identify a sequence of \textsf{Nav\_cmd} that should
+  eventually help him reach this location.
+\end{itemize}
 
+\begin{figure}[!htb]
+ \centering
+ \includegraphics[scale=0.45]{figs/AUV-agent.pdf}
+ \caption{\small A \texttt{T-REX} agent is composed of multiple
+   reactors or control loops (rounded boxes) which are connected
+   through state variables provided by one reactor ({\color{blue}blue}
+   solid line) with multiple possible clients ({\color{green}green}
+   dashed lines)}
+  \label{fig:agent}
+\end{figure}
+
+Overal T-REX architecture helps to abstract to the reactor interaction
+to only state variables. Each reactor is practically ignoring where
+its {\em external} state information is managed as long as this
+information is available and properly maintained so they can properly 
+manage their own {\em internal} state information which in turn may be
+used by other reactors. Such formalism also constrain reactors
+interaction to state information exchanges which are two folds:
+\begin{itemize}
+\item {\em Observation on the current state values}: This information
+  propagates up in the reactor graph at the synchronization phase 
+  and occur at the beginning of every time steps (called
+  ticks). During this phase the agent provides to each reactor 
+  updates on their {\em external} state variables for this tick and
+  ask them to compute their {\em internal} state variables values for
+  this same tick. By doing so we propagate a consistent view of that
+  state of the world throughout all the reactors as time advance.
+\item {\em Goals request on future state}: This information propagates
+  down in the reactor graph. It reflects that, in order to satisfy own
+  of its {\em internal} objectives, a reactor may have a plan that
+  rely on future values of one of its {\em external} state. When such
+  a plan is identified we ensure that this part of the plan is given
+  as a goal to the owner of the given {\em external(s)} state variable(s). 
+\end{itemize}
+
+The overal execution cycle of the agent is emerging through these
+interaction and the processing that occurs in each reactors in order
+to process them. New observation occurring at every tick inform each
+reactor of the current state of the world and impose them to identify
+how it impact their state (and potentially what they planned for the
+future). Goals they receive will trigger in the reactor the need to
+identify a strategy (or plan) that will allow them to reach these new
+states knowing their current state deduced from synchronization.When
+such a plan has been identified, the {\em external}  part is then
+dispatched to other reactors that can do the same. This flow and focus
+around state and goals is perfectly fitting with automated planning
+and even more so to the Europa framework. As an illustration, in 
+ Fig. \ref{fig:agent}, only \textsf{Shore comm.} and \textsf{Vehicle}
+ reactors are specialized C++ code (acting as interface to external
+ programs). All the other reactors are based on the europa framework
+ differentiated only by the domain model they manipulate and som
+ heuristic configuration parameters. In the following sections we are
+ going to focus specifically ion this kind of reactor to illustrate
+ how  a formal planning framework can be used in our architecture to
+ both track state evolutions and plan for future objectives while
+ remaining efficient enough to do these tasks in a real-time control 
+loop.
 
 \subsection{The Europa deliberative reactor}
 \label{sec:arch:europa}
