@@ -139,23 +139,54 @@ complete the reactor {\em Internal} goals. These two processes are
 intertwined in the sense that one influences the outcome of the
 other. They are represented as two europa solvers modifying the same
 plan database and for which the execution is managed by the T-REX 
-framework rythemed by the time advance during the execuion of the
-system:
+framework as time advance during the execution of the system:
 \begin{enumerate}
-\item The synchronization solver is a specialized eurpa solver that
+\item The synchronization solver is a specialized europa solver that
   will integrate in the plan new information about the evolution of
-  the External state varaible and ensure that the reactor propagate
-  these in order yto both identify its current stetate and inform
+  the External state variable and ensure that the reactor propagate
+  these in order to both identify its current state and inform
   other reactors of any state change on its internal timelines. This
-  solver is summoned at the beginnning of every single tick.
+  solver is summoned at the beginning of every single tick.
 \item The deliberation solver is managing the deliberation process of
   the reactor in order to produce a new plan or alter its current plan
   as new goals are given to the reactor or the synchronization solver
   identifying a conflict between the current state of the world and
   the expectations of the previous plan. This process can  span other
-  multiple tick and therrfore can be interrupted at any single tick in
+  multiple tick and therefore can be interrupted at any single tick in
   order for the synchronization solver to do its task.
 \end{enumerate}
+
+While synchronization is assumed to be fast enough that it can be
+resolved in less than a tick. Deliberation on the other hand can take
+several ticks reflecting that automated planning can take time
+depending on how far in the future the planner is looking ahead and
+the complexity of the model. T-REX architecture, and more specifically
+the europa based reactor in our case, takes this into account by
+considering synchronization and deliberation as two concurrent tasks
+with their own timing requirements and priority. 
+While the two processes are separate, they share the same plan
+internal to a reactor and therefore at every synchronization cycle the
+planning process is informed of the new world state and its impact on
+the plan. Conversely, when the planning process eventually finds a
+solution, synchronization is informed about generating the planned
+state values on the {\em external} state variables. This {\em
+  external} plan defines the set of {\em goals} for this state
+variable managed by another {\em reactor}. Fig. \ref{fig:tick-exec}
+shows a conceptual view of these two tasks.
+
+
+\begin{figure}[!htbp]
+  \centering
+  \vskip-1pc
+  \includegraphics[width=0.55\columnwidth]{figs/tick-cycle}
+  \caption{\small \texttt{T-REX} reactor execution cycle: {\em
+      Deliberation} is interrupted by {\em synchronization} at the
+    beginning of every {\em tick} allowing integration of state
+    information.}
+  \label{fig:tick-exec}
+  \vskip-0.8pc
+\end{figure}
+
 
 In  this section we present how both processes are implemented using
 the europa framework. We first present each of them independently by
@@ -167,8 +198,17 @@ of the two result on an emergent behavior of the reactor by allowing
 the system to efficiently adapts its plan that can then be dispatched
 as objectives for the reactors it depends on in a seamless flow. 
 
+
+
+
+{\em fpy: I still wonder whether I should start with planning assuming
+  first that the initial state is known and then develop
+  synchronization and how it ties state information in to the plan or
+  the other way around as it is now}
+
 \subsubsection{Synchronization identify internal state evolution}
 \label{sec:arch:synch}
+
 
 For the sake of simplicity we introduce first how a reactor can track
 and identify its state in the context where it does not have any
