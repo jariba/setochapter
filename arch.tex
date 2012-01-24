@@ -234,7 +234,7 @@ process as this general sequence :
 \begin{figure}[!htbp]
   \centering
   \includegraphics[width=0.5\columnwidth]{figs/synch-relation}
-  \caption{Ilustration of the synchronization flaws in a reactor. The
+  \caption{Illustration of the synchronization flaws in a reactor. The
     reactor receive new observations when they are produced by the
     owner(s) of its internal timelines. The line after the last token
     of each timeline represent the domain of possible values for the
@@ -302,11 +302,140 @@ situation where the model cannot find a correct solution that both do
 not conflict with what we claimed in the past and still allow the
 planner to find its current {\em Internal} state.
 
+Synchronization remains here a deliberation process, and for this
+reason there's always the risk that the search of a solution is not a
+straightforward sequence of unit decision. As such process is required
+by the architecture at every ticks for every reactors presently
+running this need to be carefully designed. At the engine level we
+made careful choices in term of both the focus of the search -- limited
+only to tokens that can potentially overlap the current tick -- and
+its heuristic where the internal state flaw is considered last during
+the search. The later proved to limit the amount of backtrack in the
+search for a solution -- or at least how deep we need to backtrack in
+our decision tree -- similarly the sequence in which we evaluate the
+possible resolution for such a flaw -- presented previously -- was
+selected according to simple assumptions that takes benefit of a
+possibly already existing plan by assuming that if the outcome of
+synchronization appears consistent with our current plan then it
+probably reflects that this reactor plan is executed. Such assumption
+helps direct the internal state evaluation and, in nominal cases (where
+we assume that reactors are acting in concert), proved to be a sound
+solution.  
+
+One final aspect to keep into account is that in T-REX point of view
+synchronization is the only critical task of a reactor. Indeed, such
+process is used in order for the agent to identify its
+current state and maintain it consistent throughout the agent
+life-time. A reactor not being able to find a consistent solution
+during synchronization -- meaning that after evaluating all the
+possible solutions provided by its model it did not found any plan
+that is not inconsistent -- not only expresses that this reactor is
+not able anymore to explain the state of the world but may jeopardize
+other reactors that relies on its {\em internal} state. For this
+reason a failure to do synchronization immediately result on the
+agent killing this reactor and notifying any reactor that depends on
+its {\em internal} state variables by posting the special observation
+\textsf{Failed}. By doing so we allow for graceful degradation where
+other reactors can readapt their plan as they receive this
+\textsf{Failed} observation.
 
 \subsubsection{Deliberation : planning for future state evolution}
 \label{sec:arch:plan}
 
+The planning process inside a reactor is directly based on the way
+europa work which was described in previous section. Still some simple
+alterations were made in  order to both include deliberation
+information one reactor provide to the architecture -- such as its
+deliberation latency and its planning look-ahead both expressed in 
+ticks -- and the fact that we potentially need to interleave this
+deliberation with not the synchronization process but also with 
+the deliberation of other reactors\footnote{Current implementation of
+  T-REX is running on a single process and it is the responsibility of
+  the agent itself to emulate the multi-threading of the reactors
+  deliberation and synchronization}. For this reason we 
+decompose the algorithm \ref{alg:europa:solve} inside the reactor by
+having the recursive calls decomposed in single steps. This step
+function will be called after synchronization and as long as the
+previous call in this tick did not return \textsf{true} -- which would
+express that the current solution is complete.
+{\em will need to change that in algorithm environment and refine it}
 
+\begin{verbatim}
+bool step(PartialPlan plan, DecisionStack stack) 
+   if( isInconsistent(plan) ) {
+     relaxPlan(plan, stack);
+     notify("No plan");
+     return true;
+   } 
+   Flaw flaw = chooseFlaw(flaw);
+   if( flaw==NULL )
+     return true;
+   DecisionPoint decision = makeDecisionPoint(flaw, plan);
+   while(1) {
+     while( decision.hasNext() ) {
+       PartialPlan pp = decision.executeNext();
+       if( isInconsistent(pp) ) {
+         decision.undo();
+       }  else {
+          plan = pp;
+          stack.push(decision);
+          return chooseFlaw(flaw)==NULL;
+       }
+     }
+     if( decisionStack.empty() ) {
+       notify("No plan");
+       return true;
+     } else {
+        repeat {
+          decision = decisionStack.pop();
+          decision.undo();
+        } until( decision.hasNext() );
+        return false;
+     }
+   } 
+}
+\end{verbatim}
+
+One critical aspect of this deliberation step is to ensure that at the
+exit of this call the $plan$ is not proven inconsistent. Indeed, it is
+always possible that the next call made by the agent is the
+synchronization which would immediately fail if the $plan$ is
+inconsistent before any solving attempt made for synchronization. 
+For this reason if the plan is proven inconsistent during a
+deliberation step we either backtrack in the decision stack until we
+find a node fo the tree that have remaining alternate solution or
+simply fully relax the plan in situation there's absolutely no other
+alternative  (by removing all the goals and keeping
+only recent observations produced). These constraints are yet again
+related to the fact that for the agent the only crucial functionality
+of a reactor is to resolve successfully its synchronization. 
+
+The number of flaw between two steps can evolve for the following
+reasons that are exogenous to deliberation :
+\begin{enumerate}
+\item A new goal has been posted on one of the reactor timeline. This
+  is usually due to another reactor finding a plan and posting the
+  corresponding new objective to this reactor.
+\item The outcome of synchronization created new flaws that did not
+  need to be resolved during synchronization.
+\item A previously requested goal has be recalled by the initial
+  requester. This can happen when the reactor did identify that is
+  initial plan is no longer valid. For example as synchronization
+  proved this plan to be inconsistent.
+\end{enumerate}
+These 3 events will potentially produce new flaws to be resolved while
+any single deliberation step will usually reduce the number of flaws
+to be resolved.
+
+When the number of flaw is 0 A plan solution is found. This has two
+effects:
+\begin{enumerate}
+\item This reactor does not need to deliberate until the next synchronization.
+\item The {\em external} part of this plan can then be posted which
+  eventually (at the end of the current tick if these goals overlap
+  the owner planning window) will be dispatched as goals triggering
+  new deliberation on these reactors.
+\end{enumerate}
 
 
 \subsubsection{Intertwining synchronization and execution }
