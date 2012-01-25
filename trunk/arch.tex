@@ -105,6 +105,44 @@ interaction to state information exchanges which are two folds:
   as a goal to the owner of the given {\em external(s)} state variable(s). 
 \end{itemize}
 
+{\em\color{red} Following is an attempt to present TREX as a big
+  deliberation machine}
+The overall execution cycle of the agent is also abstracted as some
+continuous planning/deliberation cycle between all the
+reactors. Indeed , at the agent interface level, each reactor provided
+only two abstract calls that conceptualize their execution:
+\begin{itemize}
+\item \texttt{synchronize} that takes the last {\em external}
+  observations as argument and will return the {\em internal}
+  observations for this reactor or a failure report.
+\item \texttt{step} that accept new goals requested (if any) on the
+  {\em internal} timeline of this reactor and will execute one step of
+  deliberation. The returned value indicates if a complete plan has
+  been found and in that case will also provide the part of this plan
+  applied to {\em external} timelines of this reactor.
+\end{itemize}
+Both of these two deliberative functions have different scope and
+temporal constraints. The \texttt{synchronize} call is considered as
+atomic and will focus only on state inference from the current tick by
+identifying the current value of the {\em internal} state variables
+from the latest updates on the {\em external} variables. This process
+will then propagate up in the reactor graph at any single tick to
+ensure that all reactors are aware of the current state of the
+world. \texttt{step} relates to a single decision step of the planning
+process which is focused on the future evolution of the state
+variables and it can take multiple steps spanning other multiple
+ticks for a reactor to produce a plan that is both complete and
+valid. when such plan is identified its {\em external} part is then
+dispatched to the corresponding reactors which in turn can start their
+deliberation \texttt{step}s in order to satisfy these new
+objectives. as a consequence physical execution will occur as these
+goals and planning propagate down in the reactor graph until they
+eventually become goals for the lowest level reactor which -- instead
+of deliberating -- may just transform this goal in a physical command
+execution. 
+{\em\color{red} end of the attempt; need to rework the paragraphs
+  below accordingly}
+
 The overal execution cycle of the agent is emerging through these
 interaction and the processing that occurs in each reactors in order
 to process them. New observation occurring at every tick inform each
@@ -427,8 +465,34 @@ These 3 events will potentially produce new flaws to be resolved while
 any single deliberation step will usually reduce the number of flaws
 to be resolved.
 
-When the number of flaw is 0 A plan solution is found. This has two
-effects:
+The scope of planning for the reactor plays also a role in the
+deliberation process as we limit deliberation to the sliding temporal
+window $[\tau+\lambda, \tau+\lambda+\pi]$ where:
+\begin{itemize}
+\item $\tau$ is the current tick
+\item $\lambda$ is the specified latency of this reactor. Which is an
+  indicator on the expected maximum time this reactor is expected
+  before being able to produce a plan.\footnote{Do note that this
+    parameter remains indicative and, while it is highly recommended to
+    select a sound value, a failure to produce a plan in this delay is
+    not considered as a critical failure of the reactor}
+\item $\pi$ is the planning look-ahead of the reactor. which indicates
+  how many ticks in the future this reactor is looking ahead while planning.
+\end{itemize}
+This scope allow to filter out any tokens that are either necessarily
+ending before $\tau$ or necessarily starting after. Focusing the
+[planning problem to only the tokens that are in a reasonable
+future. This window is taken into account by the agent which will
+notify the reactor of new {\em internal} goals only when they overlap
+this window but also at the deliberation solver in order to reduce the
+number of tokens to be evaluated and consequently reduce the cost of
+deliberation. As time advance flaws that where initially beyond this
+window will become active flaw that the reactor can then evaluate
+resulting on an apparent continuous planning of the reactor.
+
+
+When there's no more flaw is present in the current planning scope a
+plan  solution is found. This has two effects:
 \begin{enumerate}
 \item This reactor does not need to deliberate until the next synchronization.
 \item The {\em external} part of this plan can then be posted which
@@ -436,6 +500,9 @@ effects:
   the owner planning window) will be dispatched as goals triggering
   new deliberation on these reactors.
 \end{enumerate}
+
+
+
 
 
 \subsubsection{Intertwining synchronization and execution }
