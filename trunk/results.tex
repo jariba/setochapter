@@ -353,3 +353,128 @@ currently investigating spatio-temporal correlations \cite{gneiting07}
 of CTD data obtained by the \texttt{Wirewalker} and tying it to the
 observations made in the contextual environment by the Dorado's
 sensors.
+
+\paragraph {Mixed-Initiative Autonomy}
+
+\begin{figure*}
+\centering
+\subfloat[The ODSS Concept]{\label{fig:odss-concept}\includegraphics[width=0.5\textwidth]{figs/odss-concept.pdf}}\\
+\subfloat[Current Implementation for \texttt{CANON}]{\label{fig:odss-frontend}\includegraphics[width=0.5\textwidth]{figs/dss-screenshot.png}}
+\caption{\small The Oceanographic Decision Support System (ODSS) is a
+  single portal for planning, visualization, situational awareness,
+  collaboration and archival of information before, during and after
+  field experiments. The ODSS has been used since mid-year 2010 for
+  \texttt{CANON} field experiments.}
+\label{fig:odss}
+\end{figure*}
+
+Large scale oceanographic field experiments akin to those targeted by
+\can are usually logistically constrained driven largely by ship
+schedules.  Once a feature set has been identified for scientific
+observation and science goals have been collated, the appropriate
+robotic assets need to be assigned and deployed for observation and
+sampling. This asset allocation in turn depends on parameters like
+sensor payload, the speed of the robot \situ in comparison to the
+spatio-temporal scales of the evolution of the phenomena being
+sampled, the number of assets in a class, the kinds of measurements
+needed (e.g synoptic or close-up), logistical considerations for
+deployments such as battery charge needed or distance/time to deploy,
+impact to long-range deployment plans among others. All drive the
+strategy to balance short and long-term scientific and engineering
+needs. Our \can deliberations during the 2010 field season for example,
+were driven by all of the above \cite{das11}. Often these strategies
+were rebalanced during each decision-making cycle, especially in light
+of opportunistic science goals. For example, gliders running at $0.5$
+knots were often retargeted when surface support vessels noted the
+apparent dispersal of the bloom to subsurface layers when HABs were a
+\texttt{CANON} target. However, their retargeting was carefully
+monitored to balance the long-term desire of obtaining time series
+within fixed tracks and with the need to ensure these assets were not
+exposed to strong currents. Powered AUVs were targeted to chase after
+advecting blooms, but the decision on their deployment locations and
+survey areas too close to the surf-zone were avoided. In
+patch-tracking experiments, the deployment of drifters close to shore
+and where depths of $20m$ or less were encountered, was avoided even
+when contrary to scientific intent. The need to obtain high-quality
+data for post-hoc analysis was also driven by the response time of
+data returned by experiment partners.
+
+\begin{figure*}
+\centering
+\subfloat[]{\label{fig:odss-mtg}\includegraphics[width=0.3\textwidth]{figs/october-canon-meeting.png}}
+\subfloat[]{\label{fig:odss-virtual}\includegraphics[width=0.33\textwidth]{figs/virtual-drifter-tool.png}}
+\subfloat[]{\label{fig:odss-ipad}\includegraphics[width=0.3\textwidth]{figs/photo-ipad-2.jpg}}
+\caption{\small Fig. \ref{fig:odss-mtg} shows a 2010 \can meeting with the
+  ODSS in use while Fig. \ref{fig:odss-ipad} shows its use on a portable
+  device.}
+xf\label{fig:odss2}
+\end{figure*}
+
+
+These distinctions make some vehicles more or less suitable to address
+certain science goals and suggest some degree of intelligent planning
+in the assignment strategy. Further, even if partial plans can be
+synthesized automatically, the need to capture qualitative 'intent'
+and desires in the final outcome of an asset allocation strategy
+drives us towards a human-in-the-loop approach for asset
+allocation. The vast uncertainty and complex interaction between
+unknown quantities in the ocean environment dictate that any
+comprehensive experimental methodology must rely in some measure on
+human reasoning and adaptability.  Furthermore, the multidisciplinary
+nature of ocean experiments suggests collaboration between multiple
+human actors. Human cognitive capability then to capture these
+uncertainties, evaluate options, factor intent and synthesize data
+needed for asset allocation becomes increasingly important. Therefore,
+mixed-initiative approaches are viable as a means to apportion problem
+solving and inference between human and computational approaches. A
+viable example was shown in the command and control of the twin Mars
+rovers in \cite{aichang04,bresina05,bresina05a}\footnote{The MAPGEN
+  system uses the same \eu planner used in \rx. It continues to be
+  used routinely to this day on the MER mission.}.
+
+Additionally, our work on ODSS is driven by a vision of how marine
+field robotics will likely be conducted in the future and the
+necessary computational infrastructure that will augment decision
+making, onshore as well as on-board. We believe ultimately ODSS will
+combine capabilities inferential and data gathering and analysis
+capabilities and more uniquely, provide an event response capability
+that could trigger the deployment of a robot and/or adapt its sampling
+strategy, all from a scientist's desktop on shore. Data returned from
+robotic assets at sea will be filtered for signals associated with
+feature(s) of interest along with information on its contextual
+environment. The association between the signal and a prospective
+event will be undertaken through tagging by experts and machine
+learning techniques used in recommender
+systems\cite{Adomavicius05}. Adaptive sampling strategies will then
+balance decision-making \situ with that done onshore with
+computational models and human agents, the subject of a new NSF
+project in which the authors are participating.
+
+
+Operationally, the ODSS has become a software system that the
+scientist consults during a \can field campaign. S/he consults
+up-to-date model outputs, synoptic views of ocean color from remote
+sensing data and weather conditions for the next $24$-hour planning
+cycle and then queries the system to compute candidate sampling
+locations. In the near future, the ODSS will consult its situational
+awareness database, incorporate model outputs projecting these outputs
+into the space-time region of interest to generates candidate
+hypotheses with associated utility metrics. With the scientist's
+guidance the automated planner would then determine the most viable
+robotic option(s) to be dispatched (underwater, surface or aerial),
+given available resources, distance of travel, required payload and
+the environment. For instance, unpowered autonomous gliders would be
+chosen for longer-duration missions with smaller payload requirements
+in areas of moderate to weak ocean currents. The automated planner
+would balance these criteria to compute a viable trajectory plan for
+the selected vehicle. Vehicles with more controllability would be
+given a specified area to survey and the path generated \situ. Goals
+are communicated to the robot after analysis on shore for selective
+targeting of features by the conglomerate of vehicles in the ocean
+being tracked by the ODSS. Thus far, the ODSS has provided a simple
+yet functional tool for scientists to use in the daily complex
+decision making and the following experiment and survey design
+needs. It has helped train scientists to think of expanding their
+repertoire of tools for the scientific process and in the process it
+enabled a mixed team of engineers and scientists to interact at the
+functional level of the systems' capabilities.
