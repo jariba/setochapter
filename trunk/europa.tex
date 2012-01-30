@@ -43,7 +43,7 @@ Below is a solution found by EUROPA using that formulation and a specialized sea
 
 
 Scheduling:
-In the Resource Constrained Project Scheduling Problem (RCPSP), a project consisting of a set of activities must be scheduled in a way that satisfies minimum and/or maximum temporal separation constraints among them, as well as respects fixed limits on the availability of resources required to perform each activity. In addition to satisfying temporal and resource constraints, it is common for the user to want to minimize makespan so that the entire project is finished as early as possible.
+In the Resource Constrained Project Scheduling Problem (RCPSP), a project consisting of a set of activities must be scheduled in a way that satisfies minimum and/or maximum temporal separation constraints. The activity schedule must also respect fixed limits on the availability of resources required to perform each activity. In addition to satisfying temporal and resource constraints, it is common for the user to want to minimize makespan so that the entire project is finished as early as possible.
 
 Below is an example of a a solution provided by EUROPA for an RCPSP instance with 10 activities, 5 resources and 30 temporal constraints.
 
@@ -57,7 +57,7 @@ Below is an example of a a solution provided by EUROPA for an RCPSP instance wit
 
 
 Planning:
-In the Shopping Agent Problem (TODO: ref to Norvig) an agent needs to purchase a set of products that are available at specific locations (supermarket, hardware store, etc), the agent  is subject to temporal (must complete tasks by specific deadlines) and resource (fuel, carrying capacity, etc) constraints.
+In the Shopping Agent Problem (TODO: ref to Norvig) an agent needs to purchase a set of products that are available at specific locations (supermarket, hardware store, etc), the agent  is subject to temporal (must complete tasks by specific deadlines) and resource (fuel, carrying capacity, etc) constraints. The agent must figure out what actions need to be performed to find and acquire the required items, as well as when to perform each of those actions.
 
 Below is a solution produced by EUROPA for a simple problem instance where the shopping agent needs to buy Bananas, Milk and a Drill.
 
@@ -70,7 +70,7 @@ Below is a solution produced by EUROPA for a simple problem instance where the s
 \end{figure}
 
 
-As we can see, a planning problem (what actions must be performed to achieve a goal) may embed a scheduling problem (in what order should those actions be performed), and both embed Constraint Satisfaction problems since temporal, resource and many other kinds of constraints must be respected in most real life problems.
+As we can see, a planning problem (what actions must be performed to achieve a goal) may embed a scheduling problem (in what order should those actions be performed), and both planning and scheduling embed Constraint Satisfaction problems since temporal, resource and many other kinds of constraints must be respected in most real life problems.
 
 These relationships between Planning, Scheduling and Constraint Satisfaction have been examined in detail in the literature (TODOL ref Frank et al on Planning vs. Scheduling), and they lead to EUROPA's use of constraint reasoning as its innermost building block. Next we will examine the main ideas from Constraint Satisfaction Programming, and from Constraint Based Planning and Scheduling that constitute EUROPA's theoretical underpinnings, then we dive into how EUROPA implements those ideas.
 
@@ -91,6 +91,8 @@ To solve a problem, CP uses logical inference to perform 2 operations:
 \end{enumerate}
 
 CP is normally implemented as part of a programming language and constraints are normally represented as objects [PUG95]. Any constraint can be introduced and, as long as the bounds propagation and domain reduction protocols specified by the host CP system are enforced, it will be indistinguishable from any other “primitive” CP constraint, such as <= or >=.
+
+Solving a CSP is NP-Hard in theory, but often very efficient in practice using a number of algorithms and techniques that are well understood.
 
 TODO: talk about arc consistency algorithms, computational complexity and solvers.
 
@@ -148,7 +150,15 @@ The following figure displays the main architectural components in EUROPA and th
 \subsection{Modeling}
 \label{sec:europa:modeling}
 
-Shopping model:
+EUROPA can ingest descriptions of models, plans and goals. This means that a single planner can be applied to different systems and problems, simply by providing different models and goals. For such planners the expressiveness of the languages for models, goals and plans is of great importance. EUROPA provides a high level language called NDDL (New Domain Description Language) that allows the user to specify the different components of a problem domain in a concise way. The main characteristics that make NDDL a powerful tool for describing problem domains are:
+
+\begin{enumerate}
+	\item It's Object Oriented: NDDL supports classes and inheritance in similar fashion to popular Object-Oriented languages like Java and C++. It also supports polymorphism for some of the planning components. Using object classes and instances is a time-tested approach to naturally describe problem domains (TODO: OO ref?).
+	\item It offers declarative constructs to define constraints and causality dependencies between actions and effects.
+	\item It offers procedural constructs to populate EUROPA's plan database with specific problem instances expressed in terms of objects, variables, constraints, facts and goals.
+\end{enumerate}
+
+To understand how the most important elements of NDDL work, let's take a look at how the Shopping Agent problem described above would be modeled:
 
 \begin{verbatim}
 
@@ -253,8 +263,19 @@ Agent::Buy {
 
 \end{verbatim}
 
+TODO: explain variable, object, predicate and action types, including constraints that can be part of them
 
-And a problem instance:
+In this model we can see:
+
+\begin{enumerate}
+	\item Variable Types:
+	\item Object Types:
+	\item Predicate Types:
+	\item Action Types:
+\end{enumerate}
+
+
+Now let's look at how a specific problem instance would be specified in NDDL:
 
 \begin{verbatim}
 
@@ -274,6 +295,7 @@ ProductLocation drillLocation = new ProductLocation(HardwareStore, Drill);
 Agent agent = new Agent();
 
 // Indicate that the database is closed - no new objects can be created
+// this allows EUROPA to perform more efficient inference
 close();
 
 // We start the day at Home:
@@ -310,8 +332,17 @@ leq(atHomeForDinner.end, horizonEnd);
 
 \end{verbatim}
 
-TODO: introduce model for Shopping link to architectural components.
-explain variable, object, predicate and action types and instances, constraints, goals and facts.
+TODO:  explain variable, object, predicate and constraint instances.
+explain goals and facts.
+
+\begin{enumerate}
+	\item Variable Instances:
+	\item Object Instances:
+	\item Facts:
+	\item Goals:
+	\item Constraint Instances:
+\end{enumerate}
+
 
 \subsection{Inference}
 \label{sec:europa:inference}
@@ -319,8 +350,23 @@ explain variable, object, predicate and action types and instances, constraints,
 TODO: explain how inference is used to detect perform bounds propagation, domain reduction and to detect constraint violations.
 - talk about AC3 implementation and extension mechanisms
 - talk about europa's constraint library
-- talk about Temporal Network
-- talk about Resource Envelopes.
+
+
+The Temporal Network:
+The notion of time is central to temporal planning. EUROPA uses variables to explicitly represent timepoints for plan activities and states. Constraints among timepoints provide a natural way to express domain axioms. For example, in order to state that activity A must occur before activity B we can say that the end timepoint of A is <= the start timepoint of B. Dechter et al. (Dechter 1991) proposed that constraints among timepoints can be grouped together to form a Simple Temporal Network (STN). Such a network can be transformed into a Distance Graph (DG) where the outward arc from a node represents the maximum distance from the source node to the target node. The diagram below illustrates a simple STN with just 2 variables and a single constraint. It also shows the resulting DG. 
+
+TODO: add figure
+
+Dechter et al. (Dechter 1991) also showed that shortest path algorithms could be used to propagate values in the network and discover a negative cycle. A negative cycle is a path from a node to itself that has a path length less than 0. If such a cycle exists, the network is inconsistent. It was further shown that a single-source shortest path algorithm was sufficient to detect a negative cycle and provide sufficient propagation to yield a backtrack-free search. Thus we have an efficient and complete algorithm for propagating an STN. These results build on the already established notion of a CSP and are naturally incorporated into the general representation and propagation scheme used in EUROPA. 
+
+Resources:
+
+    Reservoir resources can have both 'consume' and 'produce' tokens. Note that these tokens do NOT have the usual start/end/duration token variables, since occur at a single instant in time. Instead, they have a single variable, 'time' used to represent that instant.
+    Reusable resources have 'uses' tokens that use a quantity for the duration of the token. These tokens do have the usual start/end/duration variables.
+    Unary resources are reusable resources with unit quantity and have 'use' tokens (again, with the usual start/end/duration variables). 
+    
+    TODO: talk about resource envelope computation by using MaxFlow formulation.
+
 
 \subsection{Search}
 \label{sec:europa:search}
@@ -418,6 +464,66 @@ examples:
 - deal with planning (open condition flaws) before scheduling (threats) ones
 
 It should be emphasized that while this algorithm is commonly employed, it is only one of many that could be implemented. TODO: give examples of local search solvers for scheduling and CSP?
+
+N-Queens solver:
+\begin{verbatim}
+    public void solve(int maxIter)
+    {
+    	init();
+    	
+    	for (int i=0;psengine_.getViolation() > 0 && i < maxIter;i++) {
+    	    PSVariable queenToMove = getQueenWithMaxViolation();
+    		int curPos = queenToMove.getSingletonValue().asInt();
+    	    
+    	    boolean moved = false;
+            SortedSet<Move> moves = getMoves(queenToMove,curPos);             
+            for (Move m : moves) {
+            	moved = makeMove(queenToMove,curPos,m,false);
+            	if (moved)
+            	    break;
+            }
+            
+            if (!moved) 
+            	makeMove(queenToMove,curPos,moves.first(),true);
+            
+            checkSolution(); // See if we have a new best solution            
+            notifyIterationCompleted(curIteration_++);
+            
+            if (curIteration_-bestIter_ > 50) 
+            	restart();
+    	}
+    }
+\end{verbatim}
+
+RCPSP solver:
+\begin{verbatim}
+    public void solve(PSEngine psengine,
+    		          long timeout, // in msecs
+    		          int bound)
+    {
+       init(psengine,timeout,bound);
+       
+       for (int i=0; true ; i++) {
+          flatten();
+          updateSolution(i);
+          updateCriticalPrecedences();
+          
+          if ((nbStable_ > maxStable_) || (bestMakespan_ <= makespanBound_))
+             break;
+          
+          if (timer_.getElapsed() > timeout) {
+              timedOut_ = true;
+              break;
+          }
+          
+          relax();
+          curIteration_++;
+       }       
+
+       restoreBestSolution();
+    }
+
+\end{verbatim}
 
 
 TODO: 
