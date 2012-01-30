@@ -9,7 +9,14 @@ Constraint Satisfaction:
 In the N-Queens problem, chess queens must be placed on an NxN chessboard in a way that there are no queens attacking each other.
 
 Below is an example of a random positioning of queens on a NxN chessboard. Queens in violation of the non-attack constraint are highlighted in red.
-TODO: include figure.
+
+\begin{figure}
+\centering
+\includegraphics[scale=0.35]{figs/Example-NQueens0.jpg}
+\caption{\small N-Queens problem}
+\label{fig:nqueens-1}
+\vskip+0.1cm
+\end{figure}
 
 
 If we define NxN variables Qrc, r E [1,N], c E[1,N] , 
@@ -26,22 +33,44 @@ We can solve the problem by finding assignments for all variables Qrc that satis
 
 Below is a solution found by EUROPA using that formulation and a specialized search procedure.
 
-TODO: include figure
+\begin{figure}
+\centering
+\includegraphics[scale=0.35]{figs/Example-NQueens1.jpg}
+\caption{\small N-Queens solution}
+\label{fig:nqueens-2}
+\vskip+0.1cm
+\end{figure}
+
 
 Scheduling:
 In the Resource Constrained Project Scheduling Problem (RCPSP), a project consisting of a set of activities must be scheduled in a way that satisfies minimum and/or maximum temporal separation constraints among them, as well as respects fixed limits on the availability of resources required to perform each activity. In addition to satisfying temporal and resource constraints, it is common for the user to want to minimize makespan so that the entire project is finished as early as possible.
 
 Below is an example of a a solution provided by EUROPA for an RCPSP instance with 10 activities, 5 resources and 30 temporal constraints.
-TODO: include figure
+
+\begin{figure}
+\centering
+\includegraphics[scale=0.35]{figs/Example-UBO0.jpg}
+\caption{\small RCPSP problem}
+\label{fig:rcpsp-1}
+\vskip+0.1cm
+\end{figure}
+
 
 Planning:
 In the Shopping Agent Problem (TODO: ref to Norvig) an agent needs to purchase a set of products that are available at specific locations (supermarket, hardware store, etc), the agent  is subject to temporal (must complete tasks by specific deadlines) and resource (fuel, carrying capacity, etc) constraints.
 
 Below is a solution produced by EUROPA for a simple problem instance where the shopping agent needs to buy Bananas, Milk and a Drill.
 
-TODO: include figure
+\begin{figure}
+\centering
+\includegraphics[scale=0.35]{figs/Example-Shopping0.jpg}
+\caption{\small Shopping Agent problem}
+\label{fig:shopping-1}
+\vskip+0.1cm
+\end{figure}
 
-As we can see, a planning problem (what actions must be performed to achieve a goal) may embed a scheduling problem (in what order should those actions be performed), and both embed Constraint Satisfaction problems as temporal, resource and many other kinds of constraints must be respected in most real life problems.
+
+As we can see, a planning problem (what actions must be performed to achieve a goal) may embed a scheduling problem (in what order should those actions be performed), and both embed Constraint Satisfaction problems since temporal, resource and many other kinds of constraints must be respected in most real life problems.
 
 These relationships between Planning, Scheduling and Constraint Satisfaction have been examined in detail in the literature (TODOL ref Frank et al on Planning vs. Scheduling), and they lead to EUROPA's use of constraint reasoning as its innermost building block. Next we will examine the main ideas from Constraint Satisfaction Programming, and from Constraint Based Planning and Scheduling that constitute EUROPA's theoretical underpinnings, then we dive into how EUROPA implements those ideas.
 
@@ -82,8 +111,13 @@ Constraint Based and interval planning.
 The following figure displays the main architectural components in EUROPA and their relationships:
 
 
-
-(TODO: add figure)
+\begin{figure}
+\centering
+\includegraphics[scale=0.35]{figs/EUROPA-Architecture.jpg}
+\caption{\small EUROPA's Architecture}
+\label{fig:europa-architecture}
+\vskip+0.1cm
+\end{figure}
 
 
 \begin{enumerate}
