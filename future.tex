@@ -84,14 +84,49 @@ reactors hierarchy; as long as low level reactors are still active one
 will always been able to send goals/commands to them and execute what
 are traditionally known as runout sequences (or clean up scripts).
 
+Feature recognition for Sampling is a general research thrust; however
+it has specific relevance in the context of \rx and AUV control. As
+noted in Section \ref{sec:results} we have already demonstrated
+Machine Learning techniques for recognition of select features in the
+coastal ocean. A principal challenge that remains is that of obtaining
+expert labeled data for any supervised or semi-supervised learning
+methods.  While supervised techniques for learning classifiers such as
+decision trees (\cite{Quinlan93-dtrees}), instance-based
+classification (\cite{Aha-ibl-ml91}), Bayesian classifiers
+(\cite{Jensen2001-BNetworks}) and artificial neural networks
+(\cite{ANNsurvey-2000}) are popular, given the vast amount of data
+available and poor understanding of correlation between physical and
+biogeochemical variables in the coastal ocean, our work on INLs
+\cite{mcgann08d,ryan10} and reliance on a oceanographic expert has
+shown that scaling to different problems remains problematic. This is
+a prime motivation to move towards more semi-supervised methods such
+as \cite{kumar11,sergio12}. With the advent of the \od however,
+another direction our research is taking us is in Recommender systems
+\cite{Adomavicius05} as noted in Section \ref{sec:results}. We are
+working to design and deploy software infrastructure that will learn
+from user tagged data. To do so, we will use tagging techniques
+similar to what users of commercial image sharing sites like Flickr
+and Picassa do, to learn the context of the data (including remote
+sensing). In addition, the \od will integrate statistical Machine
+Learning techniques with incoming asynchronous data stream obtained by
+sensors and platforms. Identification models will be based on existing
+training sets for INLs and plumes; models for other features of
+scientific interests driven by \can requirements will be built in
+addition. Existing AUV archives for instance provide sufficient data
+for a learning base for a range of features of interest to \can; in
+addition we will build software that will learn to incorporate
+incoming data streams to provide an existence proof of a feature of
+interest. 
+
+
 
 
 
 % multi-vehicle control
 % sampling
 % diagnosis and recovery
-feature recognition
-scalable architecture for missions
+% feature recognition
+% scalable architecture for missions
 
 
 
