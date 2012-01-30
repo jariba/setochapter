@@ -11,3 +11,88 @@
 
 % The main advantage of CP is the richness of the constraints that can be modeled and the explicit use of logical inference to prune the search space
 
+Our experience of using deliberative techniques in a highly
+inter-disciplinary environment for targeted marine science
+applications has shown the need and applicability of such novel
+algorithms and methods. In addition to augmenting traditional AUV
+surveys more advanced Lagrangian observations, mixed-initiative
+methods, our colleagues at MBARI have understood the longer term
+implications of our work. Our current and consequently future efforts
+are therefore grounded in important science problems in an operational
+oceanographic setting. 
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[scale=0.45]{figs/autonomy-topics.pdf}
+  \caption{\small }
+  \label{fig:topics}
+\end{figure}
+
+The core of our problem domain for \can has been towards Sampling. In
+large part given the spatial and temporal scales of the
+bio-geochemical processes we are interested in in this project, it is
+imperative that a key direction is in formulating a multi-robot
+adaptive sampling problem. In this context while superficially \rx can
+be considered as a multi-agent system and could therefore imply a
+direct extension, sporadic communication with high-latencies in
+surface communication, not to mention low throughput acoustic
+communications imply that the extension of \rx for distributed
+applications is non-trivial. Further, in order to efficiently execute
+coordinated observation of ocean processes with multiple autonomous
+sensing platforms, significant methodological as well as technical
+challenges must be addressed. We are working towards a systematic
+approach of using \rx as a backend planner for \can field
+experiments. The expectation is that \od users will plan initially
+individual vehicle surveys which are variants of standard
+straight-line transects. Lessons learned with human planners in the
+loop will be used towards planning larger surveys, also with simple
+fixed transects but using vehicle capabilities in ontologies similar
+to \cite{patron09}. Apportioning the planning task between shore-side
+components with substantial contextual information and compute power
+with robots with in-situ reasoning capabilities a la \rx is a
+challenge and an open research problem. Fig. \ref{fig:topics} shows
+what we believe is the scope and influence of the different topic
+areas we are focusing on.
+
+Partitioned inference and decision-making within \rx also lends itself
+to graceful system degradation, making the overall approach effective
+towards increased robustness. There are two outstanding diagnosis and
+failure recovery challenges that we need to address; the first has to
+do with methodology related to model design of the instrument payload
+for a highly modular and configurable vehicle; this is local to a
+reactor. Doing so would enable (as a first step) using systematic
+Fault Diagnosis, Isolation and Recovery (FDIR) algorithms as
+demonstrated in the \texttt{RAX} experiment
+\cite{williams96,mus98,williams97} and more recently on an AUV by
+Dearden and others \cite{wang09,ernits10,dearden11}. The second
+challenge has to implementing a policy within the \rx framework that
+explicitly deals with recovery since controller failure can be
+distributed across reactors. Since reactors are hierarchical in their
+relationship to one another, their well defined dependencies allow
+them to be removed from an agent systematically. Reactors more
+abstract in scope can be removed before those which are less abstract
+(and closer to the hardware). In the event a Navigation reactor, for
+example, has a fault, it can be removed safely with lower level
+functionalities (such as those in the executive). When the Navigator
+is removed, it will recursively remove more abstract reactors (such as
+a Mission Manager) that depend on it. Such a safety feature then
+allows the system designers to ensure that early on they can invest
+more in ensuring that reactors lower in the hierarchy are robust and
+potentially formally verified. It also means that there is a safe and
+sure way to take control of the vehicle at any level within the
+reactors hierarchy; as long as low level reactors are still active one
+will always been able to send goals/commands to them and execute what
+are traditionally known as runout sequences (or clean up scripts).
+
+
+
+
+% multi-vehicle control
+% sampling
+% diagnosis and recovery
+feature recognition
+scalable architecture for missions
+
+
+
+
