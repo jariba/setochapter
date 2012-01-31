@@ -400,49 +400,15 @@ deliberation with not the synchronization process but also with
 the deliberation of other reactors\footnote{Current implementation of
   T-REX is running on a single process and it is the responsibility of
   the agent itself to emulate the multi-threading of the reactors
-  deliberation and synchronization}. For this reason we 
-decompose the algorithm \ref{alg:europa:solve} inside the reactor by
-having the recursive calls decomposed in single steps. This step
-function will be called after synchronization and as long as the
-previous call in this tick did not return \textsf{true} -- which would
-express that the current solution is complete.
-{\em will need to change that in algorithm environment and refine it}
-
-\begin{verbatim}
-bool step(PartialPlan plan, DecisionStack stack) 
-   if( isInconsistent(plan) ) {
-     relaxPlan(plan, stack);
-     notify("No plan");
-     return true;
-   } 
-   Flaw flaw = chooseFlaw(flaw);
-   if( flaw==NULL )
-     return true;
-   DecisionPoint decision = makeDecisionPoint(flaw, plan);
-   while(1) {
-     while( decision.hasNext() ) {
-       PartialPlan pp = decision.executeNext();
-       if( isInconsistent(pp) ) {
-         decision.undo();
-       }  else {
-          plan = pp;
-          stack.push(decision);
-          return chooseFlaw(flaw)==NULL;
-       }
-     }
-     if( decisionStack.empty() ) {
-       notify("No plan");
-       return true;
-     } else {
-        repeat {
-          decision = decisionStack.pop();
-          decision.undo();
-        } until( decision.hasNext() );
-        return false;
-     }
-   } 
-}
-\end{verbatim}
+  deliberation and synchronization}. For this reason while the overal
+planning of a europa reactor strictly relies on the europa framework
+plnanning solver, its slices the execution of Algorithm
+\ref{alg:europa:solve} in atomic steps. The interruption is done
+around the recursive call (line \ref{li:recurse}) while always
+ensuring that the current partial plan mainitained is never poroven
+inconsitent at any single step. This can be managed by allowing the
+call to backtrack until a DecisionPoInt that is not exhausted (ie
+$decision.hasNext()$ is \texttt{true}) is find in the call stack. 
 
 One critical aspect of this deliberation step is to ensure that at the
 exit of this call the $plan$ is not proven inconsistent. Indeed, it is
