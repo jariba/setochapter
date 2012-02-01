@@ -477,13 +477,15 @@ plan  solution is found. This has two effects:
   new deliberation on these reactors.
 \end{enumerate}
 
-
-
-
-
-\subsubsection{Intertwining synchronization and execution }
+\subsubsection{Intertwining synchronization and execution}
 \label{sec:arch:intertwine}
 
+A core aspect of this reactor is that it takes advantage of the
+specific sequencing enforced by the T-REX architecture along with the
+fact that only one $plan$ structure is maintined in the reactor and
+shared between synchronization and planning to allow these two processes
+to not only be interleaved but impact each other through the way they
+manipulate this plan. 
 
 
 
