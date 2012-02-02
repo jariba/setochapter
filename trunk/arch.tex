@@ -508,7 +508,150 @@ synchronization starts with  the plan produced this will gave a frame
 for the search process. Therefore this deliberation will not only be a
 model-based estimation uniquely based on the {\em external}
 observations but will also include the reactor intentions as described
-by the plan produced. 
+by the plan produced. Consider for example the Shopping Agent model
+described during the europa presentation and that the
+location of the \texttt{agent} is an {\em external} timeline. For
+example as, the reactor add the goal to have \texttt{Own} milk and the
+current {\em external} states indicated that it was \texttt{At(home)} it
+produced the plan in Fig. \ref{fig:shop:exec0}. The  {\em external}
+  part of the plan -- namely the tokens \texttt{Going(home,
+    superMarket)} and \texttt{At(SuperMarket)} -- and integrated as
+  goals for the reactor managing this specific state varaiable {\em
+    internally}. 
+
+\begin{figure}[!htb]
+  \centering
+  \includegraphics[width=0.7\columnwidth]{figs/shoping_exec_t0}
+  \caption{Shopping example : plan produced before synchronization. 
+    Tokens in red indicate observations, 
+    tokens in blue the goal that this plan attempt to solve. Arrows
+    indicate temporal constraints.}
+  \label{fig:shop:exec0}
+\end{figure}
+
+Now, consider that at the next tick $\tau+1$ the reactor managing the
+agent location was able to change the location state varaibale to 
+the \texttt{Going}. T-REX informs our reactor of this new observation
+which is added in the plan structure as a fact -- starting exactly at
+$\tau+1$ and lastign for an unlknown duration which is at least 1
+tick. As this new observation is integrated in the plan through
+synchronization the solver can identify the similarity between this
+new observation oand the next token in the existing plan. Which mean
+that instead of making a blind exhaustive search of all the possible
+implication the synchronization process starts its execution with the
+assumption that these new observations are consitent with the current
+plan maintained. As a result at the end of synchronization we will
+have the plan depicted in Fig. \ref{fig:shop:exec1}. Which just
+propagated the information provided by the new observation  in the
+exisiting plan (restricting in turn the start time of 
+\texttt{Going} and by propagtion of the constraints \texttt{Go} to  be
+{\em exactly} $\tau+1$). While focusing uniquely on the execution
+frontier ($\tau+1$ in this figure), the europa solver took benefit of
+the exisiting plan to evaluate a solution that asumes that the
+observation is consistent with what was decided  inside this
+reactor. 
+
+
+This choice is directed not only by some natural heurisitc
+choices made in the solver but even more enforced in general by the
+heuristic order of the decision point reolution choices for our {\em
+  internla} state flaw presented in section \ref{sec:arch:sync}
+{\em\color{red} TODO: need to rework the presentation of thee choices
+  so I can refer to them more directly -- algorithm or pseudo theorem
+  should do the trick}. Should such a flaw be revealed during
+synchronization -- meaning that the current state of an {\em internal}
+state varaibale is not fully grounded -- the sequencing of the choices
+will atempt first a conservative choice in term of maintaining
+previous state, then an optimisitic choice in term of the
+execution/advance in our current plan to finally attempt other choices
+that were not predicted by the model. The two first possible choices
+are strongly directed by the exisiting plan which help direct the
+search within this frame. This often allow to have a synchronization
+that is much more directed and i, in nominal situation such as the one
+we showed resolve the deliberation in few steps (often without any
+backtrack in the search).
+
+\begin{figure}[!htb]
+  \centering
+  \includegraphics[width=0.7\columnwidth]{figs/shoping_exec_t1}
+  \caption{Shopping example : Result of synchronization after the {\em
+      Going} observation was received by the reactor with thew plan
+    showed in Fig. \ref{fig:shop:exec0}.}
+  \label{fig:shop:exec1}
+\end{figure}
+
+The synchronization process is also in this process supporting fully
+the tracking of the plan execution as it specifies tokens parameters
+such as the time points and allow this to propagate through the plan
+in order to idenitfy if the plan remains valid -- as in our example --
+or that it cannot be executed as it is. The later  is often identified
+by the synchronization failing to find a consistent solution. for
+example dshould the \texttt{Going} observation we receive be to the 
+\texttt{hardwareStore}, this would break the current plan of our
+reactor as we cannot go simultaneously at 2 different places as
+illustrated in Fig. \ref{fig:shop:relax}-1. as synchronization is not
+possible in this context our strategy is to fully relax all decisions
+made by the previous plan steps by just keeping n the plan all the
+past observations in both {\em external} and {\em internal} state
+variables and the exsiting {\em internal} goals received by this
+reactor (\texttt{Own(Milk)} in our example) resulting on the plrtial
+plan sghowned in Fig. \ref{fig:shop:relax}-2. In this process the
+reactor inform the agent that all {\em external} goals it requested
+for the future are note valid anymore which often result in the ownere
+of htese timelines to not have to maintain this goal anynmore. 
+
+\begin{figure}[!htbp]
+  \centering
+  \includegraphics[width=0.7\columnwidth]{figs/shoping_exec_relax}  
+  \caption{Illustration of a conflict suring synchronization and the resulting relaxed plan for recovery}
+  \label{fig:shop:relax}
+\end{figure}
+
+As the plan is not anymore in the way the synchronization can resume 
+and find a solution as we initial lly described. The newly pending goals will enforce  at
+the next \texttt{step} to resumed deliberation on this new fully
+relaxed partial plan. By the simple use of synchronization the reactor 
+was not only able to identify that its plan was not executable anymore 
+but recover from it while offering a new incomplete partial plan to be
+resolved during the next deliberation \texttt{steps}. This on its own
+ogfer the core functionality one should except to close the loop
+between planning and execution in the sense that synchronization plays
+the role of what is typically named as the {\em Executive} in other
+architectures {\em\color{red} references to diverse archis, 3-tiered,
+  laas, claraty, B Wiliams, and many more}. 
+
+In our case though the interaction between planning and execution
+does not stop at this level. A core point of the overal schedulling of
+both {\em synchronization} and {\em planning} steps resides on our
+architecture enforsincing that the synchroniuzation process can occur
+in between any step of the plan. This lead us to the fact that not
+only synchronization is imnfluenced by the outcome of planning but
+this influence goes also in the alternate direction. Specifically when
+synchronuiation occuers before we found a complete plan, it will
+inject as we described new facts (the {\em external} observations and
+resulting {\em internal} state) in the plan database. This
+informatiuon will be present when the next planning \texttt{step} will
+resume. Therefore they are not intergal part of the plan resolution
+(generating potentially new flaws for the planner or contributing to
+resolve previously exisiting flaws). The planning process is therefore
+perturbed internallyand fully informed on how the world evolves as it
+is planning.  This aspect trueluy contrast to other approaches we have
+idenitifed in the literature which avoid to perturb the planner during
+it search as it is not compatible with the ``off-line planning'' assumption.
+
+By our design choices -- both at the architecture level and the integration of
+the europa framework for embedded deliberation -- we were able to
+implement an architecture that avoid this limitation while remaining in
+a formal frame that still allow for deliberation and model-based
+agent control. We believe that this tighter integration of planning
+and execution allow the system to ba more accute of its environament
+alowing better informaed decision and tighter reaction. This is
+possible while still integrating information such as a long latency
+for the reactors as long as one can ensure that synchronization of al
+the reactors and deliberation steps can be done in a time that is
+resonably small in comparison of the agent tick duration.
+
+
 
 
 
