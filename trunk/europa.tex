@@ -547,44 +547,45 @@ The initial partial plan is the state of EUROPA's Plan Database after the initia
 
 Open Conditions and Threats allow flaw detection and resolution at a higher-level of abstraction (i.e. in terms of objects and tokens) than that of simply binding variables as is common in Constraint Satisfaction Problems. This is advantageous when one applies heuristics for ordering choices since it provides a richer context in which to make decisions. Furthermore, it aids in reducing the amount of work done by a solver so that only the necessary refinements are made, otherwise leaving the partial plan with maximum flexibility. For example, one can omit unbound variables which are time-points of tokens since threats will force a solver to impose restrictions on these variables based on the semantics of the objects to which their tokens apply. Thus the planning process may yield partially-ordered plans for which all possible extensions are provably valid. 
 
-The Plan Space Planning algorithm described above can be implemented in many different ways depending on the approach chosen for flaw and resolver selection and for backtracking. EUROPA's built-in solver implements a chronological backtracking algorithm that is summarized in the figure below.
+The Plan Space Planning algorithm described above can be implemented in many different ways depending on the approach chosen for flaw and resolver selection and for backtracking. EUROPA's built-in solver implements a chronological backtracking algorithm that is summarized in Algorithm \ref{alg:europa:solve}.
+ % summarized in the figure below.
 
-\begin{verbatim}
+\begin{algorithm}[H]
+\KwIn{PartialPlan $plan$}
+\KwOut{\texttt{true} if a plan solution was found, \texttt{false} otherwise}
+\Begin{
+  \lIf{isInconsistent(plan)}{\Return \texttt{false}\;}\label{li:propagate}
+  \BlankLine
+  Flaw $flaw \leftarrow chooseFlaw(plan)$ \; \label{li:selectflaw}
+  \lIf{ $\emptyset = flaw$ }{\Return \texttt{true} \;} \label{li:noflaw}
+  \BlankLine
+  DecisionPoint $decision \leftarrow makeDecisionPoint(flaw, plan)$ \; \label{li:decisionpt}
+  \While{ $decision.hasNext()$ }{ \label{li:decisionloop}
+    PartialPlan $pp \leftarrow decision.executeNext()$ \; \label{li:decide}
+    \lIf{ $solve(pp)$ }{ \Return \texttt{true} \; } \label{li:recurse}
+    \lElse{ $decision.undo()$ \; } \label{li:backtrack}
+   }
+   \Return \texttt{false} \; \label{li:noplan}
+ }
+\caption{$\mathrm{bool} ~ solve(plan)$}
+\label{alg:europa:solve}
+\end{algorithm}
 
-01.  bool solve(PartialPlan plan)
-02.   {
-03.      if (isInconsistent(plan))  return false;
-04.
-05.      Flaw flaw = chooseFlaw(plan);
-06.      if (flaw == NULL) return true;
-07.
-08.      DecisionPoint decision = makeDecisionPoint(flaw, plan);
-09.
-10.      while(decision.hasNext()) {
-11.          PartialPlan pp = decision.executeNext();
-12.
-13.          if (solve(pp)) return true;
-14.          else d.undo();
-25.      }
-16.
-17.      return false;
-18.  }
-
-\end{verbatim}
 
 The algorithm takes as input a partial plan p and returns true if a complete and consistent refinement of p could be found (or if p is initially complete and consistent), and false otherwise. 
 
 \begin{enumerate}
-	\item Line 3: Propagate the constraints to test for inconsistency. If found to be inconsistent, then we can return false since this is a dead-end i.e. no refinements to p can yield a consistent plan.
-	\item Line 5: Choose a flaw from the set of available flaws.
-	\item Line 6: If there are no flaws, then p is complete and we can terminate with success.
-	\item Line 8: Otherwise we formulate a decision point which is a branch in the search space. Each choice is a particular refinement operation and the DecisionPoint collects all possible refinement operations for the given flaw.
-	\item Line 10: We keep trying until the chosen flaw is resolved, or until we run out of resolvers to try.
-	\item Line 11: A new partial plan is obtained by application of a refinement operator. Note that the ordering over refinement operators to select is a non-deterministic step.
-	\item Line 13: Recursive call to solve the new planning problem. If successful, then we are done.
-	\item Line 14: Otherwise, retract the last refinement operation and move on to try the next one.
-	\item Line 17:  If we arrive here, then we have exhausted all options to resolve the flaw, including the case where no options were available initially. Thus the problem cannot be solved.
+	\item Line \ref{li:propagate}: Propagate the constraints to test for inconsistency. If found to be inconsistent, then we can return false since this is a dead-end i.e. no refinements to p can yield a consistent plan.
+	\item Line \ref{li:selectflaw}: Choose a flaw from the set of available flaws.
+	\item Line \ref{li:noflaw}: If there are no flaws, then p is complete and we can terminate with success.
+	\item Line \ref{li:decisionpt}: Otherwise we formulate a decision point which is a branch in the search space. Each choice is a particular refinement operation and the DecisionPoint collects all possible refinement operations for the given flaw.
+	\item Line \ref{li:decisionloop}: We keep trying until the chosen flaw is resolved, or until we run out of resolvers to try.
+	\item Line \ref{li:decide}: A new partial plan is obtained by application of a refinement operator. Note that the ordering over refinement operators to select is a non-deterministic step.
+	\item Line \ref{li:recurse}: Recursive call to solve the new planning problem. If successful, then we are done.
+	\item Line \ref{li:backtrack}: Otherwise, retract the last refinement operation and move on to try the next one.
+	\item Line \ref{li:noplan}:  If we arrive here, then we have exhausted all options to resolve the flaw, including the case where no options were available initially. Thus the problem cannot be solved.
 \end{enumerate}
+
 
 This algorithm provides for a sound and complete search, assuming that no flaws or available refinement operators are pruned unnecessarily. Dead-ends in the search are discovered through constraint propagation. Constraint propagation is a vehicle for evaluating the consistency of a partial plan and also for filtering infeasible values from consideration prior to commitment, allowing in some cases a strong look-ahead capability which is essential for tractable search. Consistency testing is initiated by the isConsistent procedure. The algorithm permits a heuristically controlled search by applying orderings for chooseFlaw and makeDecisionPoint. It results in a chronologically-backtracking, search. 
 
