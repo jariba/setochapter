@@ -1,7 +1,13 @@
 \section{EUROPA}
 \label{sec:europa}
 
-EUROPA is a general purpose AI planning toolkit developed at NASA Ames.  Automated Planning can be reformulated as a constraint satisfaction problem (TODO: ref). EUROPA is an extension of that idea, however, unlike other approaches where the entire planning problem is translated into a CSP and then solved using traditional CSP methods, EUROPA uses a constraint reasoning engine as a fundamental building block, and enriches it with other architectural components that allow a more direct mapping for scheduling and planning problems, which in turn allows easier development of efficient solving methods.
+Planning, for our purposes, can be thought of as determining all the small tasks that must be carried out in order to accomplish a goal. Let's say your goal is to buy a gallon of milk. It may sound like a simple task, but if you break it down, there are many small tasks involved: obtain keys, obtain wallet, start car, drive to store, find and obtain milk, purchase milk, etc. Planning also takes into account rules, called constraints, which control when certain tasks can or cannot happen. Two (of many) constraints in this example are that you must obtain your keys and wallet before driving to the store and you must obtain the milk before purchasing it.
+
+Here is what a simple plan for buying milk at the store might look like:
+
+
+EUROPA is a general purpose AI planning toolkit developed at NASA Ames.  
+TODO: Talk about NASA missions where EUROPA has been used.
 
 Let's look at some of the problems that can be tackled using EUROPA.
 
@@ -57,7 +63,7 @@ Below is an example of a a solution provided by EUROPA for an RCPSP instance wit
 
 
 Planning:
-In the Shopping Agent Problem (TODO: ref to Norvig) an agent needs to purchase a set of products that are available at specific locations (supermarket, hardware store, etc), the agent  is subject to temporal (must complete tasks by specific deadlines) and resource (fuel, carrying capacity, etc) constraints. The agent must figure out what actions need to be performed to find and acquire the required items, as well as when to perform each of those actions.
+In the Shopping Agent Problem (TODO: ref to Norvig) an agent needs to purchase a set of products (milk, drill, etc) that are available at specific locations (supermarket, hardware store, etc), the agent  is subject to temporal (must complete tasks by specific deadlines) and resource (fuel, carrying capacity, etc) constraints. The agent must figure out what actions need to be performed to find and acquire the required items, as well as when to perform each of those actions.
 
 Below is a solution produced by EUROPA for a simple problem instance where the shopping agent needs to buy Bananas, Milk and a Drill.
 
@@ -72,7 +78,7 @@ Below is a solution produced by EUROPA for a simple problem instance where the s
 
 As we can see, a planning problem (what actions must be performed to achieve a goal) may embed a scheduling problem (in what order should those actions be performed), and both planning and scheduling embed Constraint Satisfaction problems since temporal, resource and many other kinds of constraints must be respected in most real life problems.
 
-These relationships between Planning, Scheduling and Constraint Satisfaction have been examined in detail in the literature (TODOL ref Frank et al on Planning vs. Scheduling), and they lead to EUROPA's use of constraint reasoning as its innermost building block. Next we will examine the main ideas from Constraint Satisfaction Programming, and from Constraint Based Planning and Scheduling that constitute EUROPA's theoretical underpinnings, then we dive into how EUROPA implements those ideas.
+These relationships between Planning, Scheduling and Constraint Satisfaction have been examined in detail in the literature (TODOL ref Frank et al on Planning vs. Scheduling), and they lead to EUROPA's use of constraint reasoning as its innermost building block. Below we examine the main ideas from Constraint Satisfaction Programming, and from Constraint Based Planning and Scheduling that constitute EUROPA's theoretical underpinnings, then we dive into how EUROPA implements those ideas.
 
 \subsection{Constraint Programming}
 \label{sec:europa:cp}
@@ -100,15 +106,33 @@ TODO: talk about arc consistency algorithms, computational complexity and solver
 \subsection{Constraint-Based Attribute and Interval Planning}
 \label{sec:europa:cp}
 
-There has been 
-State Variable representation
 
-CSP encodings
+The most common planning formulations use a propositional representation, where the state of the world is represented by a set of propositions (statements that can be true or false), and operators change the truth values of these propositions (TODO ref?). Although these formulations are powerful and have allowed researchers to develop numerous contributions in automated planning, there are many classes of problem domains that are difficult it is difficult to represent using them. 
 
-Constraint Based and interval planning.
+In particular, it is hard to represent time, resources, mutual exclusion and concurrency using propositions (TODO: ref?).  It is straightforward to represent and reason about all of those elements using a CSP representation, as a result there has been some work on doing automated planning while taking advantage of CSP  (TODO: ref).  Traditionally, the entire planning problem is translated into a CSP and then solved using traditional CSP methods, this leads to a formulation where action choices and relationships are represented as variables and/or constraints. However, this has at least two major drawbacks:
+\begin{enumerate}
+	\item Given that action choices and relationships (rules) are expresed through variables, the domain descriptions that result from this approach are not intuitive and therefore difficult to understand and debug
+	\item If the structure of a planning model (actions, conditions, effects, dependencies at the action level, etc) is not explicitly maintained by the CSP planner, the search algorithms are deprived of critical information to make better decisions. If that structure is maintained somehow (for instance, by internally marking variables that represent action choice and relationships between actions), it is still hard to write search algorithms as any planning-specific insight has to be translated into the CSP representation of variables and constraints  (TODO: example?)
+\end{enumerate}
+
+
+Constraint-Based Attribute and Interval planning (CAIP) (TODO:ref) is intended to close that gap: on the one hand, it takes advantage of a CSP representation, but it also uses attributes and intervals to maintain an explicit representation of the elements relevant to planning, so that it is easier to write algorithms that search for an reason abut plans. The main elements of CAIP are:
+
+\begin{enumerate}
+	\item Intervals:
+	\item Attributes:
+	\item Domain Constraints an Configuration rules:
+\end{enumerate}
+
+TODO: Explain how planning problem instances and their solutions are represented.
 
 \subsection{EUROPA's Plan Representation}
 \label{sec:europa:pr}
+
+
+EUROPA is an implementation of the CAIP framework explained in the previous section
+
+
 
 Variables
 
@@ -155,9 +179,6 @@ As we have noted, Tokens describe some aspect of an Object in time. Objects thus
     Timelines: Often objects in a domain must be described by exactly one token for every given timepoint in the plan. Such objects are so common that we provide a special construct in EUROPA to extend these semantics to derived classes. Any instances of a class derived from a Timeline will induce ordering requirements among its tokens in order to ensure no temporal overlap may occur among them. See below for further discussion.
     Resources: Metric resources, e.g. the energy of a battery or the capacity of a cargo hold, are objects with an explicit quantitative state in time and with a circumscribed range of changes that can occur to impact that state i.e. produce, consume, use, change. These changes are captured as tokens. Resources are such a common requirement for EUROPA users that special constructs are also provided for them. Instances of classes derived from a Resource will induce ordering requirements on their Tokens in order to ensure that the level of the resource remains within specified limits. 
 
-Dynamic Objects
-
-TODO (there was a stub in the old doxygen docs for this)
 Timelines
 
 It may be sufficient to maintain only a partial-order among tokens. However, it is often the case that tokens represent states and actions of a single object in the system. Such tokens are typically mutually-exclusive. EUROPA uses a Timeline structure developed in (??) to concisely capture system components whose behavior is described over time in this manner.
@@ -361,10 +382,10 @@ Agent::Buy {
 
 \end{verbatim}
 
-TODO: explain variable, object, predicate and action types, including constraints that can be part of them
 
 In this model we can see:
 
+TODO: explain variable, object, predicate and action types, including constraints that can be part of them
 \begin{enumerate}
 	\item Variable Types: This model uses integer (activity duration, start and end times, etc) and string (Location and Product names, etc)
 	\item Object Types:
