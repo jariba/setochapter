@@ -21,30 +21,29 @@ exogenous or endogenous change.
 
 To enable this responsiveness to external observations, the agent has
 to be able to synthesize plans insitu and to re-plan. We use a
-temporal constraint-based planner EUROPA$_2$ with a demonstrated
-legacy of having flown on NASA space missions
-\cite{jonsson00,bresina05, barreiro09}. Our autonomy architecture
-brings three key innovations for AUV adaptation: the use of flexible
-plan representations, compositional control with the use of
-partitioned networks and off-line learning to inform insitu
-environmental state estimation. In this section we detail some of the
-key concepts relevant to flexible plan representation. Section
-\ref{sec:arch} has details the \texttt{T-REX} partitioned architecture
-and estimation driven vehicle adaptation.
+temporal constraint-based planner \eu with a demonstrated legacy of
+having flown on NASA space missions \cite{jonsson00,bresina05,
+  barreiro09}. Our autonomy architecture brings three key innovations
+for AUV adaptation: the use of flexible plan representations,
+compositional control with the use of partitioned networks and
+off-line learning to inform insitu environmental state estimation. In
+this section we detail some of the key concepts relevant to flexible
+plan representation. Section \ref{sec:arch} has details the
+\texttt{T-REX} partitioned architecture and estimation driven vehicle
+adaptation.
 
-EUROPA$_2$ uses a domain model written in a declarative language
-(NDDL: New Domain Description Language), together with initial
-conditions and goals also specified in NDDL, to construct a set of
-temporal relations that must be true at the start time. These models
-include assertions about the physics of the vehicle, i.e how it
-responds to external stimulus and internally driven goals. By
-propagating these relations forward using Simple Temporal Networks
-\cite{dechter91} and applying goal constraints, EUROPA$_2$ can select
-a set of conditions that should be true in the future, where some of
-these conditions will correspond to actions the agent must take. The
-planner can backtrack and try another path during search if a goal
-cannot be reached while being capable of discarding unachievable
-goals.
+\eu uses a domain model written in a declarative language (NDDL: New
+Domain Description Language), together with initial conditions and
+goals also specified in NDDL, to construct a set of temporal relations
+that must be true at the start time. These models include assertions
+about the physics of the vehicle, i.e how it responds to external
+stimulus and internally driven goals. By propagating these relations
+forward using Simple Temporal Networks \cite{dechter91} and applying
+goal constraints, \eu can select a set of conditions that should be
+true in the future, where some of these conditions will correspond to
+actions the agent must take. The planner can backtrack and try another
+path during search if a goal cannot be reached while being capable of
+discarding unachievable goals.
 
 Traditionally robot execution has relied on dispatching commands at
 precise times. Such linear sequences of precisely timed commands give
@@ -72,7 +71,7 @@ delay constraints between such variables.
 \vskip+0.1cm
 \end{figure}
 
-EUROPA$_2$ uses a \emph{state variable} representation to describe the
+\eu uses a \emph{state variable} representation to describe the
 evolution of state over time. The instantiated history of such state
 variable evolution over a temporal horizon we call \emph{timelines}
 and which represent a single thread in the execution of a concurrent
@@ -85,7 +84,7 @@ parameter values of the procedure, and the time values defining the
 interval. We allow encapsulation of uncertainty within these tokens
 with a range of start and end times and parameters, all of which are
 encoded as variables. A constraint solver in turn manipulates these
-variables defined in a EUROPA$_2$ domain model. For example, consider
+variables defined in a \eu domain model. For example, consider
 a scientific need to take a water samples 100 meters from a hotspot
 while an AUV is performing a Yo-Yo in the water-column. Two samples
 are needed if the feature's signal is above a threshold; one
@@ -143,7 +142,7 @@ of a part of such plans with tokens representing constraints on
 flexible temporal intervals. Systematic computation is reflected by
 the use of the \texttt{Allen Algebra} \cite{allen84} temporal
 relations shown in Fig. \ref{fig:allen-algebra}. It is the use of such
-interval arithmetic in the EUROPA$_2$ domain model that allows
+interval arithmetic in the \eu domain model that allows
 encoding of temporal constraint relationships between tokens on the
 same or other concurrent timelines. Details of propagation algorithms
 or of interval logic are beyond the scope of this paper.
