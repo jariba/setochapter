@@ -445,8 +445,18 @@ rule imposes a requirement for supporting tokens to be in the plan in
 order for the master to be valid. There are 2 possibilities to
 consider:
 
-    The slave is inserted as an active token in the plan. As such, rules may be activated on the slave, and it may consume resources.
-    The token is merged with a matching token already in the plan. Once a slave is merged, the requirement it represents are considered satisfied. The process of merging passes on all restrictions imposed on the slave to the active token upon which it is merged. Merging a token requires finding a target active token that is compatible with the inactive token. For an active token and an inactive token to be compatible requires that they are instances of the same predicate and that no intersections between corresponding variables are empty. The effect of merging is illustrated in Figure 3. 
+The slave is inserted as an active token in the plan. As such, rules
+may be activated on the slave, and it may consume resources.
+
+The token is merged with a matching token already in the plan. Once a
+slave is merged, the requirement it represents are considered
+satisfied. The process of merging passes on all restrictions imposed
+on the slave to the active token upon which it is merged. Merging a
+token requires finding a target active token that is compatible with
+the inactive token. For an active token and an inactive token to be
+compatible requires that they are instances of the same predicate and
+that no intersections between corresponding variables are empty. The
+effect of merging is illustrated in Figure 3.
 
     Figure 3: Merging an inactive token on an active token. Domain
     restrictions occur in highlighted variables of active token.
