@@ -40,7 +40,14 @@ For such a robot the milk buying plan at the store might look like
 % \eu is a general purpose AI planning toolkit developed at NASA Ames.  
 % TODO: Talk about NASA missions where \eu has been used.
 
-\eu is a versatile planning framework, let's start by looking at some examples of the main problem types that it can tackle.
+At the core of the \rx framework, is the deliberation engine, \eu,
+which has a rich legacy from NASA missions. \eu is a versatile
+Constraint-based temporal planner which continues to be deployed on a
+diverse set of applications. We motivate this section with some
+problem domains this planner can handle and then delve in substantial
+detail.
+
+% \eu is a versatile planning framework.  let's start by looking at some examples of the main problem types that it can tackle.
 
 \paragraph \textit{Constraint Satisfaction}: A canonical problem in
 dealing with constraints is the $N$-Queens problem in which chess queens
@@ -128,7 +135,10 @@ solution produced by \eu for such a problem instance.
 \vskip+0.1cm
 \end{figure}
 
-As the examples above show, a Planning problem (actions to achieve a goal) may embed a Scheduling problem (what resources are necessary to achieve stated goals) and both Planning and Scheduling may embed a Constraint Satisfaction problem. % since temporal, resource and  other
+As the examples above show, a Planning problem (actions to achieve a
+goal) may embed a Scheduling problem (what resources are necessary to
+achieve stated goals) and both Planning and Scheduling may embed a
+Constraint Satisfaction problem. % since temporal, resource and other
 % kinds of constraints must be respected in most real life problems.
 The relationships between Planning, Scheduling and Constraint
 Satisfaction have been examined \cite{smith00} and have lead to use of
@@ -148,12 +158,11 @@ A constraint programming problem consists of a set of variables $V=
 {x_1,..,x_N}$, where each variable takes values from a domain
 $d_1,..,d_N$; in this chapter we will deal only with discrete and
 finite domains. Given a defined conjunctive set of constraints on the
-variables: $C=\{c_1(x_1,..,x_N), ..., c_K(x_1,..,x_N)\}$, the objective
-is to find one or more value assignments to $V$ where all constraints
-are satisfied.
-
-To solve a problem, CP techniques use logical inference to perform Constraint Propagation, which consists of two
-operations:
+variables: $C=\{c_1(x_1,..,x_N), ..., c_K(x_1,..,x_N)\}$, the
+objective is to find one or more value assignments to $V$ where all
+constraints are satisfied. To solve a problem, CP techniques use
+logical inference to perform Constraint Propagation, which consists of
+two operations:
 
 \begin{enumerate}
 
@@ -168,14 +177,37 @@ operations:
 
 \end{enumerate}
 
-A set of constraints and variables that describe a problem domain are typically represented as a Constraint Network, where the variables are nodes , and constraints are arcs between the variables. Having this network representation in mind, Arc Consistency for a a pair of variables x,y is achieved if for every value in x's domain, there is a value in the y's domain that is consistent with all the constraints that connect x and y. 
-A naive approach to ensuring arc consistency consists of cycling through all the variable pairs and performing constraint propagation until there are no variable domain changes, the AC-3 algorithm \comment {citation [MAC77]} improves over the naive approach by ignoring constraints whose variables were not affected since the last iteration. AC-3 is very popular in CP implementations.
+A set of constraints and variables that describe a problem domain are
+typically represented as a Constraint Network, where the variables are
+nodes and constraints are arcs between the variables. Having this
+network representation in mind, Arc Consistency \comment{needs a
+  definition} for a pair of variables $x,y$ is achieved if for every
+value in $x$'s domain, there is a value in $y$'s domain that is
+consistent with all the constraints that connect $x$ and $y$.  A naive
+approach to ensuring arc consistency consists of cycling through all
+the variable pairs and performing constraint propagation until there
+are no variable domain changes. The AC-3 algorithm \cite{mackworth77},
+a popular implementation, improves over the naive approach by ignoring
+constraints whose variables were not affected since the last
+iteration. 
 
-Arc Consistency and other, more sophisticated consistency algorithms \comment {citation CP Handbook} can be used to efficiently prove that a CP problem is unsatisfiable, however, they generally can't prove that a CP problem is satisfiable and provide specific variable assignments that constitute solutions. For that, search algorithms like global backtracking or local search are used \comment {citation CP Handbook}, which use consistency as an efficient way to prune the search space.
+Arc Consistency and other sophisticated consistency algorithms can be
+used to efficiently prove that a CP problem is unsatisfiable. However,
+they generally cannot prove that a CP problem is satisfiable and
+provide specific variable assignments that constitute solutions. For
+that, search algorithms like global backtracking \comment{citation
+  needed} or local search are used; these use consistency as an
+efficient way to prune the search space \comment {citation CP
+  Handbook}. In theory, solving a CP problem is NP-Hard
+\cite{ghallab04}, but often very efficient in practice using a number
+of consistency and search algorithms that are well understood.
 
-In theory, solving a CP problem is NP-Hard \cite{ghallab04}, but often very efficient in practice using a number of consistency and search algorithms that are well understood.
-
-CP is usually implemented as part of a programming language and constraints are usually represented as objects \cite{puget95}. Any constraint can be introduced and, as long as the constraint propagation protocols specified by the hostCP system are enforced, it will be indistinguishable from any other ``primitive'' CP constraint, such as $\leq$ or $\geq$. 
+CP is usually implemented as part of a programming language and
+constraints are usually represented as objects \cite{puget95}. Any
+constraint can be introduced and, as long as the constraint
+propagation protocols specified by the hostCP system are enforced, it
+will be indistinguishable from any other ``primitive'' CP constraint,
+such as $\leq$ or $\geq$.
 
 \subsection{Constraint-Based Attribute and Interval Planning}
 \label{sec:europa:cp}
@@ -222,7 +254,7 @@ major drawbacks:
 Constraint-based Planning and specifically Constraint-Based Attribute
 and Interval planning (CAIP) \cite{mus94,frank2003} is intended to
 close that gap. On one hand, it takes advantage of a CSP
-representation; one the other it also uses attributes and intervals to
+representation; on the other it uses attributes and intervals to
 maintain an explicit representation of the elements relevant to
 planning. This makes it easier to write algorithms that search for an
 reason abut plans. The main elements of CAIP are:
@@ -241,15 +273,16 @@ reason abut plans. The main elements of CAIP are:
 \eu is an implementation of the CAIP framework. 
 
 
-\textit{Variables} Values that need to be represented to describe the problem domain and over which we may want to specify constraints.
+\textit{Variables} Values that need to be represented to describe the
+problem domain and over which we may want to specify constraints.
 
-\textit{Objects} The things we wish to describe and refer to in a domain are considered
-Objects. As in the case with object-oriented analysis and design, one
-can seek out the nouns in any domain description to find likely
-objects. In a Mars rover example, we might consider the satellite, the
-camera, and the attitude controller (which orients the robot for
-taking pictures) to be objects. Objects have state and behavior. For
-example, a camera can be:
+\textit{Objects} The things we wish to describe and refer to in a
+domain are considered Objects. As in the case with object-oriented
+analysis and design, one can seek out the nouns in any domain
+description to find likely objects. In a Mars rover example, we might
+consider the satellite, the camera, and the attitude controller (which
+orients the robot for taking pictures) to be objects. Objects have
+state and behavior. For example, a camera can be:
 
     off,
     ready, or
@@ -293,7 +326,7 @@ variables to indicate the object to which the statement principally
 applies and the timepoints over which it holds. In \eu, all predicate
 instances are Tokens.
 
-TODO: talk about actions
+\comment{talk about actions}
 
 A Token is an instance of a predicate or an action and is defined over
 a temporal extent. Every token has five built-in variables:
@@ -315,8 +348,10 @@ below for details.
 
 \textit{Objects (continued)}
 
-As we have noted, Tokens describe some aspect of an Object in time. Objects thus may have many Tokens in a plan in order to describe
-their state and behavior throughout all points in time of the plan. Within this general framework, we note a few particulars:
+As we have noted, Tokens describe some aspect of an Object in
+time. Objects thus may have many Tokens in a plan in order to describe
+their state and behavior throughout all points in time of the
+plan. Within this general framework, we note a few particulars:
 
 Static Facts: Classes without predicates lead to Objects without
 Tokens. This arises where an objects state or behavior is independent
@@ -350,12 +385,14 @@ mutually-exclusive. \eu uses a Timeline structure developed in (??)
 to concisely capture system components whose behavior is described
 over time in this manner.
 
-For example, consider the tire-world domain. The tire was located in
-the trunk with the predicate tireLocated(Trunk) and located on the
-ground with the predicate tireLocated(Ground). Clearly, the same tire
-cannot be in both places at once. A Timeline provides a simple method
-for aggregating the statements about a tire such that they are
-mutually exclusive.
+\comment{This is the first instance that this domain is being
+  introduced. Either we need more explanation or it ought to be
+  removed.} For example, consider the tire-world domain. The tire was
+located in the trunk with the predicate tireLocated(Trunk) and located
+on the ground with the predicate tireLocated(Ground). Clearly, the
+same tire cannot be in both places at once. A Timeline provides a
+simple method for aggregating the statements about a tire such that
+they are mutually exclusive.
 
 Figure 1: A Timeline for a Tire
 
@@ -441,25 +478,24 @@ compatible requires that they are instances of the same predicate and
 that no intersections between corresponding variables are empty. The
 effect of merging is illustrated in Figure 3.
 
-    Figure 3: Merging an inactive token on an active token. Domain
-    restrictions occur in highlighted variables of active token.
+Figure 3: Merging an inactive token on an active token. Domain
+restrictions occur in highlighted variables of active token.
 
-    On creation of a token, where the commitment has not been made yet
-    to activate or merge the token, the token is said to be
-    inactive. There is a nuance to the state model for tokens which
-    relate to the mode of its creation. If the token is allocated
-    explicitly by an external actor, rather than internally through
-    rule firing, it may include the state rejected indicating the
-    planner is permitted to reject the token. A valid plan can include
-    rejected tokens. This typically arises where the token represents
-    a goal that is preferable to achieve but not mandatory. This state
-    is not reachable for slaves since that would imply selective
-    adherence to the domain model. Figure 4 presents the state
-    transition diagram for token states relevant for planning. The
-    transitions are operations on a partial plan which can decide an
-    outcome for an inactive token. As operations which may arise in
-    search, they must be reversible during backtracking. The
-    cancellation operations in each case are also shown.
+On creation of a token, where the commitment has not been made yet to
+activate or merge the token, the token is said to be inactive. There
+is a nuance to the state model for tokens which relate to the mode of
+its creation. If the token is allocated explicitly by an external
+actor, rather than internally through rule firing, it may include the
+state rejected indicating the planner is permitted to reject the
+token. A valid plan can include rejected tokens. This typically arises
+where the token represents a goal that is preferable to achieve but
+not mandatory. This state is not reachable for slaves since that would
+imply selective adherence to the domain model. Figure 4 presents the
+state transition diagram for token states relevant for planning. The
+transitions are operations on a partial plan which can decide an
+outcome for an inactive token. As operations which may arise in
+search, they must be reversible during backtracking. The cancellation
+operations in each case are also shown.
 
 Figure 4: Token States and Transitions for Planning
 
