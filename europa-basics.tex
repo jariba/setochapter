@@ -180,8 +180,7 @@ two operations:
 A set of constraints and variables that describe a problem domain are
 typically represented as a Constraint Network, where the variables are
 nodes and constraints are arcs between the variables. Having this
-network representation in mind, Arc Consistency \comment{needs a
-  definition} for a pair of variables $x,y$ is achieved if for every
+network representation in mind, a pair of variables $x,y$ is said to be arc consistent if for every
 value in $x$'s domain, there is a value in $y$'s domain that is
 consistent with all the constraints that connect $x$ and $y$.  A naive
 approach to ensuring arc consistency consists of cycling through all
@@ -191,7 +190,7 @@ a popular implementation, improves over the naive approach by ignoring
 constraints whose variables were not affected since the last
 iteration. 
 
-Arc Consistency and other sophisticated consistency algorithms can be
+Arc Consistency and other, more stringent consistency definitions can be
 used to efficiently prove that a CP problem is unsatisfiable. However,
 they generally cannot prove that a CP problem is satisfiable and
 provide specific variable assignments that constitute solutions. For
@@ -204,9 +203,9 @@ of consistency and search algorithms that are well understood.
 
 CP is usually implemented as part of a programming language and
 constraints are usually represented as objects \cite{puget95}. Any
-constraint can be introduced and, as long as the constraint
-propagation protocols specified by the hostCP system are enforced, it
-will be indistinguishable from any other ``primitive'' CP constraint,
+constraint that the user is able to reason about can be introduced into the system and, as long as the constraint
+propagation protocols specified by the host CP system are enforced, it
+will be indistinguishable from any other "primitive'' CP constraint,
 such as $\leq$ or $\geq$.
 
 \subsection{Constraint-Based Attribute and Interval Planning}
