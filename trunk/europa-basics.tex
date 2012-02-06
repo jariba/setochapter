@@ -145,11 +145,11 @@ constraint reasoning in \eu as its innermost building block. % Below we
 \label{sec:europa:cp}
 
 Constraint Satisfaction Programming (also known as Constraint
-Programming (CP)) is a discipline that provides a generic framework for
-representing, solving and making logical inference on constraints. A
-complete treatment of this discipline is given in [MAR98] and [APT03]
-and very concise introductions are provided in [BAR99] and
-[LUS01].\comment{fix citations}
+Programming (CP)) is a discipline that provides a generic framework
+for representing, solving and making logical inference on
+constraints. A complete treatment of this discipline is given in
+\cite{marriott98,apt03} and very concise introductions are provided in
+\cite{bartak99,lustig01}.
 
 A constraint programming problem consists of a set of variables $V=
 {x_1,..,x_N}$, where each variable takes values from a domain
@@ -176,7 +176,7 @@ important operations:
 \end{enumerate}
 
 CP is normally implemented as part of a programming language and
-constraints are normally represented as objects [PUG95]
+constraints are normally represented as objects \cite{puget95}
 \comment{citation}. Any constraint can be introduced and, as long as the
 bounds propagation and domain reduction protocols specified by the host
 CP system are enforced, it will be indistinguishable from any other
@@ -275,7 +275,7 @@ An attitude controller can be:
     pointing at a position, or
     turning from one position to another. 
 
-    An object is an instance of a class. In EUROPA we model using the
+    An object is an instance of a class. In \eu we model using the
     abstraction of a class to speak about all instances having certain
     properties of state and behavior. In order to describe such state
     and behavior we build on the formalism of first order logic.
@@ -284,7 +284,7 @@ An attitude controller can be:
 Temporally Qualified Predicates and Actions
 
 A predicate defines a relation between objects and properties. In
-EUROPA, we define such relations between variables whose domains are
+\eu, we define such relations between variables whose domains are
 sets of objects and sets of properties. For example, we might use a
 predicate Pointing(a,p) to indicate that a rover's attitude controller
 a is pointing at position p. Note that a is a variable which may have
@@ -302,10 +302,10 @@ must be defined with timepoints to represent its start and end. So we
 might want to write Pointing(a,s,e,p) to indicate that the attitude
 controller a is pointing at position p from time s to time e. In fact,
 this pattern of using such predicates to describe both state and
-behavior of objects is so prevalent in EUROPA that we have introduced
+behavior of objects is so prevalent in \eu that we have introduced
 a special construct called a Token which has the built in variables to
 indicate the object to which the statement principally applies and the
-timepoints over which it holds. In EUROPA, all predicate instances are
+timepoints over which it holds. In \eu, all predicate instances are
 Tokens.
 
 Tokens
@@ -342,7 +342,7 @@ paths for which there is nothing more to say than that they exist.
 
 Timelines: Often objects in a domain must be described by exactly one
 token for every given timepoint in the plan. Such objects are so
-common that we provide a special construct in EUROPA to extend these
+common that we provide a special construct in \eu to extend these
 semantics to derived classes. Any instances of a class derived from a
 Timeline will induce ordering requirements among its tokens in order
 to ensure no temporal overlap may occur among them. See below for
@@ -353,7 +353,7 @@ capacity of a cargo hold, are objects with an explicit quantitative
 state in time and with a circumscribed range of changes that can occur
 to impact that state i.e. produce, consume, use, change. These changes
 are captured as tokens. Resources are such a common requirement for
-EUROPA users that special constructs are also provided for
+\eu users that special constructs are also provided for
 them. Instances of classes derived from a Resource will induce
 ordering requirements on their Tokens in order to ensure that the
 level of the resource remains within specified limits.
@@ -363,7 +363,7 @@ Timelines
 It may be sufficient to maintain only a partial-order among
 tokens. However, it is often the case that tokens represent states and
 actions of a single object in the system. Such tokens are typically
-mutually-exclusive. EUROPA uses a Timeline structure developed in (??)
+mutually-exclusive. \eu uses a Timeline structure developed in (??)
 to concisely capture system components whose behavior is described
 over time in this manner.
 
@@ -382,7 +382,7 @@ represented as a timeline. It has predicates associated with it which
 can describe its states and actions over time. The predicate names
 need not contain the tire prefix; this is now implicit since the
 tokens are assigned to a specific tire instance (i.e. an instance of a
-Timeline). While Timelines are a useful element of the EUROPA planning
+Timeline). While Timelines are a useful element of the \eu planning
 paradigm, they are not essential. A more general notion of a system
 Object can be used which does not impose restrictions of
 mutual-exclusion or non-zero duration. This can be important in
@@ -488,7 +488,8 @@ is removed from the domain, that state will not be reachable. For
 example, when a slave is created via a rule, the REJECTED value is
 removed from its state variable.  Summary
 
-This page has presented the main elements of the EUROPA planning approach. They are:
+This page has presented the main elements of the \eu planning
+approach. They are:
 
 Temporally scoped predicates and actions (a.k.a. Tokens) to represent
 states and actions in time. Note that tokens do not discriminate
@@ -501,13 +502,13 @@ context of Temporal Planning.
 Timelines as a concise abstraction to express the evolution of state
 and behavior for a system component. It provides semantics of mutual
 exclusion sequencing in time. Other core abstractions are available in
-EUROPA for handling metric resources.
+\eu for handling metric resources.
 
 Domain rules to describe internal and external relationships on and
 between tokens respectively. Rules are applied to active tokens
 (master tokens) referred to as masters and typically produce inactive
 tokens (slaves) which are a key vehicle through which the planning
-process evolves. The rule structure in EUROPA differs from the more
+process evolves. The rule structure in \eu differs from the more
 restrictive commitment to preconditions and effects in classical
 planning which prohibits durative actions and disembodied effects
 (i.e. effects which may not occur until some temporal distance after
