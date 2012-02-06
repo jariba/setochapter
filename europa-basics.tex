@@ -40,10 +40,9 @@ For such a robot the milk buying plan at the store might look like
 % \eu is a general purpose AI planning toolkit developed at NASA Ames.  
 % TODO: Talk about NASA missions where \eu has been used.
 
-\eu is a versatile planning framework which can be used in a range of
-problem-solving methods. 
+\eu is a versatile planning framework, let's start by looking at some examples of the main problem types that it can tackle.
 
-\paragraph \texttt{Constraint Satisfaction}: A canonical problem in
+\paragraph \textit{Constraint Satisfaction}: A canonical problem in
 dealing with constraints is the $N$-Queens problem in which chess queens
 must be placed on an  $N$x$N$ chessboard so no queens attack the other. Fig.
 \ref{fig:nqueens-1} shows an example of a random positioning of queens
@@ -89,7 +88,7 @@ procedure.
 \end{figure}
 
 
-\paragraph \texttt{Scheduling}: In the Resource Constrained Project
+\paragraph \textit{Scheduling}: In the Resource Constrained Project
 Scheduling Problem (RCPSP) \comment{citations needed}, a project
 consisting of a set of activities must be scheduled in a way that
 satisfies minimum and/or maximum temporal separation constraints. The
@@ -110,7 +109,7 @@ and 30 temporal constraints.
 \end{figure}
 
 
-\paragraph \texttt{Planning}: In the Shopping Agent Problem
+\paragraph \textit{Planning}: In the Shopping Agent Problem
 \cite{russelnorvig} an agent needs to purchase a set of products (milk,
 drill, etc) that are available at specific locations (supermarket,
 hardware store, etc), the agent is subject to temporal (must complete
@@ -129,17 +128,11 @@ solution produced by \eu for such a problem instance.
 \vskip+0.1cm
 \end{figure}
 
-As the examples above show, a planning problem (actions to achieve a
-goal) may embed a scheduling problem (what resources are necessary to
-achieve stated goals) and both planning and scheduling could embed a
-Constraint Satisfaction problem. % since temporal, resource and  other
+As the examples above show, a Planning problem (actions to achieve a goal) may embed a Scheduling problem (what resources are necessary to achieve stated goals) and both Planning and Scheduling may embed a Constraint Satisfaction problem. % since temporal, resource and  other
 % kinds of constraints must be respected in most real life problems.
 The relationships between Planning, Scheduling and Constraint
 Satisfaction have been examined \cite{smith00} and have lead to use of
-constraint reasoning in \eu as its innermost building block. % Below we
-% examine the main ideas from Constraint Satisfaction Programming, and
-% from Constraint Based Planning and Scheduling that constitute
-% \texttt{EUROPA}$_2$'s theoretical underpinnings.
+constraint reasoning in \eu as its innermost building block. 
 
 \subsection{Constraint Programming}
 \label{sec:europa:cp}
@@ -159,8 +152,8 @@ variables: $C=\{c_1(x_1,..,x_N), ..., c_K(x_1,..,x_N)\}$, the objective
 is to find one or more value assignments to $V$ where all constraints
 are satisfied.
 
-To solve a problem, CP techniques use logical inference to perform two
-important operations:
+To solve a problem, CP techniques use logical inference to perform Constraint Propagation, which consists of two
+operations:
 
 \begin{enumerate}
 
@@ -175,18 +168,14 @@ important operations:
 
 \end{enumerate}
 
-CP is normally implemented as part of a programming language and
-constraints are normally represented as objects \cite{puget95}
-\comment{citation}. Any constraint can be introduced and, as long as the
-bounds propagation and domain reduction protocols specified by the host
-CP system are enforced, it will be indistinguishable from any other
-``primitive'' CP constraint, such as $\leq$ or $\geq$. In theory,
-solving a CSP problem is NP-Hard \cite{ghallab04}, but often very
-efficient in practice using a number of algorithms and techniques that
-are well understood.
+A set of constraints and variables that describe a problem domain are typically represented as a Constraint Network, where the variables are nodes , and constraints are arcs between the variables. Having this network representation in mind, Arc Consistency for a a pair of variables x,y is achieved if for every value in x's domain, there is a value in the y's domain that is consistent with all the constraints that connect x and y. 
+A naive approach to ensuring arc consistency consists of cycling through all the variable pairs and performing constraint propagation until there are no variable domain changes, the AC-3 algorithm \comment {citation [MAC77]} improves over the naive approach by ignoring constraints whose variables were not affected since the last iteration. AC-3 is very popular in CP implementations.
 
-\comment{TODO: talk about arc consistency algorithms, computational
-  complexity and solvers.}
+Arc Consistency and other, more sophisticated consistency algorithms \comment {citation CP Handbook} can be used to efficiently prove that a CP problem is unsatisfiable, however, they generally can't prove that a CP problem is satisfiable and provide specific variable assignments that constitute solutions. For that, search algorithms like global backtracking or local search are used \comment {citation CP Handbook}, which use consistency as an efficient way to prune the search space.
+
+In theory, solving a CP problem is NP-Hard \cite{ghallab04}, but often very efficient in practice using a number of consistency and search algorithms that are well understood.
+
+CP is usually implemented as part of a programming language and constraints are usually represented as objects \cite{puget95}. Any constraint can be introduced and, as long as the constraint propagation protocols specified by the hostCP system are enforced, it will be indistinguishable from any other ``primitive'' CP constraint, such as $\leq$ or $\geq$. 
 
 \subsection{Constraint-Based Attribute and Interval Planning}
 \label{sec:europa:cp}
@@ -249,16 +238,12 @@ reason abut plans. The main elements of CAIP are:
 \subsection{\eu Plan Representation}
 \label{sec:europa:pr}
 
-\eu is an implementation of the CAIP framework.
+\eu is an implementation of the CAIP framework. 
 
 
-Variables
+\textit{Variables} Values that need to be represented to describe the problem domain and over which we may want to specify constraints.
 
-Values that need to be represented to describe the problem domain and over which we may want to specify constraints.
-
-Objects
-
-The things we wish to describe and refer to in a domain are considered
+\textit{Objects} The things we wish to describe and refer to in a domain are considered
 Objects. As in the case with object-oriented analysis and design, one
 can seek out the nouns in any domain description to find likely
 objects. In a Mars rover example, we might consider the satellite, the
@@ -281,7 +266,7 @@ An attitude controller can be:
     and behavior we build on the formalism of first order logic.
 
 
-Temporally Qualified Predicates and Actions
+\textit{Tokens}
 
 A predicate defines a relation between objects and properties. In \eu,
 we define such relations between variables whose domains are sets of
@@ -308,7 +293,7 @@ variables to indicate the object to which the statement principally
 applies and the timepoints over which it holds. In \eu, all predicate
 instances are Tokens.
 
-Tokens
+TODO: talk about actions
 
 A Token is an instance of a predicate or an action and is defined over
 a temporal extent. Every token has five built-in variables:
@@ -328,12 +313,10 @@ variable captures the token's current state and its reachable states
 through further restriction. See the Token State Model discussion
 below for details.
 
-Objects (continued)
+\textit{Objects (continued)}
 
-As we have noted, Tokens describe some aspect of an Object in
-time. Objects thus may have many Tokens in a plan in order to describe
-their state and behavior throughout all points in time of the
-plan. Within this general framework, we note a few particulars:
+As we have noted, Tokens describe some aspect of an Object in time. Objects thus may have many Tokens in a plan in order to describe
+their state and behavior throughout all points in time of the plan. Within this general framework, we note a few particulars:
 
 Static Facts: Classes without predicates lead to Objects without
 Tokens. This arises where an objects state or behavior is independent
@@ -486,25 +469,31 @@ values in the domain of this variable {MERGED, ACTIVE, REJECTED}. The
 INACTIVE state is captured by the variable being unbound. If a value
 is removed from the domain, that state will not be reachable. For
 example, when a slave is created via a rule, the REJECTED value is
-removed from its state variable.  Summary
+removed from its state variable.  
 
-This page has presented the main elements of the \eu planning
-approach. They are:
+\textit{Summary}
 
-Temporally scoped predicates and actions (a.k.a. Tokens) to represent
+This has presented the main elements of the EUROPA planning approach. They are:
+
+\begin{enumerate}
+
+\item Temporally scoped predicates and actions (a.k.a. Tokens) to represent
 states and actions in time. Note that tokens do not discriminate
-between state and action.
+between state and action. 
 
-Constraints to describe relationships among tokens. This provides an
+\item Token States which are the basis of planning operations on a partial
+plan.
+
+\item Constraints to describe relationships among tokens. This provides an
 expressive method of describing interactions among tokens in the
 context of Temporal Planning.
 
-Timelines as a concise abstraction to express the evolution of state
+\item Timelines as a concise abstraction to express the evolution of state
 and behavior for a system component. It provides semantics of mutual
 exclusion sequencing in time. Other core abstractions are available in
 \eu for handling metric resources.
 
-Domain rules to describe internal and external relationships on and
+\item Domain rules to describe internal and external relationships on and
 between tokens respectively. Rules are applied to active tokens
 (master tokens) referred to as masters and typically produce inactive
 tokens (slaves) which are a key vehicle through which the planning
@@ -514,5 +503,7 @@ planning which prohibits durative actions and disembodied effects
 (i.e. effects which may not occur until some temporal distance after
 the end of the action).
 
-Token States which are the basis of planning operations on a partial
-plan.
+
+
+\end{enumerate}
+
