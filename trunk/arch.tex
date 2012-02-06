@@ -32,19 +32,66 @@ system reactiveness. As a result the planning problem managed {\em in
 reactive adaptation which in contrast is managed by specialized 
 component that relies on different representations for modeling 
 the local behavior they control or even do not have any explicit 
-formal model of this behavior. Taking cues from the IDEA 
-architecture \cite{mus02}, we designed a core framework that provides a
-formal basis \cite{Py:2010ti} on the way each of the sub-component --
-called reactors -- of our agent can interact by exchanging only
-information through {\em state variables} by ensuring that state 
-information can propagate through all the reactors ensuring a
-consistent view of the present state of the world at every single tick
-trough a bottom-up {\em synchronization} flow and collaboration for
-future state evolution by timely exchanges of goals on {\em state
-  variables}. This exchange does not impose to any reactor to be aware
-of the reactors it is connected to but only focus on the state
-variables it relies on (called {\em external}) and the state
-variables it manages and maintains (called {\em internal}). 
+formal model of this behavior. The two angles our architecture attck
+this issue are the following:
+\begin{itemize}
+\item Distribute the global planning problem into multiple decision
+  loops, called {\em reactors}. Each reactor have its own scope both 
+  functionally (one for example focusing on the conversion of high 
+  level waypoints into low-level commands) and temporally as 
+  each reactor specifies to the agent their planning look-ahead and
+  their expected latency before being able to produce plan.
+\item Enforce a stronger interaction between the planning process 
+  and the integration of the world evolution. The objective being to
+  make sure that the plannign task is done while continuously informed 
+  on new world state change. By doing so, we expect to allow the planner
+  tohave better informed decision despite the fact that its latency is
+  larger that the world change rate.
+\end{itemize}
+
+For the first point T-REX provides a formal framework described in
+details in \cite{Py:2010ti} and is not the focus of this paper. The
+second have deep implication on how on should integrate a planner in
+this framework in general and was applied to the europa framework
+specifically. We'll develop later how this requirement implies to see
+in-situ planning as two parallels processes that are tightly linked
+through the same plan structure. But before that we need to introduce
+at least the high leve lconcepts and ideas behind our architecture as
+a whole. 
+
+T-REX architecture is structured around the notion of 
+{\em state variables} as the unique basis of interactionalong
+with a well defined ownership  model for each of these. 
+In this framework each reactor is seen as a
+black box providing its own {\em internal} state variables for which
+its is reponsible to maintain its value at every single instant --
+represented by a {\em tick} with a fixed duration. In order to
+identify its state a reactor can subscribe to {\em external} state
+variables for  which it will received new updates when the owner of
+these will produce its {\em internal} state. This {\em
+  synchronization} process progate through the reactor dependency 
+graph on a bottom up flow at every {\em tick} ensuring that all the
+reactors have a consistent view of the world. Conversely each reactor
+can request a future change on one of its {\em external} state
+varaiable which will be transfromed as an {\em internal} goal to the
+owner. This goal is expected to porduce a deliberation phase on the
+receiver which can in turn produce a plan impacting its {\em external}
+state variables that will propagate down following the same
+mechanism. 
+
+% Taking cues from the IDEA 
+% architecture \cite{mus02}, we designed a core framework that provides a
+% formal basis \cite{Py:2010ti} on the way each of the sub-component --
+% called reactors -- of our agent can interact by exchanging only
+% information through {\em state variables} by ensuring that state 
+% information can propagate through all the reactors ensuring a
+% consistent view of the present state of the world at every single tick
+% trough a bottom-up {\em synchronization} flow and collaboration for
+% future state evolution by timely exchanges of goals on {\em state
+%   variables}. This exchange does not impose to any reactor to be aware
+% of the reactors it is connected to but only focus on the state
+% variables it relies on (called {\em external}) and the state
+% variables it manages and maintains (called {\em internal}). 
 
 Take for example the T-REX agent instance we use in our AUV
 (Fig. \ref{fig:agent}). In this architecture all the reactors
