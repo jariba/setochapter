@@ -270,80 +270,73 @@ reason abut plans. The main elements of CAIP are:
 \label{sec:europa:pr}
 
 \eu is an implementation of the CAIP framework. 
+\comment{once the CAIP section is finished, this section will need an iteration to provide a few pointers back to it}
 
 
 \textit{Variables} Values that need to be represented to describe the
-problem domain and over which we may want to specify constraints.
+problem domain and over which we may want to specify constraints. In the Shopping Agent example, the times at which the agent needs to leave or be back, or executes a purchase, are all instances where variables representing time would be used.
 
 \textit{Objects} The things we wish to describe and refer to in a
 domain are considered Objects. As in the case with object-oriented
 analysis and design, one can seek out the nouns in any domain
-description to find likely objects. In a Mars rover example, we might
-consider the satellite, the camera, and the attitude controller (which
-orients the robot for taking pictures) to be objects. Objects have
-state and behavior. For example, a camera can be:
+description to find likely objects. In the Shopping Agent example, we night consider the Agent itself, Products and Locations all to be objects. Objects have state and behavior. For example, a Shopping Agent can have:
+\begin{enumerate}
+	\item State: it's location, a bag that contains the products it has already purchased (the bag can in turn be another object), etc.
+	\item Behavior: go to a location to look for a product, perform a purchase, return home, etc. 
+\end{enumerate}
 
-    off,
-    ready, or
-    taking a picture. 
-
-An attitude controller can be:
-
-    pointing at a position, or
-    turning from one position to another. 
-
-    An object is an instance of a class. In \eu we model using the
-    abstraction of a class to speak about all instances having certain
-    properties of state and behavior. In order to describe such state
-    and behavior we build on the formalism of first order logic.
+As in object-oriented design, objects that have similar state and behavior can be described generically in terms of object types or classes. \eu allows the definition of object classes in the same way that it is done in popular object-oriented programming languages. However, to describe state and behavior for the purposes of planning we need a different mechanism, for that we build on the formalism of first order logic as explained below.
 
 
 \textit{Tokens}
 
-A predicate defines a relation between objects and properties. In \eu,
-we define such relations between variables whose domains are sets of
-objects and sets of properties. For example, we might use a predicate
-\texttt{Pointing($a,p$)} to indicate that a rover's attitude controller
-$a$ is pointing at position $p$. Note that $a$ is a variable which may
+In first order logic, a predicate defines a relation between objects and properties \comment{citation?}. 
+In \eu, we define such relations between variables whose domains are sets of
+objects and sets of properties to describe state and behavior. For example, we might use a predicate
+\texttt{At($a$,$l$)} to indicate that agent
+$a$ is at location $l$, or a predicate \texttt{Buy($a$,$p$}) to indicate that agent $a$ is taking acting to buy product $p$. Note that $a$ is a variable which may
 have a number of possible values in a problem with multiple
-satellites. Similarly, $p$ is a variable whose values are the set of
-possible positions. In a grounded plan, single values will be
-specified for each variable as we saw in the case of a solved
-Constraint Satisfaction Problem.
+agents. Similarly, $l$ and $p$ are variables whose values are the set of
+possible positions and products respectively. \eu can be used to create partial plans, where the domains of variables $a$ and $l$ can have more than one possible value in them, or grounded plans, where single values will be
+specified for each variable as we saw in the case of the N-queen's problem.
 
-In general, it is not sufficient to state that a predicate is true
-without giving it some temporal extent over which it holds. Predicates
+In general, to come up with an executable plan it is not sufficient to state predicates that describe required state or behavior
+without also specifying some temporal extent over which each of those predicates hold. Predicates
 that are always true can be thought to hold from the beginning to the
 end of time. However, in practice, the temporal extent of interest
 must be defined with timepoints to represent its start and end. So we
-might want to write \texttt{Pointing($a,s,e,p$)} to indicate that the
-attitude controller a is pointing at position $p$ from time $s$ to
+might want to write \texttt{At($a$,$s$,$e$,$l$)} to indicate that the
+agent $a$ is at location $p$ from time $s$ to
 time $e$. In fact, this pattern of using such predicates to describe
 both state and behavior of objects is so prevalent in \eu that we have
 introduced a special construct called a Token which has the built in
 variables to indicate the object to which the statement principally
 applies and the timepoints over which it holds. In \eu, all predicate
-instances are Tokens.
+instances are Tokens. Also, in the same way that objects are described generically by classes, in \eu Tokens can be described generically by Token Types.
 
-\comment{talk about actions}
-
-A Token is an instance of a predicate or an action and is defined over
+A Token is an instance of a predicate that represents and object's state or behavior and is defined over
 a temporal extent. Every token has five built-in variables:
 
-start: The beginning of the temporal extent over which the predicate
-is defined.  end: The end of the temporal extent over which the
-predicate is defined.  duration: The constraints start + duration =
-end is enforced automatically.  object: made. The set of objects to
+\begin{enumerate}
+    \item \textit {start}: The beginning of the temporal extent over which the predicate
+is defined.  
+    \item \textit {end}: The end of the temporal extent over which the
+predicate is defined.  
+    \item \textit {duration}: The constraint \textit{start} + \textit{duration} =
+\textit{end} is enforced automatically.  
+    \item \textit{object}: The set of objects to
 which a token might apply. In a grounded plan each Token applies to a
 specific Object, reflecting the intuition that we are using Tokens to
 describe some aspect of an Object (i.e. its state or behavior) in
 time. However, in a partial plan, the commitment to a specific object
 may not yet have been made.
-
-state: Tokens can be ACTIVE, INACTIVE, MERGED, or REJECTED. The state
+    \item \textit{state}: Tokens can be ACTIVE, INACTIVE, MERGED, or REJECTED. The state
 variable captures the token's current state and its reachable states
-through further restriction. See the Token State Model discussion
+through further restriction.  This is \eu's mechanism to support CAIP's planning approach, see the Token State Model discussion
 below for details.
+\end{enumerate}
+
+\comment {resume cleanup here}
 
 \textit{Objects (continued)}
 
