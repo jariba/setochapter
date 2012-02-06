@@ -283,30 +283,30 @@ An attitude controller can be:
 
 Temporally Qualified Predicates and Actions
 
-A predicate defines a relation between objects and properties. In
-\eu, we define such relations between variables whose domains are
-sets of objects and sets of properties. For example, we might use a
-predicate Pointing(a,p) to indicate that a rover's attitude controller
-a is pointing at position p. Note that a is a variable which may have
-a number of possible values in a problem with multiple
-satellites. Similarly, p is a variable whose values are the set of
+A predicate defines a relation between objects and properties. In \eu,
+we define such relations between variables whose domains are sets of
+objects and sets of properties. For example, we might use a predicate
+\texttt{Pointing($a,p$)} to indicate that a rover's attitude controller
+$a$ is pointing at position $p$. Note that $a$ is a variable which may
+have a number of possible values in a problem with multiple
+satellites. Similarly, $p$ is a variable whose values are the set of
 possible positions. In a grounded plan, single values will be
 specified for each variable as we saw in the case of a solved
 Constraint Satisfaction Problem.
 
-In general, is is not sufficient to state that a predicate is true
+In general, it is not sufficient to state that a predicate is true
 without giving it some temporal extent over which it holds. Predicates
 that are always true can be thought to hold from the beginning to the
 end of time. However, in practice, the temporal extent of interest
 must be defined with timepoints to represent its start and end. So we
-might want to write Pointing(a,s,e,p) to indicate that the attitude
-controller a is pointing at position p from time s to time e. In fact,
-this pattern of using such predicates to describe both state and
-behavior of objects is so prevalent in \eu that we have introduced
-a special construct called a Token which has the built in variables to
-indicate the object to which the statement principally applies and the
-timepoints over which it holds. In \eu, all predicate instances are
-Tokens.
+might want to write \texttt{Pointing($a,s,e,p$)} to indicate that the
+attitude controller a is pointing at position $p$ from time $s$ to
+time $e$. In fact, this pattern of using such predicates to describe
+both state and behavior of objects is so prevalent in \eu that we have
+introduced a special construct called a Token which has the built in
+variables to indicate the object to which the statement principally
+applies and the timepoints over which it holds. In \eu, all predicate
+instances are Tokens.
 
 Tokens
 
