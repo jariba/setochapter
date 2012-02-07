@@ -1,7 +1,7 @@
 \section{Planning and execution in the \texttt{T-REX} architecture}
 \label{sec:arch}
 
-\subsection{The T-REX architecture}
+\subsection{The \rx architecture}
 \label{sec:arch:trex}
 
 % {\em\tiny This section introduces shortly T-REX architecture but move
@@ -22,62 +22,64 @@
 %     execution with a rich representation of resources and time.
 %   \end{itemize}}
  
-The T-REX architecture was designed with the objective to bring 
-planning closer to the low-level control of the vehicle while
-maintaining its reactivity. Indeed, in most of the architecture where
-task planning is embedded, this task remains at a failry high level of
-abstraction as the complexity of this task would otherwise impede the
-system reactiveness. As a result the planning problem managed {\em in
-  situ} remains fairly detached from low-level control and most of the 
-reactive adaptation which in contrast is managed by specialized 
-component that relies on different representations for modeling 
-the local behavior they control or even do not have any explicit 
-formal model of this behavior. The two angles our architecture attck
-this issue are the following:
+The \rx architecture was designed with the objective to bring planning
+closer to the low-level control of the vehicle while maintaining its
+reactivity. Indeed, in most of the architecture where task planning is
+embedded, this task remains at a failry high level of abstraction as
+the complexity of this task would otherwise impede the system
+reactiveness. As a result the planning problem managed {\em in situ}
+remains fairly detached from low-level control and most of the
+reactive adaptation which in contrast is managed by specialized
+component that relies on different representations for modeling the
+local behavior they control or even do not have any explicit formal
+model of this behavior. The two angles our architecture attck this
+issue are the following:
+
 \begin{itemize}
+
 \item Distribute the global planning problem into multiple decision
   loops, called {\em reactors}. Each reactor have its own scope both 
   functionally (one for example focusing on the conversion of high 
   level waypoints into low-level commands) and temporally as 
   each reactor specifies to the agent their planning look-ahead and
   their expected latency before being able to produce plan.
+
 \item Enforce a stronger interaction between the planning process 
   and the integration of the world evolution. The objective being to
   make sure that the plannign task is done while continuously informed 
   on new world state change. By doing so, we expect to allow the planner
   tohave better informed decision despite the fact that its latency is
   larger that the world change rate.
+
 \end{itemize}
 
-For the first point T-REX provides a formal framework described in
-details in \cite{py10} and is not the focus of this paper. The
-second have deep implication on how on should integrate a planner in
-this framework in general and was applied to the europa framework
-specifically. We'll develop later how this requirement implies to see
-in-situ planning as two parallels processes that are tightly linked
-through the same plan structure. But before that we need to introduce
-at least the high leve lconcepts and ideas behind our architecture as
-a whole. 
+For the first point \rx provides a formal framework described in
+details in \cite{py10} and \cite{rajan12} and is not the focus of this
+paper. The second have deep implication on how on should integrate a
+planner in this framework in general and was applied to the europa
+framework specifically. We'll develop later how this requirement
+implies to see in-situ planning as two parallels processes that are
+tightly linked through the same plan structure. But before that we
+need to introduce at least the high leve lconcepts and ideas behind
+our architecture as a whole.
 
-T-REX architecture is structured around the notion of 
-{\em state variables} as the unique basis of interactionalong
-with a well defined ownership  model for each of these. 
-In this framework each reactor is seen as a
-black box providing its own {\em internal} state variables for which
-its is reponsible to maintain its value at every single instant --
-represented by a {\em tick} with a fixed duration. In order to
-identify its state a reactor can subscribe to {\em external} state
-variables for  which it will received new updates when the owner of
-these will produce its {\em internal} state. This {\em
-  synchronization} process progate through the reactor dependency 
+\rx architecture is structured around the notion of {\em state
+  variables} as the unique basis of interactionalong with a well
+defined ownership model for each of these.  In this framework each
+reactor is seen as a black box providing its own {\em internal} state
+variables for which its is reponsible to maintain its value at every
+single instant -- represented by a {\em tick} with a fixed
+duration. In order to identify its state a reactor can subscribe to
+{\em external} state variables for which it will received new updates
+when the owner of these will produce its {\em internal} state. This
+{\em synchronization} process progate through the reactor dependency
 graph on a bottom up flow at every {\em tick} ensuring that all the
 reactors have a consistent view of the world. Conversely each reactor
 can request a future change on one of its {\em external} state
-varaiable which will be transfromed as an {\em internal} goal to the
+variable which will be transfromed as an {\em internal} goal to the
 owner. This goal is expected to porduce a deliberation phase on the
 receiver which can in turn produce a plan impacting its {\em external}
-state variables that will propagate down following the same
-mechanism. 
+state variables that will propagate down following the same mechanism.
 
 % Taking cues from the IDEA 
 % architecture \cite{mus02}, we designed a core framework that provides a
@@ -93,21 +95,24 @@ mechanism.
 % variables it relies on (called {\em external}) and the state
 % variables it manages and maintains (called {\em internal}). 
 
-Take for example the T-REX agent instance we use in our AUV
+Take for example the \rx agent instance we use in our AUV
 (Fig. \ref{fig:agent}). In this architecture all the reactors
 (symbolized by colored boxes) do not have explicit connection from one
 to another but instead rely on a publish/subscribe model on state
 variables. For Example the \textsf{Pilot} reactor needs the {\em
-  externally} managed state informations from \textsf{Sensor\_Data} 
+  externally} managed state informations from \textsf{Sensor\_Data}
 and \textsf{Nav\_cmd} states variables in order to maintain {\em
   internally} the state variables \textsf{Waypoint} and
 \textsf{Nav\_policy}. This relation applies in two way :
+
 \begin{itemize}
+
 \item In order to identify its current {\em internal} state values
   this reactor needs to know the current {\em external} state
   information it relies on. In this case the current \textsf{Waypoint}
   the vehicle is heading to can be extracted for example from the
   current \textsf{Nav\_cmd} executed.
+
 \item The future objectives a reactor has on its future \textsf{Internal}
   state will probably imply sub-objectives to be reported to the
   owner of its {\em external} depending on their current values. Again
@@ -115,6 +120,7 @@ and \textsf{Nav\_cmd} states variables in order to maintain {\em
   depending on its current position provided by \textsf{Sensor\_Data}
   it can identify a sequence of \textsf{Nav\_cmd} that should
   eventually help him reach this location.
+
 \end{itemize}
 
 \begin{figure}[!htb]
@@ -128,14 +134,17 @@ and \textsf{Nav\_cmd} states variables in order to maintain {\em
   \label{fig:agent}
 \end{figure}
 
-Overal T-REX architecture helps to abstract to the reactor interaction
-to only state variables. Each reactor is practically ignoring where
-its {\em external} state information is managed as long as this
-information is available and properly maintained so they can properly 
-manage their own {\em internal} state information which in turn may be
-used by other reactors. Such formalism also constrain reactors
-interaction to state information exchanges which are two folds:
+Overall the \rx architecture helps to abstract to the reactor
+interaction to only state variables. Each reactor is practically
+ignoring where its {\em external} state information is managed as long
+as this information is available and properly maintained so they can
+properly manage their own {\em internal} state information which in
+turn may be used by other reactors. Such formalism also constrain
+reactors interaction to state information exchanges which are two
+folds:
+
 \begin{itemize}
+
 \item {\em Observation on the current state values}: This information
   propagates up in the reactor graph at the synchronization phase 
   and occur at the beginning of every time steps (called
@@ -144,35 +153,42 @@ interaction to state information exchanges which are two folds:
   ask them to compute their {\em internal} state variables values for
   this same tick. By doing so we propagate a consistent view of that
   state of the world throughout all the reactors as time advance.
+
 \item {\em Goals request on future state}: This information propagates
   down in the reactor graph. It reflects that, in order to satisfy own
   of its {\em internal} objectives, a reactor may have a plan that
   rely on future values of one of its {\em external} state. When such
   a plan is identified we ensure that this part of the plan is given
   as a goal to the owner of the given {\em external(s)} state variable(s). 
+
 \end{itemize}
 
 The choice of representation of state variables, observations and
-goals is directly derieved to the timleines and tokens from europa. 
+goals is directly derieved to the timleines and tokens from europa.
 such representation is ich enough to allow the excahnge of state
 information in a formal and yet flexible way and its transaltion in
-planning frameworks that have an explicit representation of time 
-(such as but not limited to europa) is often trivial. 
+planning frameworks that have an explicit representation of time (such
+as but not limited to europa) is often trivial.
 
 The overall execution cycle of the agent is also abstracted as some
 continuous planning/deliberation cycle between all the
 reactors. Indeed , at the agent interface level, each reactor provided
 only two abstract calls that conceptualize their execution:
+
 \begin{itemize}
+
 \item \texttt{synchronize} that takes the last {\em external}
   observations as argument and will return the {\em internal}
   observations for this reactor or a failure report.
+
 \item \texttt{step} that accept new goals requested (if any) on the
   {\em internal} timeline of this reactor and will execute one step of
   deliberation. The returned value indicates if a complete plan has
   been found and in that case will also provide the part of this plan
   applied to {\em external} timelines of this reactor.
+
 \end{itemize}
+
 Both of these two deliberative functions have different scope and
 temporal constraints. The \texttt{synchronize} call is considered as
 atomic and will focus only on state inference from the current tick by
@@ -182,16 +198,15 @@ will then propagate up in the reactor graph at any single tick to
 ensure that all reactors are aware of the current state of the
 world. \texttt{step} relates to a single decision step of the planning
 process which is focused on the future evolution of the state
-variables and it can take multiple steps spanning other multiple
-ticks for a reactor to produce a plan that is both complete and
-valid. when such plan is identified its {\em external} part is then
-dispatched to the corresponding reactors which in turn can start their
-deliberation \texttt{step}s in order to satisfy these new
-objectives. As a consequence physical execution will occur as these
-goals and planning propagate down in the reactor graph until they
-eventually become goals for the lowest level reactor which -- instead
-of deliberating -- may just transform this goal in a physical command
-execution. 
+variables and it can take multiple steps spanning other multiple ticks
+for a reactor to produce a plan that is both complete and valid. when
+such plan is identified its {\em external} part is then dispatched to
+the corresponding reactors which in turn can start their deliberation
+\texttt{step}s in order to satisfy these new objectives. As a
+consequence physical execution will occur as these goals and planning
+propagate down in the reactor graph until they eventually become goals
+for the lowest level reactor which -- instead of deliberating -- may
+just transform this goal in a physical command execution.
 
 The way the agent interleave planning \texttt{step}s and
 synchronization is illustrated in Figure \ref{fig:tick-exec}.
@@ -199,6 +214,7 @@ Synchronization happens at every single tick and will interrupt
 planning allowing this reactor to identify its current state that can
 propagate through the reactor graph in order to ensure t aconsitent
 view of the state of the world between all the reactors.  
+
 \begin{figure}[!htbp]
   \centering
   \vskip-1pc
@@ -210,6 +226,7 @@ view of the state of the world between all the reactors.
   \label{fig:tick-exec}
   \vskip-0.8pc
 \end{figure}
+
 This view of the reactor has two parallel tasks aloow for long
 planning deliberation while ensuring that the state evolution
 propagates through the agent as time advance. These two tasks 
@@ -226,27 +243,30 @@ configurations.
 \subsection{The Europa deliberative reactor}
 \label{sec:arch:europa}
 
-The europa reactor is our implementation inside T-REX of a reactor
-that usess automated planning for its execution. This reactor is fully
-based on the europa framework and applies the core idea we of T-REX we
+The \eu reactor is our implementation inside \rx of a reactor that
+usess automated planning for its execution. This reactor is fully
+based on the europa framework and applies the core idea we of \rx we
 described above to implement a reactor for which the sole purpse is to
 deliberate as time advance. The choice of europa as the planning
-framework was directed by the fact thta this framework provide  a rich
+framework was directed by the fact thta this framework provide a rich
 and highly configurable framework to be able to infer around a rich
 temporal domain.
 
-This reactor is implemented following the idea that in T-REX, the
+This reactor is implemented following the idea that in \rx, the
 whole execution cycle is two deliberation processes. Both of these
 processes are implemented as two europa solvers modifying the same
-plan database and for which the execution is managed by the T-REX 
+plan database and for which the execution is managed by the \rx 
 framework as time advance during the execution of the system:
+
 \begin{enumerate}
+
 \item The synchronization solver is a specialized europa solver that
   will integrate in the plan new information about the evolution of
   the External state variable and ensure that the reactor propagate
   these in order to both identify its current state and inform
   other reactors of any state change on its internal timelines. This
   solver is summoned at the beginning of every single tick.
+
 \item The deliberation solver is managing the deliberation process of
   the reactor in order to produce a new plan or alter its current plan
   as new goals are given to the reactor or the synchronization solver
@@ -254,7 +274,9 @@ framework as time advance during the execution of the system:
   the expectations of the previous plan. This process can  span other
   multiple tick and therefore can be interrupted at any single tick in
   order for the synchronization solver to do its task.
+
 \end{enumerate}
+
 While the two processes are separate, they share the same plan
 internal to a reactor and therefore at every synchronization cycle the
 planning process is informed of the new world state and its impact on
@@ -262,18 +284,20 @@ the plan. Conversely, when the planning process eventually finds a
 solution, synchronization is informed about generating the planned
 state values on the {\em external} state variables. This {\em
   external} plan defines the set of {\em goals} for this state
-variable managed by another {\em reactor}. 
+variable managed by another {\em reactor}.
 
 An important challenge for embedding automayted planning i na situated
 agent as always been to go around the asumptions made by most classical
 planners. Specifically one assumption restrict the problem to ``offline
 planning''  defined in \cite{ghallab04} as follow:
+
 \begin{quotation}
   The planner is not concerned with any change that may occur in
   $\Sigma$ \footnote{In this book $\Sigma$ identifies the world modeled
     by the plan domain} while it is planning; it plans for the given
   initial and goal states regardless of the current dynamics, if any.
 \end{quotation}
+
 This assumption, while helpfull to reduce the scope of the planning
 problem, becomes problematic if one wants to embed a planner in a
 real-time system that evolves in a highly dynamic environment. In a
@@ -281,7 +305,7 @@ typical robot this implies that the only point where the planner can
 be informed about the current world state is righe before the planning
 is started by giving to the planner the intial state and current
 objectives. During the planning, it is assumed that the agent can
-maintin the world as perceived by the planner as stable. In 
+maintin the world as perceived by the planner as stable. In
 \cite{lemai04, lemai-chenevier2004}, they do attempt to reduce the
 impact of planning by aloowing local plan repairs which attempt to
 insert repairing actions in the exisiting plan andf can be done fast
@@ -291,19 +315,17 @@ complete. {\em I may need more examples/refs here}
 
 Looking back at Fig. \ref{fig:tick-exec}, one can already see that
 this asumtpion is problematic in our architecture. Indeed
-synchronization that tracks state evolution can occur several times 
+synchronization that tracks state evolution can occur several times
 during the reactor deliberation process. By making synchronization and
 deliberation share the same plan we provide a solution that relax this
 assumption. In the following sections we present how synchronization
 and deliberation are implemented independently first to finally show
 how their interaction through the plan helps relax this assumption by
 making the planning fully integrated to the reactor execution cycle
-while potentially allowing for more informed planning. 
-
+while potentially allowing for more informed planning.
 
 \subsubsection{Synchronization identify internal state evolution}
 \label{sec:arch:synch}
-
 
 For the sake of simplicity we introduce first how a reactor can track
 and identify its state in the context where it does not have any
@@ -315,15 +337,20 @@ have no future goal. {\em Need to develop the reason why it is a
 
 In the europa based reactor we introduce this requirement as a new
 type of flaw for the europa framework. This flaw enforces at the
-reactor to identify fully its internal state for the current
-tick. By using this new flaw we can describe the synchronization
-process as this general sequence :
+reactor to identify fully its internal state for the current tick. By
+using this new flaw we can describe the synchronization process as
+this general sequence :
+
 \begin{enumerate}
+
 \item Integrate the external state as provided by the owner of each
   external timeline into the plan database.
+
 \item Propagate this information in the plan database following the
   model $\mathcal{M}$ of this reactor.
+
 \item Resolve the current state value of each internal timelines.
+
 \end{enumerate}
 
 \begin{figure}[!htbp]
@@ -343,27 +370,33 @@ process as this general sequence :
 
 The resolution of internal state flaw can be resolved using one of the
 following choices which are evaluated in the given order:
+
 \begin{enumerate}
+
 \item Extend the previous state value to end after this tick (ie
   restrict its end time to $[\tau+1, \infty)$). 
+
 \item Start the next active token in the timeline and
   attempt to start it now (ie restrict its start time to the single
   value $\tau$).
+
 \item Create and insert a new token in this timeline that will start
   at the current tick $\tau$ (attempt this for each possible token
   type for this timeline if necessary). 
+
 \end{enumerate}
 
 All of these choices are evaluated sequentially until a consistent
 solution with no more flaw for this tick is identified. In order to do
 so we need to make the assumption that the current state value of an
-internal timeline do not depend on the future or more accurately
-that any choices made during this synchronization will not lead to a
-future inconsistency (meaning no possible solution) for a future
+internal timeline do not depend on the future or more accurately that
+any choices made during this synchronization will not lead to a future
+inconsistency (meaning no possible solution) for a future
 synchronization. Such assumption deeply impact the set of possible
 domains one the reactor can support while remaining complete. Take for
 example the following model rule where {\tt Vehicle} is {\em Internal}
 and {\tt Command} is {\em External} to the reactor.
+
 \begin{verbatim}
 Vehicle::Dive {
   contains(Command.Descend descend);
@@ -371,7 +404,7 @@ Vehicle::Dive {
 }
 \end{verbatim}
 
-Such model present the issue that the reactor needs at one point to
+Such model presents the issue that the reactor needs at one point to
 take the decision to start the token {\tt Vehicle.Dive} and by doing
 so it assumes that in {\em exactly} 2 ticks in the future the {\tt
   Command} timeline will change its state to {\tt Command.Descend}. If
@@ -383,7 +416,7 @@ future that the {\tt Command.Descend} state value. In this case it
 would have missed the opportunity to set its {\tt Vehicle} state to
 the correct value which may similarly lead (depending on the rest of
 the model) to a similar inconsistency it won't be able to resolve (as
-TREX enforces that  the past is monotonic).
+TREX enforces that the past is monotonic).
 
 While this limitation of the system is important to take into account,
 it is also important to note that the model snippet we gave here --
@@ -402,88 +435,93 @@ reason there's always the risk that the search of a solution is not a
 straightforward sequence of unit decision. As such process is required
 by the architecture at every ticks for every reactors presently
 running this need to be carefully designed. At the engine level we
-made careful choices in term of both the focus of the search -- limited
-only to tokens that can potentially overlap the current tick -- and
-its heuristic where the internal state flaw is considered last during
-the search. The later proved to limit the amount of backtrack in the
-search for a solution -- or at least how deep we need to backtrack in
-our decision tree -- similarly the sequence in which we evaluate the
-possible resolution for such a flaw -- presented previously -- was
-selected according to simple assumptions that takes benefit of a
-possibly already existing plan by assuming that if the outcome of
-synchronization appears consistent with our current plan then it
-probably reflects that this reactor plan is executed. Such assumption
-helps direct the internal state evaluation and, in nominal cases (where
-we assume that reactors are acting in concert), proved to be a sound
-solution.  
+made careful choices in term of both the focus of the search --
+limited only to tokens that can potentially overlap the current tick
+-- and its heuristic where the internal state flaw is considered last
+during the search. The later proved to limit the amount of backtrack
+in the search for a solution -- or at least how deep we need to
+backtrack in our decision tree -- similarly the sequence in which we
+evaluate the possible resolution for such a flaw -- presented
+previously -- was selected according to simple assumptions that takes
+benefit of a possibly already existing plan by assuming that if the
+outcome of synchronization appears consistent with our current plan
+then it probably reflects that this reactor plan is executed. Such
+assumption helps direct the internal state evaluation and, in nominal
+cases (where we assume that reactors are acting in concert), proved to
+be a sound solution.
 
-One final aspect to keep into account is that in T-REX point of view
+One final aspect to keep into account is that in \rx point of view
 synchronization is the only critical task of a reactor. Indeed, such
-process is used in order for the agent to identify its
-current state and maintain it consistent throughout the agent
-life-time. A reactor not being able to find a consistent solution
-during synchronization -- meaning that after evaluating all the
-possible solutions provided by its model it did not found any plan
-that is not inconsistent -- not only expresses that this reactor is
-not able anymore to explain the state of the world but may jeopardize
-other reactors that relies on its {\em internal} state. For this
-reason a failure to do synchronization immediately result on the
-agent killing this reactor and notifying any reactor that depends on
-its {\em internal} state variables by posting the special observation
-\textsf{Failed}. By doing so we allow for graceful degradation where
-other reactors can readapt their plan as they receive this
-\textsf{Failed} observation.
+process is used in order for the agent to identify its current state
+and maintain it consistent throughout the agent life-time. A reactor
+not being able to find a consistent solution during synchronization --
+meaning that after evaluating all the possible solutions provided by
+its model it did not found any plan that is not inconsistent -- not
+only expresses that this reactor is not able anymore to explain the
+state of the world but may jeopardize other reactors that relies on
+its {\em internal} state. For this reason a failure to do
+synchronization immediately result on the agent killing this reactor
+and notifying any reactor that depends on its {\em internal} state
+variables by posting the special observation \textsf{Failed}. By doing
+so we allow for graceful degradation where other reactors can readapt
+their plan as they receive this \textsf{Failed} observation.
 
 \subsubsection{Deliberation : planning for future state evolution}
 \label{sec:arch:plan}
 
 The planning process inside a reactor is directly based on the way
 europa work which was described in previous section. Still some simple
-alterations were made in  order to both include deliberation
+alterations were made in order to both include deliberation
 information one reactor provide to the architecture -- such as its
-deliberation latency and its planning look-ahead both expressed in 
+deliberation latency and its planning look-ahead both expressed in
 ticks -- and the fact that we potentially need to interleave this
-deliberation with not the synchronization process but also with 
-the deliberation of other reactors\footnote{Current implementation of
-  T-REX is running on a single process and it is the responsibility of
-  the agent itself to emulate the multi-threading of the reactors
+deliberation with not the synchronization process but also with the
+deliberation of other reactors\footnote{Current implementation of \rx
+  is running on a single process and it is the responsibility of the
+  agent itself to emulate the multi-threading of the reactors
   deliberation and synchronization}. For this reason while the overal
 planning of a europa reactor strictly relies on the europa framework
 plnanning solver, its slices the execution of Algorithm
 \ref{alg:europa:solve} in atomic steps. The interruption is done
 around the recursive call (line \ref{li:recurse}) while always
-ensuring that the current partial plan mainitained is never poroven
-inconsitent at any single step. This can be managed by allowing the
+ensuring that the current partial plan mainitained is never proven
+inconsistant at any single step. This can be managed by allowing the
 call to backtrack until a DecisionPoInt that is not exhausted (ie
-$decision.hasNext()$ is \texttt{true}) is find in the call stack. 
+$decision.hasNext()$ is \texttt{true}) is find in the call stack.
 
 One critical aspect of this deliberation step is to ensure that at the
 exit of this call the $plan$ is not proven inconsistent. Indeed, it is
 always possible that the next call made by the agent is the
 synchronization which would immediately fail if the $plan$ is
-inconsistent before any solving attempt made for synchronization. 
-For this reason if the plan is proven inconsistent during a
-deliberation step we either backtrack in the decision stack until we
-find a node fo the tree that have remaining alternate solution or
-simply fully relax the plan in situation there's absolutely no other
-alternative  (by removing all the goals and keeping
-only recent observations produced). These constraints are yet again
-related to the fact that for the agent the only crucial functionality
-of a reactor is to resolve successfully its synchronization. 
+inconsistent before any solving attempt made for synchronization.  For
+this reason if the plan is proven inconsistent during a deliberation
+step we either backtrack in the decision stack until we find a node fo
+the tree that have remaining alternate solution or simply fully relax
+the plan in situation there's absolutely no other alternative (by
+removing all the goals and keeping only recent observations
+produced). These constraints are yet again related to the fact that
+for the agent the only crucial functionality of a reactor is to
+resolve successfully its synchronization.
 
-The number of flaw between two steps can evolve for the following
+The number of flaws between two steps can evolve for the following
 reasons that are exogenous to deliberation :
+
 \begin{enumerate}
+
 \item A new goal has been posted on one of the reactor timeline. This
   is usually due to another reactor finding a plan and posting the
   corresponding new objective to this reactor.
+
 \item The outcome of synchronization created new flaws that did not
   need to be resolved during synchronization.
+
 \item A previously requested goal has be recalled by the initial
   requester. This can happen when the reactor did identify that is
   initial plan is no longer valid. For example as synchronization
   proved this plan to be inconsistent.
+
 \end{enumerate}
+
 These 3 events will potentially produce new flaws to be resolved while
 any single deliberation step will usually reduce the number of flaws
 to be resolved.
@@ -491,17 +529,23 @@ to be resolved.
 The scope of planning for the reactor plays also a role in the
 deliberation process as we limit deliberation to the sliding temporal
 window $[\tau+\lambda, \tau+\lambda+\pi]$ where:
+
 \begin{itemize}
+
 \item $\tau$ is the current tick
+
 \item $\lambda$ is the specified latency of this reactor. Which is an
   indicator on the expected maximum time this reactor is expected
   before being able to produce a plan.\footnote{Do note that this
-    parameter remains indicative and, while it is highly recommended to
-    select a sound value, a failure to produce a plan in this delay is
-    not considered as a critical failure of the reactor}
+    parameter remains indicative and, while it is highly recommended
+    to select a sound value, a failure to produce a plan in this delay
+    is not considered as a critical failure of the reactor}
+
 \item $\pi$ is the planning look-ahead of the reactor. which indicates
   how many ticks in the future this reactor is looking ahead while planning.
+
 \end{itemize}
+
 This scope allow to filter out any tokens that are either necessarily
 ending before $\tau$ or necessarily starting after. Focusing the
 [planning problem to only the tokens that are in a reasonable
@@ -513,26 +557,29 @@ deliberation. As time advance flaws that where initially beyond this
 window will become active flaw that the reactor can then evaluate
 resulting on an apparent continuous planning of the reactor.
 
+When there are no more flaw is present in the current planning scope a
+plan solution is found. This has two effects:
 
-When there's no more flaw is present in the current planning scope a
-plan  solution is found. This has two effects:
 \begin{enumerate}
+
 \item This reactor does not need to deliberate until the next synchronization.
+
 \item The {\em external} part of this plan can then be posted which
   eventually (at the end of the current tick if these goals overlap
   the owner planning window) will be dispatched as goals triggering
   new deliberation on these reactors.
+
 \end{enumerate}
 
 \subsubsection{Intertwining synchronization and execution}
 \label{sec:arch:intertwine}
 
 A core aspect of this reactor is that it takes advantage of the
-specific sequencing enforced by the T-REX architecture along with the
+specific sequencing enforced by the \rx architecture along with the
 fact that only one $plan$ structure is maintained in the reactor and
-shared between synchronization and planning to allow these two processes
-to not only be interleaved but impact each other through the way they
-manipulate this plan.  
+shared between synchronization and planning to allow these two
+processes to not only be interleaved but impact each other through the
+way they manipulate this plan.
 
 The most obvious case is how synchronization allow propagate of {\em
   external} observations as a new tick occur in the plan. In or
@@ -546,25 +593,25 @@ able to focus on synchronization as a state evluation process that can
 be resolved within the europa framework with few extensions. simliarly
 we presented deliberation at this fairly high level not necessarily
 discussing how the disruptive nature of synchronization in this
-process could impact the way this planning process will evolve. 
+process could impact the way this planning process will evolve.
 
 We first anlyse the case during which synchronization occurs after the
-planning has vcompleted (ie the last seep of deliberation resulted into
-a plan that is considered as complete for the current look-ahead). As
-synchronization starts with  the plan produced this will gave a frame
-for the search process. Therefore this deliberation will not only be a
-model-based estimation uniquely based on the {\em external}
-observations but will also include the reactor intentions as described
-by the plan produced. Consider for example the Shopping Agent model
-described during the europa presentation and that the
+planning has vcompleted (ie the last seep of deliberation resulted
+into a plan that is considered as complete for the current
+look-ahead). As synchronization starts with the plan produced this
+will gave a frame for the search process. Therefore this deliberation
+will not only be a model-based estimation uniquely based on the {\em
+  external} observations but will also include the reactor intentions
+as described by the plan produced. Consider for example the Shopping
+Agent model described during the europa presentation and that the
 location of the \texttt{agent} is an {\em external} timeline. For
 example as, the reactor add the goal to have \texttt{Own} milk and the
-current {\em external} states indicated that it was \texttt{At(home)} it
-produced the plan in Fig. \ref{fig:shop:exec0}. The  {\em external}
-  part of the plan -- namely the tokens \texttt{Going(home,
-    superMarket)} and \texttt{At(SuperMarket)} -- and integrated as
-  goals for the reactor managing this specific state varaiable {\em
-    internally}. 
+current {\em external} states indicated that it was \texttt{At(home)}
+it produced the plan in Fig. \ref{fig:shop:exec0}. The {\em external}
+part of the plan -- namely the tokens \texttt{Going(home,
+  superMarket)} and \texttt{At(SuperMarket)} -- and integrated as
+goals for the reactor managing this specific state varaiable {\em
+  internally}.
 
 \begin{figure}[!htb]
   \centering
@@ -577,9 +624,9 @@ produced the plan in Fig. \ref{fig:shop:exec0}. The  {\em external}
 \end{figure}
 
 Now, consider that at the next tick $\tau+1$ the reactor managing the
-agent location was able to change the location state varaibale to 
-the \texttt{Going}. T-REX informs our reactor of this new observation
-which is added in the plan structure as a fact -- starting exactly at
+agent location was able to change the location state varaibale to the
+\texttt{Going}. \rx informs our reactor of this new observation which
+is added in the plan structure as a fact -- starting exactly at
 $\tau+1$ and lastign for an unlknown duration which is at least 1
 tick. As this new observation is integrated in the plan through
 synchronization the solver can identify the similarity between this
@@ -589,34 +636,32 @@ implication the synchronization process starts its execution with the
 assumption that these new observations are consitent with the current
 plan maintained. As a result at the end of synchronization we will
 have the plan depicted in Fig. \ref{fig:shop:exec1}. Which just
-propagated the information provided by the new observation  in the
-exisiting plan (restricting in turn the start time of 
-\texttt{Going} and by propagtion of the constraints \texttt{Go} to  be
-{\em exactly} $\tau+1$). While focusing uniquely on the execution
-frontier ($\tau+1$ in this figure), the europa solver took benefit of
-the exisiting plan to evaluate a solution that asumes that the
-observation is consistent with what was decided  inside this
-reactor. 
+propagated the information provided by the new observation in the
+exisiting plan (restricting in turn the start time of \texttt{Going}
+and by propagtion of the constraints \texttt{Go} to be {\em exactly}
+$\tau+1$). While focusing uniquely on the execution frontier ($\tau+1$
+in this figure), the europa solver took benefit of the exisiting plan
+to evaluate a solution that asumes that the observation is consistent
+with what was decided inside this reactor.
 
 
-This choice is directed not only by some natural heurisitc
-choices made in the solver but even more enforced in general by the
-heuristic order of the decision point reolution choices for our {\em
-  internla} state flaw presented in section \ref{sec:arch:sync}
-{\em\color{red} TODO: need to rework the presentation of thee choices
-  so I can refer to them more directly -- algorithm or pseudo theorem
-  should do the trick}. Should such a flaw be revealed during
-synchronization -- meaning that the current state of an {\em internal}
-state varaibale is not fully grounded -- the sequencing of the choices
-will atempt first a conservative choice in term of maintaining
-previous state, then an optimisitic choice in term of the
-execution/advance in our current plan to finally attempt other choices
-that were not predicted by the model. The two first possible choices
-are strongly directed by the exisiting plan which help direct the
-search within this frame. This often allow to have a synchronization
-that is much more directed and i, in nominal situation such as the one
-we showed resolve the deliberation in few steps (often without any
-backtrack in the search).
+This choice is directed not only by some natural heurisitc choices
+made in the solver but even more enforced in general by the heuristic
+order of the decision point reolution choices for our {\em internla}
+state flaw presented in section \ref{sec:arch:sync} {\em\color{red}
+  TODO: need to rework the presentation of thee choices so I can refer
+  to them more directly -- algorithm or pseudo theorem should do the
+  trick}. Should such a flaw be revealed during synchronization --
+meaning that the current state of an {\em internal} state varaibale is
+not fully grounded -- the sequencing of the choices will atempt first
+a conservative choice in term of maintaining previous state, then an
+optimisitic choice in term of the execution/advance in our current
+plan to finally attempt other choices that were not predicted by the
+model. The two first possible choices are strongly directed by the
+exisiting plan which help direct the search within this frame. This
+often allow to have a synchronization that is much more directed and
+i, in nominal situation such as the one we showed resolve the
+deliberation in few steps (often without any backtrack in the search).
 
 \begin{figure}[!htb]
   \centering
@@ -631,9 +676,9 @@ The synchronization process is also in this process supporting fully
 the tracking of the plan execution as it specifies tokens parameters
 such as the time points and allow this to propagate through the plan
 in order to idenitfy if the plan remains valid -- as in our example --
-or that it cannot be executed as it is. The later  is often identified
+or that it cannot be executed as it is. The later is often identified
 by the synchronization failing to find a consistent solution. for
-example dshould the \texttt{Going} observation we receive be to the 
+example dshould the \texttt{Going} observation we receive be to the
 \texttt{hardwareStore}, this would break the current plan of our
 reactor as we cannot go simultaneously at 2 different places as
 illustrated in Fig. \ref{fig:shop:relax}-1. as synchronization is not
@@ -645,31 +690,33 @@ reactor (\texttt{Own(Milk)} in our example) resulting on the plrtial
 plan sghowned in Fig. \ref{fig:shop:relax}-2. In this process the
 reactor inform the agent that all {\em external} goals it requested
 for the future are note valid anymore which often result in the ownere
-of htese timelines to not have to maintain this goal anynmore. 
+of htese timelines to not have to maintain this goal anynmore.
 
 \begin{figure}[!htbp]
   \centering
   \includegraphics[width=0.7\columnwidth]{figs/shoping_exec_relax}  
-  \caption{Illustration of a conflict suring synchronization and the resulting relaxed plan for recovery}
+  \caption{Illustration of a conflict suring synchronization and the
+    resulting relaxed plan for recovery} 
   \label{fig:shop:relax}
 \end{figure}
 
-As the plan is not anymore in the way the synchronization can resume 
-and find a solution as we initial lly described. The newly pending goals will enforce  at
-the next \texttt{step} to resumed deliberation on this new fully
-relaxed partial plan. By the simple use of synchronization the reactor 
-was not only able to identify that its plan was not executable anymore 
-but recover from it while offering a new incomplete partial plan to be
-resolved during the next deliberation \texttt{steps}. This on its own
-ogfer the core functionality one should except to close the loop
-between planning and execution in the sense that synchronization plays
-the role of what is typically named as the {\em Executive} in other
-architectures {\em\color{red} references to diverse archis, 3-tiered,
-  laas, claraty, B Wiliams, and many more}. 
+As the plan is not anymore in the way the synchronization can resume
+and find a solution as we initial lly described. The newly pending
+goals will enforce at the next \texttt{step} to resumed deliberation
+on this new fully relaxed partial plan. By the simple use of
+synchronization the reactor was not only able to identify that its
+plan was not executable anymore but recover from it while offering a
+new incomplete partial plan to be resolved during the next
+deliberation \texttt{steps}. This on its own ogfer the core
+functionality one should except to close the loop between planning and
+execution in the sense that synchronization plays the role of what is
+typically named as the {\em Executive} in other architectures
+{\em\color{red} references to diverse archis, 3-tiered, laas, claraty,
+  B Wiliams, and many more}.
 
-In our case though the interaction between planning and execution
-does not stop at this level. A core point of the overal schedulling of
-both {\em synchronization} and {\em planning} steps resides on our
+In our case though the interaction between planning and execution does
+not stop at this level. A core point of the overal schedulling of both
+{\em synchronization} and {\em planning} steps resides on our
 architecture enforsincing that the synchroniuzation process can occur
 in between any step of the plan. This lead us to the fact that not
 only synchronization is imnfluenced by the outcome of planning but
@@ -683,20 +730,22 @@ resume. Therefore they are not intergal part of the plan resolution
 resolve previously exisiting flaws). The planning process is therefore
 perturbed internallyand fully informed on how the world evolves as it
 is planning.  This aspect trueluy contrast to other approaches we have
-idenitifed in the literature which avoid to perturb the planner during
-it search as it is not compatible with the ``off-line planning'' assumption.
+identified in the literature which avoid to perturb the planner during
+it search as it is not compatible with the ``off-line planning''
+assumption.
 
-By our design choices -- both at the architecture level and the integration of
-the europa framework for embedded deliberation -- we were able to
-implement an architecture that avoid this limitation while remaining in
-a formal frame that still allow for deliberation and model-based
-agent control. We believe that this tighter integration of planning
-and execution allow the system to ba more accute of its environament
-alowing better informaed decision and tighter reaction. This is
-possible while still integrating information such as a long latency
-for the reactors as long as one can ensure that synchronization of al
-the reactors and deliberation steps can be done in a time that is
-resonably small in comparison of the agent tick duration.
+By our design choices -- both at the architecture level and the
+integration of the europa framework for embedded deliberation -- we
+were able to implement an architecture that avoid this limitation
+while remaining in a formal frame that still allow for deliberation
+and model-based agent control. We believe that this tighter
+integration of planning and execution allow the system to ba more
+acute of its environment allowing better informaed decision and
+tighter reaction. This is possible while still integrating information
+such as a long latency for the reactors as long as one can ensure that
+synchronization of al the reactors and deliberation steps can be done
+in a time that is resonably small in comparison of the agent tick
+duration.
 
 
 
