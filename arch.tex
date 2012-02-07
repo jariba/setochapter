@@ -21,7 +21,7 @@
 %     planning capabilities in order to do model based planning and
 %     execution with a rich representation of resources and time.
 %   \end{itemize}}
- 
+
 The \rx architecture was designed with the objective to bring planning
 closer to the low-level control of the vehicle while maintaining its
 reactivity. Indeed, in most of the architecture where task planning is
@@ -32,8 +32,8 @@ remains fairly detached from low-level control and most of the
 reactive adaptation which in contrast is managed by specialized
 component that relies on different representations for modeling the
 local behavior they control or even do not have any explicit formal
-model of this behavior. The two angles our architecture attck this
-issue are the following:
+model of this behavior. The two angles our architecture attack this issue 
+are the following:
 
 \begin{itemize}
 
@@ -164,15 +164,16 @@ folds:
 \end{itemize}
 
 The choice of representation of state variables, observations and
-goals is directly derieved to the timleines and tokens from europa.
-such representation is ich enough to allow the excahnge of state
+goals is directly derieved to the timelines and tokens from europa. 
+such representation is rich enough to allow the exchange of state
 information in a formal and yet flexible way and its transaltion in
 planning frameworks that have an explicit representation of time (such
 as but not limited to europa) is often trivial.
 
-The overall execution cycle of the agent is also abstracted as some
+
+The overall execution cycle of the agent is also abstracted as a
 continuous planning/deliberation cycle between all the
-reactors. Indeed , at the agent interface level, each reactor provided
+reactors. At the agent interface level, each reactor provided
 only two abstract calls that conceptualize their execution:
 
 \begin{itemize}
@@ -209,11 +210,12 @@ for the lowest level reactor which -- instead of deliberating -- may
 just transform this goal in a physical command execution.
 
 The way the agent interleave planning \texttt{step}s and
-synchronization is illustrated in Figure \ref{fig:tick-exec}.
-Synchronization happens at every single tick and will interrupt
-planning allowing this reactor to identify its current state that can
-propagate through the reactor graph in order to ensure t aconsitent
-view of the state of the world between all the reactors.  
+synchronization for a single reactor is illustrated in Figure 
+\ref{fig:tick-exec}. Synchronization happens at every single 
+tick and will interrupt planning allowing this reactor to identify
+ its current state that can propagate through the reactor graph
+ in order to ensure t aconsitent view of the state of the world 
+between all the reactors.  
 
 \begin{figure}[!htbp]
   \centering
@@ -227,7 +229,7 @@ view of the state of the world between all the reactors.
   \vskip-0.8pc
 \end{figure}
 
-This view of the reactor has two parallel tasks aloow for long
+This view of the reactor has two parallel tasks allow for long
 planning deliberation while ensuring that the state evolution
 propagates through the agent as time advance. These two tasks 
 intertwined together give the two natural flows (bottom-up for state
@@ -245,12 +247,14 @@ configurations.
 
 The \eu reactor is our implementation inside \rx of a reactor that
 usess automated planning for its execution. This reactor is fully
-based on the europa framework and applies the core idea we of \rx we
-described above to implement a reactor for which the sole purpse is to
-deliberate as time advance. The choice of europa as the planning
-framework was directed by the fact thta this framework provide a rich
-and highly configurable framework to be able to infer around a rich
-temporal domain.
+based on the europa framework and applies the core idea of \rx we
+described above to implement a reactor for which the sole purpose is to
+deliberate as time advance. The design of this reactor takes cues from 
+the IDEA architecture presented on \cite{mus02, mus06} in the sense taht both
+planning and execution are based on a single unified model. The choice 
+of \eu as the planning framework was directed by the fact that this 
+framework provide a rich and highly configurable toolset to be able to 
+infer around a rich temporal domain.
 
 This reactor is implemented following the idea that in \rx, the
 whole execution cycle is two deliberation processes. Both of these
@@ -302,12 +306,12 @@ This assumption, while helpfull to reduce the scope of the planning
 problem, becomes problematic if one wants to embed a planner in a
 real-time system that evolves in a highly dynamic environment. In a
 typical robot this implies that the only point where the planner can
-be informed about the current world state is righe before the planning
+be informed about the current world state is right before the planning
 is started by giving to the planner the intial state and current
 objectives. During the planning, it is assumed that the agent can
 maintin the world as perceived by the planner as stable. In
 \cite{lemai04, lemai-chenevier2004}, they do attempt to reduce the
-impact of planning by aloowing local plan repairs which attempt to
+impact of planning by allowing local plan repairs which attempt to
 insert repairing actions in the exisiting plan andf can be done fast
 enough. Still in ythe eventuality that such repair is not possible
 they add to stop their vehicle until the full (re-)planning was
