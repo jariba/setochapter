@@ -141,7 +141,20 @@ typical to other CAIP-based formalisms.
   describe the problem domain and over which we may want to specify
   constraints. In the Shopping Agent example, the times at which the
   agent needs to leave or be back, or executes a purchase, are all
-  instances where variables representing time would be used.
+  instances where variables representing time would be used. 
+  As explained in the CP section, a variable can take values from a domain. In \eu, domains are defined over a specific data type, the primitive data types supported are:
+  \begin{enumerate}
+    \item \textit{String}: sequences of characters, like "Red", "Spirit", etc 
+    \item \textit{Boolean}: {True,False}
+    \item \textit{Numeric}: integers and floats
+    \item \textit{Object}: reference to an object instance
+  \end {enumerate}
+  Two types of variable Domains can be defined over a data type: 
+  \begin{enumerate}
+    \item \textit{Enumerated}: Finite sets over any data type, specified explicitly, for instance: ["Red","Yellow","Green"], [1,18,32], etc
+    \item \textit{Interval}: Only for Numeric data types, they are specified by a [LowerBound,UpperBound] pair, for instance: [1,10], [5.0,100.0], etc.
+  \end {enumerate}
+  \eu's ability to represent and reason over numeric intervals is a very useful characteristic that allow users to create flexible plans. \comment{say more about the benefits of flexibility?}
 
 \item[\textbf{Objects}] The items we wish to describe and refer to in
   a domain are considered Objects. As in the case with object-oriented
@@ -225,126 +238,34 @@ typical to other CAIP-based formalisms.
   \item \textit{state}: Tokens can be \texttt{ACTIVE, INACTIVE,
       MERGED}, or \texttt{REJECTED}. The state variable captures the
     token's current state and its reachable states through further
-    restriction.  This is \eus mechanism to support the CAIP approach.
+    restriction.  This is \eu's mechanism to support the CAIP approach.
 
+  \end{enumerate}
+
+\item[\textbf{Built-in Object Types}] In a domain model, there may be some classes that don't have any time-dependent state or behavior, and therefore those classes will not have any Token types associated with them, for instance in the Shopping Agent model, the set locations and products are static for the agent's purposes so we may only want to say what they are but not have any state or behavior associated with them.
+
+However, the most common case in any non-trivial domain model is that Objects will have many Tokens  in order to describe their state and behavior throughout a plan. There are a couple of Object Types that are so commonly used in domain descriptions, that \eu provides a built-in implementation for them:
+
+\begin{enumerate}
+    \item \textit{Timelines}: Often objects in a domain must be described by exactly one
+    token for every given timepoint in the plan. \eu provides a built-in Timeline class, any instances of a class derived from a
+    Timeline will induce ordering requirements among its tokens in order
+     to ensure no temporal overlap may occur among them  \cite{mus94}. 
+     \comment{add small example?}
+
+    \item \textit{Resources}: Metric resources, e.g. the energy of a battery or the
+    capacity of a cargo hold, are objects with an explicit quantitative
+    state in time and with a circumscribed range of changes that can occur
+     to impact that state i.e. produce, consume, use, change. 
+     Resources are such a common requirement for \eu users that built-in object types (with their corresponding token types to denote production, consumption, etc) are provided for them. Instances of classes derived from a Resource will induce
+     ordering requirements on their Tokens in order to ensure that the
+     level of the resource remains within specified limits.
+     \comment{add small example?}
 \end{enumerate}
-
 
 \comment {resume cleanup here}
 
-
-% \textit{Objects (continued)}
-
-% As we have noted, Tokens describe some aspect of an Object in
-% time. Objects thus may have many Tokens in a plan in order to describe
-% their state and behavior throughout all points in time of the
-% plan. Within this general framework, we note a few particulars:
-
-% Static Facts: Classes without predicates lead to Objects without
-% Tokens. This arises where an objects state or behavior is independent
-% of time. For example, a domain may have a set of locations and/or
-% paths for which there is nothing more to say than that they exist.
-
-% Timelines: Often objects in a domain must be described by exactly one
-% token for every given timepoint in the plan. Such objects are so
-% common that we provide a special construct in \eu to extend these
-% semantics to derived classes. Any instances of a class derived from a
-% Timeline will induce ordering requirements among its tokens in order
-% to ensure no temporal overlap may occur among them. See below for
-% further discussion.
-
-% Resources: Metric resources, e.g. the energy of a battery or the
-% capacity of a cargo hold, are objects with an explicit quantitative
-% state in time and with a circumscribed range of changes that can occur
-% to impact that state i.e. produce, consume, use, change. These changes
-% are captured as tokens. Resources are such a common requirement for
-% \eu users that special constructs are also provided for
-% them. Instances of classes derived from a Resource will induce
-% ordering requirements on their Tokens in order to ensure that the
-% level of the resource remains within specified limits.
-
-\item[\textbf{Timelines}] It may be sufficient to maintain only a
-  partial-order among tokens. However, it is often the case that
-  tokens represent states and actions of a single object in the
-  system. Such tokens are typically mutually-exclusive. \eu uses a
-  Timeline structure \cite{mus94} to concisely capture system
-  components whose behavior is described over time in this manner.
-
-\end{description}
-
-For example, consider the tire-world domain. The tire was located in
-the trunk with the predicate tireLocated(Trunk) and located on the
-ground with the predicate tireLocated(Ground). Clearly, the same tire
-cannot be in both places at once. A Timeline provides a simple method
-for aggregating the statements about a tire such that they are
-mutually exclusive.
-
-Figure 1: A Timeline for a Tire
-
-Figure 1 illustrates how a Timeline can be used to describe the
-whereabouts of a tire. The tire is an object in the tire-world
-represented as a timeline. It has predicates associated with it which
-can describe its states and actions over time. The predicate names
-need not contain the tire prefix; this is now implicit since the
-tokens are assigned to a specific tire instance (i.e. an instance of a
-Timeline). While Timelines are a useful element of the \eu planning
-paradigm, they are not essential. A more general notion of a system
-Object can be used which does not impose restrictions of
-mutual-exclusion or non-zero duration. This can be important in
-supporting partial-order planning.
-
-For this example, the state of the tire is specified using 3
-contiguous tokens. The end and start time-points are related by an
-equality constraint. A Moving predicate has been introduced to cover
-the transition from one location to another. It takes 2 location
-arguments. Notice that precedence relationships exist between tokens
-such that they cannot overlap but the start and end times may remain
-flexible. To illustrate this, sample times are included. Assume a
-total time range of interest between 0 and 1000. In addition, tokens
-on Timelines have a minimum duration of 1. As a result the values
-shown are the most flexible possible values for the start and end of
-each token. There are a number of advantages of allowing this
-flexibility. First, the basic structure of the plan can be developed
-without over-committing to specific times. If it is not necessary for
-the tire to be on the ground at time-step 4, then a planner should not
-be forced to specify it. Such an approach permits a least-commitment
-approach to planning. Second, in many domains it is simply impossible
-to know in planning exactly how long an activity might take. For
-example, a common activity of driving a car from one point to another
-on a road can take varying amounts of time depending on traffic and
-traffic lights. In such circumstances it is more practical to express
-upper and lower bounds on durations which naturally lead to intervals
-for start and end times. In such domains, flexibility in planning aids
-robustness in execution.  Rules
-
-In order for a plan to be valid, it must comply with all rules and
-regulations pertinent to the application domain in question. Rules
-govern the internal and external relationships of a token. For
-example, consider a parameterized predicate describing a transition
-from one location to another. Let the parameters be from and to. The
-parameters are instantiated on a token as variables whose domain of
-values is the set of all locations in a given problem. A rule
-governing an internal relationship among token variables might
-stipulate that a transition must involve a change in location. This
-can be easily expressed as a constraint on the definition of a
-predicate of the form: from != to. It is reasonable to further
-stipulate that one must be Located somewhere before a transition can
-occur, and one must end up Located somewhere when completed. This is
-an example of a rule governing an external relationship among
-tokens. It specifies a requirement that tokens of the predicate
-Located precede and succeed tokens of the predicate Moving.
-
-Figure 2: Internal and external relationships from rules on Moving
-Figure 2 illustrates the entities and relations involved in specifying
-such a rule on a Moving predicate. The token on which the rule applies
-is referred to as the master. Each Located token required by the
-master is referred to as a slave. All variables are indicated by name
-and their domains are expressed as intervals in the case of temporal
-variables and as enumerations for the remainder. Application of a rule
-on a token can thus cause slave tokens, variables, and constraints to
-be introduced.  Token State Model
-
-The capability of a domain rule to cause a slave token to be created
+\item[\textbf{Token State Model}] The capability of a domain rule to cause a slave token to be created
 is a key vehicle through which planning occurs. Semantically, this
 rule imposes a requirement for supporting tokens to be in the plan in
 order for the master to be valid. There are 2 possibilities to
@@ -382,56 +303,157 @@ outcome for an inactive token. As operations which may arise in
 search, they must be reversible during backtracking. The cancellation
 operations in each case are also shown.
 
+\item[\textbf{Rules}] In order for a plan to be valid, it must comply with all rules and
+regulations pertinent to the application domain in question. Rules
+govern the internal and external relationships of a token. For
+example, consider a parameterized predicate describing a transition
+from one location to another. Let the parameters be from and to. The
+parameters are instantiated on a token as variables whose domain of
+values is the set of all locations in a given problem. A rule
+governing an internal relationship among token variables might
+stipulate that a transition must involve a change in location. This
+can be easily expressed as a constraint on the definition of a
+predicate of the form: from != to. It is reasonable to further
+stipulate that one must be Located somewhere before a transition can
+occur, and one must end up Located somewhere when completed. This is
+an example of a rule governing an external relationship among
+tokens. It specifies a requirement that tokens of the predicate
+Located precede and succeed tokens of the predicate Moving.
 
+Figure 2: Internal and external relationships from rules on Moving
+Figure 2 illustrates the entities and relations involved in specifying
+such a rule on a Moving predicate. The token on which the rule applies
+is referred to as the master. Each Located token required by the
+master is referred to as a slave. All variables are indicated by name
+and their domains are expressed as intervals in the case of temporal
+variables and as enumerations for the remainder. Application of a rule
+on a token can thus cause slave tokens, variables, and constraints to
+be introduced.  
+
+\end{description}
+
+\comment{instead of summary, tie every concept to the shopping example?}
+
+This section has presented the main elements of \eu's planning representation:
+
+\begin{enumerate}
+    \item Temporally scoped predicates and actions (a.k.a. Tokens) to represent
+    states and actions in time. Note that tokens do not discriminate between state and action. 
+
+    \item Token States which are the basis of planning operations on a partial plan.
+
+    \item Constraints to describe relationships among tokens. This provides an
+    expressive method of describing interactions among tokens in the context of Temporal Planning.
+
+    \item Timelines as a concise abstraction to express the evolution of state
+    and behavior for a system component. It provides semantics of mutual
+    exclusion sequencing in time. Other core abstractions are available in
+    \eu for handling metric resources.
+
+    \item Domain rules to describe internal and external relationships on and
+     between tokens respectively. Rules are applied to active tokens (master tokens) 
+     referred to as masters and typically produce inactive
+     tokens (slaves) which are a key vehicle through which the planning
+     process evolves. The rule structure in \eu differs from the more
+     restrictive commitment to preconditions and effects in classical
+     planning which prohibits durative actions and disembodied effects
+     (i.e. effects which may not occur until some temporal distance after
+     the end of the action).
+\end{enumerate}
 
  
-Each of the token variables, including the parameter variables, has a
-domain of values assigned to it.  The variables may also participate
-in constraints that specify which value combinations are valid.  To
-allow the specification of multiple values, e.g, to express a range of
-possible start times, variables are used to specify parameter, start
-and end time values for a token.  As a result, a token $T$ is a tuple
-$\langle v, P, s, e \rangle$, where $v$ is a variable denoting a state
-variable, $P$ is the name of a procedure and $s$ and $e$ (satisfying
-$s\leq e$) are variables encoded as flexible token start and end time
-points. Consequently, partial plans represent a \textit{range of
-  possible solutions} rather than an explicit definition of a single
-trajectory of state.  Fig. \ref{fig:flex-timelines} shows an example
-of a part of such plans with tokens representing constraints on
-flexible temporal intervals. Systematic computation is reflected by
-the use of the \texttt{Allen Algebra} \cite{allen84} temporal
-relations shown in Fig. \ref{fig:allen-algebra}. It is the use of such
-interval arithmetic in the \eu domain model that allows
-encoding of temporal constraint relationships between tokens on the
-same or other concurrent timelines. Details of propagation algorithms
-or of interval logic are beyond the scope of this paper.
+%Each of the token variables, including the parameter variables, has a
+%domain of values assigned to it.  The variables may also participate
+%in constraints that specify which value combinations are valid.  To
+%allow the specification of multiple values, e.g, to express a range of
+%possible start times, variables are used to specify parameter, start
+%and end time values for a token.  As a result, a token $T$ is a tuple
+%$\langle v, P, s, e \rangle$, where $v$ is a variable denoting a state
+%variable, $P$ is the name of a procedure and $s$ and $e$ (satisfying
+%$s\leq e$) are variables encoded as flexible token start and end time
+%points. Consequently, partial plans represent a \textit{range of
+%  possible solutions} rather than an explicit definition of a single
+%trajectory of state.  Fig. \ref{fig:flex-timelines} shows an example
+%of a part of such plans with tokens representing constraints on
+%flexible temporal intervals. Systematic computation is reflected by
+%the use of the \texttt{Allen Algebra} \cite{allen84} temporal
+%relations shown in Fig. \ref{fig:allen-algebra}. It is the use of such
+%interval arithmetic in the \eu domain model that allows
+%encoding of temporal constraint relationships between tokens on the
+%same or other concurrent timelines. Details of propagation algorithms
+%or of interval logic are beyond the scope of this paper.
+%
+%\begin{figure}
+%\centering
+%\includegraphics[scale=0.3]{figs/FSM-transition.pdf}
+%\caption{\small Timeline evolution can be described by simple finite
+%  state transitions where temporal relationships describe the arc
+%  transition and temporal extant of state are token
+%  durations. Constraints here are for \emph{meets} or its equivalent
+%  inverse \emph{met\_by}.}
+%\label{fig:FSM}
+%\vskip-0.3cm
+%\end{figure}
+%
+%In describing the evolution of state via timelines, transitions within
+%a timeline can be described by simple finite state
+%machines. Fig. \ref{fig:FSM} for example describes a timeline
+%evolution for an abstract timeline entity describing navigation. Arc
+%transitions represent temporal constraints and token duration are
+%represented by temporal extant of state. The entire vehicle can then
+%be modeled as a number of state transitions with concurrency for each
+%of the modeled state variables defined a priori. However this simple
+%view is often complicated when temporal constraints between state
+%variables are articulated in our domain models. If there is a
+%criticism of this approach, modeling then, requires a proper balance
+%between abstraction, state variable description and concurrency
+%described by the inter-connectedness between such finite state
+%machines.
 
-\begin{figure}
-\centering
-\includegraphics[scale=0.3]{figs/FSM-transition.pdf}
-\caption{\small Timeline evolution can be described by simple finite
-  state transitions where temporal relationships describe the arc
-  transition and temporal extant of state are token
-  durations. Constraints here are for \emph{meets} or its equivalent
-  inverse \emph{met\_by}.}
-\label{fig:FSM}
-\vskip-0.3cm
-\end{figure}
-
-In describing the evolution of state via timelines, transitions within
-a timeline can be described by simple finite state
-machines. Fig. \ref{fig:FSM} for example describes a timeline
-evolution for an abstract timeline entity describing navigation. Arc
-transitions represent temporal constraints and token duration are
-represented by temporal extant of state. The entire vehicle can then
-be modeled as a number of state transitions with concurrency for each
-of the modeled state variables defined a priori. However this simple
-view is often complicated when temporal constraints between state
-variables are articulated in our domain models. If there is a
-criticism of this approach, modeling then, requires a proper balance
-between abstraction, state variable description and concurrency
-described by the inter-connectedness between such finite state
-machines.
+%For example, consider the tire-world domain. The tire was located in
+%the trunk with the predicate tireLocated(Trunk) and located on the
+%ground with the predicate tireLocated(Ground). Clearly, the same tire
+%cannot be in both places at once. A Timeline provides a simple method
+%for aggregating the statements about a tire such that they are
+%mutually exclusive.
+%
+%Figure 1: A Timeline for a Tire
+%
+%Figure 1 illustrates how a Timeline can be used to describe the
+%whereabouts of a tire. The tire is an object in the tire-world
+%represented as a timeline. It has predicates associated with it which
+%can describe its states and actions over time. The predicate names
+%need not contain the tire prefix; this is now implicit since the
+%tokens are assigned to a specific tire instance (i.e. an instance of a
+%Timeline). While Timelines are a useful element of the \eu planning
+%paradigm, they are not essential. A more general notion of a system
+%Object can be used which does not impose restrictions of
+%mutual-exclusion or non-zero duration. This can be important in
+%supporting partial-order planning.
+%
+%For this example, the state of the tire is specified using 3
+%contiguous tokens. The end and start time-points are related by an
+%equality constraint. A Moving predicate has been introduced to cover
+%the transition from one location to another. It takes 2 location
+%arguments. Notice that precedence relationships exist between tokens
+%such that they cannot overlap but the start and end times may remain
+%flexible. To illustrate this, sample times are included. Assume a
+%total time range of interest between 0 and 1000. In addition, tokens
+%on Timelines have a minimum duration of 1. As a result the values
+%shown are the most flexible possible values for the start and end of
+%each token. There are a number of advantages of allowing this
+%flexibility. First, the basic structure of the plan can be developed
+%without over-committing to specific times. If it is not necessary for
+%the tire to be on the ground at time-step 4, then a planner should not
+%be forced to specify it. Such an approach permits a least-commitment
+%approach to planning. Second, in many domains it is simply impossible
+%to know in planning exactly how long an activity might take. For
+%example, a common activity of driving a car from one point to another
+%on a road can take varying amounts of time depending on traffic and
+%traffic lights. In such circumstances it is more practical to express
+%upper and lower bounds on durations which naturally lead to intervals
+%for start and end times. In such domains, flexibility in planning aids
+%robustness in execution.  
 
 
 \begin{figure*}
@@ -483,41 +505,6 @@ starts [50,0] Go(x$_2$,y$_2$,Min\_Depth,Max\_Depth); \\
 ends [50,0] Go(x$_{n-1}$,y$_{n-1}$, Min\_Depth,Max\_Depth); \\
 meets Go(x$_n$,y$_n$,Min\_Depth, Max\_Depth); 
 \end{minipage}
-
-
-% \textit{Summary}
-
-% This has presented the main elements of the EUROPA planning approach. They are:
-
-% \begin{enumerate}
-
-% \item Temporally scoped predicates and actions (a.k.a. Tokens) to represent
-% states and actions in time. Note that tokens do not discriminate
-% between state and action. 
-
-% \item Token States which are the basis of planning operations on a partial
-% plan.
-
-% \item Constraints to describe relationships among tokens. This provides an
-% expressive method of describing interactions among tokens in the
-% context of Temporal Planning.
-
-% \item Timelines as a concise abstraction to express the evolution of state
-% and behavior for a system component. It provides semantics of mutual
-% exclusion sequencing in time. Other core abstractions are available in
-% \eu for handling metric resources.
-
-% \item Domain rules to describe internal and external relationships on and
-% between tokens respectively. Rules are applied to active tokens
-% (master tokens) referred to as masters and typically produce inactive
-% tokens (slaves) which are a key vehicle through which the planning
-% process evolves. The rule structure in \eu differs from the more
-% restrictive commitment to preconditions and effects in classical
-% planning which prohibits durative actions and disembodied effects
-% (i.e. effects which may not occur until some temporal distance after
-% the end of the action).
-
-
 
 % \end{enumerate}
 
