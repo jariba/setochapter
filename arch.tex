@@ -398,41 +398,79 @@ any choices made during this synchronization will not lead to a future
 inconsistency (meaning no possible solution) for a future
 synchronization. Such assumption deeply impact the set of possible
 domains one the reactor can support while remaining complete. Take for
-example the following model rule where {\tt Vehicle} is {\em Internal}
-and {\tt Command} is {\em External} to the reactor.
-
+example this rule from our \texttt{Shopping} model :
 \begin{verbatim}
-Vehicle::Dive {
-  contains(Command.Descend descend);
-  descend.start = start + 2;
-}
+ 1 Agent::Go {
+ 2   met_by(condition object.location.At origin);
+ 3   eq(from, origin.loc);
+ 4
+ 5   equals(effect object.location.Going going);
+ 6   eq(going.from, from);
+ 7   eq(going.to, to);
+ 8   
+ 9   meets(effect object.location.At destination);
+10   eq(to, destination.loc);
+11 }
 \end{verbatim}
+While this model is perfectly standard and acceptable in the overall
+case. It can become problematic while tied to the
+execution. Specificially it puts a strong tie between the {\em fact} that we
+are \texttt{Going} to a location and the {\em expected} future outcome  of
+ending at this location. This ties is even stronger due to the
+constraint at line 5. Knwoing this aspect assume that the
+\texttt{Agent.location} is {\em external} to the reactor which receive
+the observation \texttt{Going(Home,SuperMarket)} which synchronization
+resolved by producing the observation \texttt{Go(Home, SuperMarket)}
+in the Agent timeline. From this point this means that the only
+possible outcome on \texttt{Agent.location} is to be
+\texttt{At(SuperMarket)} in the directly foreseeable future. In the
+real world the fact that we are \texttt{Going} to a certain location
+does not necessarly imply that we will succeed on ending up there. An
+extreme case could be that due to some exogenous event, the road to
+the \texttt{SuperMarket} is closed which could result on an alternate
+observation \texttt{At(7th st. \& Foo Ave.)}. This observation
+contradicts thre existing plan the reactor maintin and it is important
+here to relaize the temp[oral direction of the causal link that is
+triggereing this inconsitency. Indeed at the time we will observe this
+contradicting \texttt{At}, the rule that generated this conlict is
+connected to the past observations \texttt{Going} and \texttt{Go}
+which cannot be fully retracted without potential global impact in the
+rest of the exisiting reactors -- implying  a huge cost in
+backprogation that would be problematic. 
 
-Such model presents the issue that the reactor needs at one point to
-take the decision to start the token {\tt Vehicle.Dive} and by doing
-so it assumes that in {\em exactly} 2 ticks in the future the {\tt
-  Command} timeline will change its state to {\tt Command.Descend}. If
-this observation does not occur at the given time this implies that
-the reactor estimation was wrong leading him to an inconsistent view
-of the world. Conversely the reactor can decide to not switch this
-timeline to the {\tt Vehicle.Dive} state and observe 2 ticks in the
-future that the {\tt Command.Descend} state value. In this case it
-would have missed the opportunity to set its {\tt Vehicle} state to
-the correct value which may similarly lead (depending on the rest of
-the model) to a similar inconsistency it won't be able to resolve (as
-TREX enforces that the past is monotonic).
-
-While this limitation of the system is important to take into account,
-it is also important to note that the model snippet we gave here --
-while formally acceptable in the general planning problem -- is also
-illustrating a bad design for execution in a situated agent. Indeed,
-in this model we are tying the current decision to a future outcome
-that is {\em External} to the reactor and therefore not necessarily
-controllable by this reactor. Therefore we are entailing a part of the
-future to past decisions which can lead the system to a dead-end
-situation where the model cannot find a correct solution that both do
-not conflict with what we claimed in the past and still allow the
-planner to find its current {\em Internal} state.
+More generally tying a token
+to future outcomes in a model that is meant to be confronted to rela
+executionis something that is problematic. It may be valid ifg you can
+gurantee that this will always happen (for example the reactor
+managing \texttt{Agent.location} timeline guarantees that the outcome
+of the \texttt{Going} will {\em always} result on ending at the traget
+location) but should be manipulated while keeping in mind that
+predicting the future is not absolute. In this case one could alter
+this part of the model as follow in order to give the reactor more
+flexibility:
+\begin{verbatim}
+ 1 Agent::Go {
+ 2   met_by(condition object.location.At origin);
+ 3   eq(from, origin.loc);
+ 4
+ 5   contains(effect object.location.Going going);
+ 6   eq(going.from, from);
+ 7   eq(going.to, to);
+ 8   
+ 9   meets(effect object.location.At destination);
+10   eq(to, destination.loc);
+11   going meets destination;
+12 }
+\end{verbatim}
+The alteration made to relax the constraint on linbe 5 from a strict 
+\texttt{equals} to contains and then add the new constraint at line 11
+that ensure that the last \texttt{Going} done during this \texttt{Go}
+ends up in the location the agent wnats to be. This firts level of
+relaxation will therefore allow the agent to usies multiple
+\texttt{Going} should the first one fail to reach our objective.  The
+probalem can even be relaxed further if needed but this relaxation
+gicves already more felxibility for the reactor to recover from local
+failures.
 
 Synchronization remains here a deliberation process, and for this
 reason there's always the risk that the search of a solution is not a
