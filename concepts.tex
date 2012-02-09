@@ -225,7 +225,7 @@ typical to other CAIP-based formalisms.
   \item \textit {end}: The end of the temporal extent over which the
     predicate is defined.
 
-  \item \textit {duration}: The constraint \textit{start} $+$
+  \item \textit {duration}: The duration of the temporal extent over which the predicate is defined. The constraint \textit{start} $+$
     \textit{duration} = \textit{end} is enforced automatically.
 
   \item \textit{object}: The set of objects to which a token might
@@ -238,18 +238,18 @@ typical to other CAIP-based formalisms.
   \item \textit{state}: Tokens can be \texttt{ACTIVE, INACTIVE,
       MERGED}, or \texttt{REJECTED}. The state variable captures the
     token's current state and its reachable states through further
-    restriction.  This is \eu's mechanism to support the CAIP approach.
+    restriction.  This is required to support CAIP's approach to planning where goals and subgoals can be satisfied by either adding new intervals (Tokens) to the plan, or by merging with existing intervals. Token State lifecycle is examined in detailed in a separate section below.
 
   \end{enumerate}
 
 \item[\textbf{Built-in Object Types}] In a domain model, there may be some classes that don't have any time-dependent state or behavior, and therefore those classes will not have any Token types associated with them, for instance in the Shopping Agent model, the set locations and products are static for the agent's purposes so we may only want to say what they are but not have any state or behavior associated with them.
 
-However, the most common case in any non-trivial domain model is that Objects will have many Tokens  in order to describe their state and behavior throughout a plan. There are a couple of Object Types that are so commonly used in domain descriptions, that \eu provides a built-in implementation for them:
+However, the most common case in any non-trivial domain model is that Objects will have many associated Tokens in order to describe their state and behavior throughout a plan. There are a couple of Object Types that are so commonly used in domain descriptions, that \eu provides a built-in implementation for them:
 
 \begin{enumerate}
     \item \textit{Timelines}: Often objects in a domain must be described by exactly one
-    token for every given timepoint in the plan. \eu provides a built-in Timeline class, any instances of a class derived from a
-    Timeline will induce ordering requirements among its tokens in order
+    token for every given timepoint in the plan. Any instances of a class derived from \eu's built-in
+    Timeline class will induce ordering requirements among its tokens
      to ensure no temporal overlap may occur among them  \cite{mus94}. 
      \comment{add small example?}
 
@@ -263,45 +263,42 @@ However, the most common case in any non-trivial domain model is that Objects wi
      \comment{add small example?}
 \end{enumerate}
 
-\comment {resume cleanup here}
+\item[\textbf{Token State Model}] In \eu's representation, goals are temporally scoped states that need to be achieved, or actions that must be performed. As a result, \eu internally represents goals as Tokens.  Goals can be posted explicitly, for instance, when a user asks the Shopping Agent to own a specific product by a specific time, or implicitly when subgoals are created as a result of domain compatibilities (described in the CAIP framework above), for instance, when the Shopping Agent must get to a Location where a Product is available before it is able to purchase it, in this case the original goal of purchasing the product will spawn a subgoal of being at a specific location.
 
-\item[\textbf{Token State Model}] The capability of a domain rule to cause a slave token to be created
-is a key vehicle through which planning occurs. Semantically, this
-rule imposes a requirement for supporting tokens to be in the plan in
-order for the master to be valid. There are 2 possibilities to
-consider:
+Looking at a how a simple Shopping Agent goal would be addresed by \eu helps illustrate how Token States support the planning process.
 
-The slave is inserted as an active token in the plan. As such, rules
-may be activated on the slave, and it may consume resources.
+Let's assume we start with a partial plan that places the Shopping agent at home at time 0 and with no Products in its possession, then we post a goal for the Shopping Agent to own a Drill at time 10.
 
-The token is merged with a matching token already in the plan. Once a
-slave is merged, the requirement it represents are considered
-satisfied. The process of merging passes on all restrictions imposed
-on the slave to the active token upon which it is merged. Merging a
+\comment{Add figure showing an AgentLocation timeline with an At(Home) token with start=0 and end open, an empty AgentBag timeline, and a Own(Drill) token with start=10 floating below both timelines}
+
+Notice that the \texttt{Own(Drill)} token that represents the goal is not immediately placed on the \texttt{AgentBag} timeline since \eu must determine whether it can achieve that goal and how. When the goal is posted and before any decisions are made on it, the  \texttt{Own(Drill)} token is created in an INACTIVE state, then \eu looks at the current partial plan and considers 2 alternatives:
+
+\begin{enumerate}
+    \item If there are any tokens in the plan that are compatible with the new goal, \eu may attempt to satisfy the goal by merging it with any of them (if there is more than one it can try them one at a time), in this case, the state of the token would change to MERGED.
+    \item Instead of merging with existing tokens in the plan, \eu may decide to insert the new token into the plan, in that case its state would change to ACTIVE.
+\end{enumerate}
+
+When a token is merged, all restrictions imposed
+on the merged token are transferred to the active token upon which it is merged. Merging a
 token requires finding a target active token that is compatible with
-the inactive token. For an active token and an inactive token to be
-compatible requires that they are instances of the same predicate and
+the inactive token. Two tokens are merge-compatible if they are instances of the same predicate and
 that no intersections between corresponding variables are empty. The
 effect of merging is illustrated in Figure 3.
 
-Figure 3: Merging an inactive token on an active token. Domain
-restrictions occur in highlighted variables of active token.
+\comment{Add figure showing the effect of merging}
 
-On creation of a token, where the commitment has not been made yet to
-activate or merge the token, the token is said to be inactive. There
-is a nuance to the state model for tokens which relate to the mode of
-its creation. If the token is allocated explicitly by an external
-actor, rather than internally through rule firing, it may include the
-state rejected indicating the planner is permitted to reject the
-token. A valid plan can include rejected tokens. This typically arises
-where the token represents a goal that is preferable to achieve but
-not mandatory. This state is not reachable for slaves since that would
-imply selective adherence to the domain model. Figure 4 presents the
-state transition diagram for token states relevant for planning. The
-transitions are operations on a partial plan which can decide an
-outcome for an inactive token. As operations which may arise in
-search, they must be reversible during backtracking. The cancellation
-operations in each case are also shown.
+When a token is activated all compatibilities associated with its token type are evaluated, which may lead to new subgoals being generated. In our example, there should be a compatibility stating that the Shopping Agent must be at the same location as the product it is purchasing. In that case, activating the \texttt{Own(Drill)} token will cause a new  \texttt{At(Drill.location)} to be created in an INACTIVE state, which in turn will have to be dealt with.
+
+\comment{Add figure showing the effect of activating the token by putting it on the AgentBag timeline, and a new At(Drill.location) token floating below}
+
+If neither activating nor merging works, a token may become REJECTED, this is possible only for goals posted by the end user and specified as optional. Subgoals generated as a result of token activation cannot be rejected, if a subgoal cannot be satisfied through activation or merging then it will cause the original activation decision that spawned it to be retracted (\eu's search mechanisms are explained in detail in a separate section later on).
+
+As we can see, a token's state can go from INACTIVE to ACTIVE, MERGED or REJECTED, this lifecycle is illustrated in the figure below.
+
+\comment{Add figure showing possible state transitions}
+
+
+\comment {resume cleanup here}
 
 \item[\textbf{Rules}] In order for a plan to be valid, it must comply with all rules and
 regulations pertinent to the application domain in question. Rules
@@ -329,6 +326,11 @@ and their domains are expressed as intervals in the case of temporal
 variables and as enumerations for the remainder. Application of a rule
 on a token can thus cause slave tokens, variables, and constraints to
 be introduced.  
+
+The capability of a domain rule to cause a slave token to be created
+is a key vehicle through which planning occurs. Semantically, this
+rule imposes a requirement for supporting tokens to be in the plan in
+order for the master to be valid. 
 
 \end{description}
 
