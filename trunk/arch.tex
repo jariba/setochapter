@@ -70,8 +70,8 @@ beyond \texttt{IDEA} are in the following ways:
 
 \end{itemize}
 
-\rx provides a formal framework described which details partitioning
-in \cite{py10} and \cite{rajan12} and is not the focus of this
+\rx provides a formal framework which details partitioning in
+\cite{py10} and \cite{rajan12} and is not the focus of this
 chapter. Coupled interaction between planning and the world on the
 other hand, has a significant implication on how planning can be
 integrated in such frameworks; here we show using the \eu planner can
@@ -129,6 +129,17 @@ that will propagate down following the same mechanism.
 % variables it relies on (called {\em external}) and the state
 % variables it manages and maintains (called {\em internal}). 
 
+
+\begin{figure}[!htb]
+ \centering
+ \includegraphics[scale=0.45]{figs/AUV-agent.pdf}
+ \caption{\small A \rx agent is composed of multiple reactors or
+   control loops (rounded boxes) which are connected through state
+   variables provided by one reactor ({\color{blue}blue} solid line)
+   with multiple possible clients ({\color{green}green} dashed lines)}
+  \label{fig:agent}
+\end{figure}
+
 Consider for example the \rx agent instance we use on our AUV as shown
 in Fig. \ref{fig:agent}. In this instance all the reactors (symbolized
 by colored boxes) do not have an explicit connection from one to
@@ -159,16 +170,6 @@ variables. For instance the \textsf{Pilot} reactor needs the {\em
 
 \end{itemize}
 
-\begin{figure}[!htb]
- \centering
- \includegraphics[scale=0.45]{figs/AUV-agent.pdf}
- \caption{\small A \rx agent is composed of multiple reactors or
-   control loops (rounded boxes) which are connected through state
-   variables provided by one reactor ({\color{blue}blue} solid line)
-   with multiple possible clients ({\color{green}green} dashed lines)}
-  \label{fig:agent}
-\end{figure}
-
 Given the above example, the \rx architecture therefore helps abstract
 reactor interaction by containing them to state variables. Each
 reactor is therefore agnostic where its {\em external} state
@@ -181,20 +182,22 @@ state information exchange which comes in two forms:
 \begin{itemize}
 
 \item {\em Observation on the current state values}: This information
-  propagates up in the reactor dependency graph at the synchronization
-  phase and occurs at the beginning of every tick. During this phase
-  the agent provides to each reactor updates on their {\em external}
-  state variables for this tick and ask them to compute their {\em
-    internal} state variables values for this same tick. By doing so
-  we propagate a consistent view of that state of the world throughout
-  all the reactors as time advance.
+  propagates \emph{up} in the reactor dependency graph at the
+  synchronization phase and occurs at the beginning of every
+  tick. During this phase the agent provides updates to each reactor
+  on their {\em external} state variables for this tick so as they
+  could compute their {\em internal} state variable values for this
+  same tick. By doing so we propagate a consistent view of that state
+  of the world throughout all the reactors as time
+  advances. \comment{could do with a figure here}
 
 \item {\em Goals request on future state}: This information propagates
-  down in the reactor graph. It reflects that, in order to satisfy own
-  of its {\em internal} objectives, a reactor may have a plan that
-  rely on future values of one of its {\em external} state. When such
-  a plan is identified we ensure that this part of the plan is given
-  as a goal to the owner of the given {\em external(s)} state variable(s). 
+  \emph{down} in the reactor dependency graph. In order to satisfy own
+  {\em internal} objectives, a reactor may have a plan that relies on
+  future values of one of its {\em external} state. When such a plan
+  is identified the agent ensures that this part of the plan is given
+  as a goal to the owner of the given {\em external} state
+  variable(s). \comment{could do with a figure here}
 
 \end{itemize}
 
