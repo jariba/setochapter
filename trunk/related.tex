@@ -246,9 +246,9 @@ It was with the demonstration of \texttt{RAX} $65$ Million miles in
 outer space, that temporal reasoning using methods came to the
 forefront of AI planning and for situated agents. Lessons learned from
 \texttt{RAX} led to the development of \texttt{IDEA}
-\cite{mus02,mus04,mus06} with the central theme of using planners
-collectively for problem solving arose. Another critical theme was
-iteratively and incremental plan repair of an anytime plan
+\cite{mus02,mus04,Dias:2003ua,mus06} with the central theme of using
+planners collectively for problem solving arose. Another critical
+theme was iteratively and incremental plan repair of an anytime plan
 \cite{Zaimag96} as proposed by \texttt{CASPER} \cite{chien00}.
 
 This last lesson in particular had a lasting impact with the
@@ -370,19 +370,19 @@ structure is fundamental to making the approach effective in practice.
 
 Our system, \texttt{T-REX}, the focus of this chapter, is an agent
 control structure formally defined as a composition of coordinated
-control loops with a recurring sense-plan-act (SPA)
-cycle. \texttt{T-REX} was designed after carefully evaluating lessons
-learned from \texttt{IDEA} and owes substantially to the notion of
-partitioned problem solving from that effort. However this
-partitioning is systematic and methodologically principled where we
-manage the information flow within the partitioned structure to ensure
-consistency in order to direct the flow of goals and observations in a
-timely manner. The resulting control structure improves scalability
-since many details of each controller can be encapsulated within a
-single control loop.  Furthermore, partitioning increases robustness
-since controller failure can be localized to enable graceful system
-degradation, making this an effective \emph{divide-and-conquer}
-approach to the overall control problem.
+control loops with a recurring sense-plan-act (SPA) cycle with
+deliberation at its core. \texttt{T-REX} was designed after carefully
+evaluating lessons learned from \texttt{IDEA} and owes substantially
+to the notion of partitioned problem solving from that effort. However
+this partitioning is systematic and methodologically principled where
+we manage the information flow within the partitioned structure to
+ensure consistency in order to direct the flow of goals and
+observations in a timely manner. The resulting control structure
+improves scalability since many details of each controller can be
+encapsulated within a single control loop.  Furthermore, partitioning
+increases robustness since controller failure can be localized to
+enable graceful system degradation, making this an effective
+\emph{divide-and-conquer} approach to the overall control problem.
 
 A recent variation of the key idea of such controller composition
 derived from \texttt{T-REX} is \texttt{ROAR} \cite{degroote11} where
