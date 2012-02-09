@@ -22,64 +22,92 @@
 %     execution with a rich representation of resources and time.
 %   \end{itemize}}
 
-The \rx architecture was designed with the objective to bring planning
-closer to the low-level control of the vehicle while maintaining its
-reactivity. Indeed, in most of the architecture where task planning is
-embedded, this task remains at a failry high level of abstraction as
-the complexity of this task would otherwise impede the system
-reactiveness. As a result the planning problem managed {\em in situ}
-remains fairly detached from low-level control and most of the
-reactive adaptation which in contrast is managed by specialized
-component that relies on different representations for modeling the
-local behavior they control or even do not have any explicit formal
-model of this behavior. The two angles our architecture attack this issue 
-are the following:
+A prime motivation behind the \rx architecture was to design a
+controller which could bring automated planning closer to low-level
+control of the vehicle while maintaining its reactivity. Traditionally
+planning has been deemed computationally expensive with planner
+performance restricting robot reactivity
+\cite{ghallab04,Dias:2003ua}. In control architectures where task
+planning is embedded, planning consequently remains at an abstract
+level with the assumption that it would otherwise impede system
+reactiveness and that the environment can change at a faster rate than
+the planner can plan for it. In such a situation, the agent may thrash
+if the internal state of the plan gets out of synch with the actual
+state of the world. As a result the planning problem managed {\em in
+  situ} remains fairly detached from low-level control. Most
+adaptations at the lower-level reactive layers in contrast are managed
+by specialized components (for example GeNoM \comment{} and CLARATy
+\comment{}) that rely on different representations for modeling local
+control behavior or worse do not have any explicit formal agent
+behavior model. The consequent different techniques for specifying
+each layer in the architecture results in duplication of effort and a
+diffusion of knowledge leading to significant design and integration
+issues \cite{ds1report}.  \texttt{IDEA} mitigated most of these issues
+by tightly integrating planning and execution in a single
+representational and computational framework with a unified
+declarative model. Our approach with \texttt{T-REX} builds on this
+design methodology albeit in a substantially systematic manner
+
+The \rx architecture contributes to agent architectures over and
+beyond \texttt{IDEA} are in the following ways:
 
 \begin{itemize}
 
-\item Distribute the global planning problem into multiple decision
-  loops, called {\em reactors}. Each reactor have its own scope both 
-  functionally (one for example focusing on the conversion of high 
-  level waypoints into low-level commands) and temporally as 
-  each reactor specifies to the agent their planning look-ahead and
-  their expected latency before being able to produce plan.
+\item \emph{Partitioning} the global planning problem into multiple
+  decision loops, called {\em reactors}. Each reactor has its own
+  scope both functionally (one for example focusing on the conversion
+  of high level waypoints into low-level commands) and temporally as
+  each reactor declares its planning look-ahead and expected latency
+  before being able to produce plan to the agent depending on where it
+  is located in a reactor dependency graph such as shown in
+  Fig. \ref{fig:agent}.
 
-\item Enforce a stronger interaction between the planning process 
-  and the integration of the world evolution. The objective being to
-  make sure that the plannign task is done while continuously informed 
-  on new world state change. By doing so, we expect to allow the planner
-  tohave better informed decision despite the fact that its latency is
-  larger that the world change rate.
+\item \emph{Coupling} a tighter integration between the planning
+  process and world evolution to ensure that planning occurs while
+  being continuously informed of state change. By doing so, the
+  planner is better informed in its deliberation despite a larger
+  latency than changing world change state.
 
 \end{itemize}
 
-For the first point \rx provides a formal framework described in
-details in \cite{py10} and \cite{rajan12} and is not the focus of this
-paper. The second have deep implication on how on should integrate a
-planner in this framework in general and was applied to the europa
-framework specifically. We'll develop later how this requirement
-implies to see in-situ planning as two parallels processes that are
-tightly linked through the same plan structure. But before that we
-need to introduce at least the high leve lconcepts and ideas behind
-our architecture as a whole.
+\rx provides a formal framework described which details partitioning
+in \cite{py10} and \cite{rajan12} and is not the focus of this
+chapter. Coupled interaction between planning and the world on the
+other hand, has a significant implication on how planning can be
+integrated in such frameworks; here we show using the \eu planner can
+be coupled to our framework. First we link concepts in \eu planning
+with the \rx framework.
 
-\rx architecture is structured around the notion of {\em state
-  variables} as the unique basis of interactionalong with a well
-defined ownership model for each of these.  In this framework each
-reactor is seen as a black box providing its own {\em internal} state
-variables for which its is reponsible to maintain its value at every
-single instant -- represented by a {\em tick} with a fixed
-duration. In order to identify its state a reactor can subscribe to
-{\em external} state variables for which it will received new updates
-when the owner of these will produce its {\em internal} state. This
-{\em synchronization} process progate through the reactor dependency
-graph on a bottom up flow at every {\em tick} ensuring that all the
+% on should integrate a
+% planner in this framework in general and was applied to the europa
+% framework specifically. We'll develop later how this requirement
+% implies to see in-situ planning as two parallels processes that are
+% tightly linked through the same plan structure. But before that we
+% need to introduce at least the high leve lconcepts and ideas behind
+% our architecture as a whole.
+
+The \rx architecture is structured around the notion of \eu {\em state
+  variables} as the fundamental basis of interaction. Additionally it
+comes with a well-defined ownership model associated with each state
+variable. In this framework each reactor is seen as a 'black box'
+providing its own {\em internal} state variables which it is
+responsible for in order to maintain its value at every instant of
+time. Each such instance is represented by a {\em tick} with a fixed
+duration; in our implementation of \rx on the Dorado, we use a tick of
+$1$ second. In order to identify its state a reactor can subscribe to
+{\em external} state variables owned by other reactors, for which it
+will receive new updates when the owner reactor generates its {\em
+  internal} state.
+
+This {\em synchronization} process propagates up through the reactor
+dependency graph bottom up at every {\em tick} ensuring that all the
 reactors have a consistent view of the world. Conversely each reactor
 can request a future change on one of its {\em external} state
-variable which will be transfromed as an {\em internal} goal to the
-owner. This goal is expected to porduce a deliberation phase on the
-receiver which can in turn produce a plan impacting its {\em external}
-state variables that will propagate down following the same mechanism.
+variables which will be transfromed as an {\em internal} goal to the
+owner. Such \emph{goal dispatching} is expected to produce a
+deliberation phase for the receiving reactor which can cyclically and
+in turn, produce a plan impacting its {\em external} state variables
+that will propagate down following the same mechanism.
 
 % Taking cues from the IDEA 
 % architecture \cite{mus02}, we designed a core framework that provides a
@@ -95,15 +123,15 @@ state variables that will propagate down following the same mechanism.
 % variables it relies on (called {\em external}) and the state
 % variables it manages and maintains (called {\em internal}). 
 
-Take for example the \rx agent instance we use in our AUV
-(Fig. \ref{fig:agent}). In this architecture all the reactors
-(symbolized by colored boxes) do not have explicit connection from one
-to another but instead rely on a publish/subscribe model on state
-variables. For Example the \textsf{Pilot} reactor needs the {\em
-  externally} managed state informations from \textsf{Sensor\_Data}
-and \textsf{Nav\_cmd} states variables in order to maintain {\em
-  internally} the state variables \textsf{Waypoint} and
-\textsf{Nav\_policy}. This relation applies in two way :
+Consider for example the \rx agent instance we use on our AUV as shown
+in Fig. \ref{fig:agent}. In this instance all the reactors (symbolized
+by colored boxes) do not have an explicit connection from one to
+another but instead rely on a publish/subscribe model on shared state
+variables. For instance the \textsf{Pilot} reactor needs the {\em
+  externally} managed state information from \textsf{Sensor\_Data} and
+\textsf{Nav\_cmd} state variables in order to maintain the internal
+state variables \textsf{Waypoint} and \textsf{Nav\_policy}. This
+relation applies in two ways:
 
 \begin{itemize}
 
@@ -210,12 +238,12 @@ for the lowest level reactor which -- instead of deliberating -- may
 just transform this goal in a physical command execution.
 
 The way the agent interleave planning \texttt{step}s and
-synchronization for a single reactor is illustrated in Figure 
-\ref{fig:tick-exec}. Synchronization happens at every single 
-tick and will interrupt planning allowing this reactor to identify
- its current state that can propagate through the reactor graph
- in order to ensure t aconsitent view of the state of the world 
-between all the reactors.  
+synchronization for a single reactor is illustrated in
+Fig.~\ref{fig:tick-exec}. Synchronization happens at every single tick
+and will interrupt planning allowing this reactor to identify its
+current state that can propagate through the reactor graph in order to
+ensure t aconsitent view of the state of the world between all the
+reactors.
 
 \begin{figure}[!htbp]
   \centering
@@ -248,13 +276,13 @@ configurations.
 The \eu reactor is our implementation inside \rx of a reactor that
 usess automated planning for its execution. This reactor is fully
 based on the europa framework and applies the core idea of \rx we
-described above to implement a reactor for which the sole purpose is to
-deliberate as time advance. The design of this reactor takes cues from 
-the IDEA architecture presented on \cite{mus02, mus06} in the sense taht both
-planning and execution are based on a single unified model. The choice 
-of \eu as the planning framework was directed by the fact that this 
-framework provide a rich and highly configurable toolset to be able to 
-infer around a rich temporal domain.
+described above to implement a reactor for which the sole purpose is
+to deliberate as time advance. The design of this reactor takes cues
+from the IDEA architecture presented on \cite{mus02, mus06} in the
+sense that both planning and execution are based on a single unified
+model. The choice of \eu as the planning framework was directed by the
+fact that this framework provide a rich and highly configurable
+toolset to be able to infer around a rich temporal domain.
 
 This reactor is implemented following the idea that in \rx, the
 whole execution cycle is two deliberation processes. Both of these
@@ -682,9 +710,9 @@ propagated the information provided by the new observation in the
 exisiting plan (restricting in turn the start time of \texttt{Going}
 and by propagtion of the constraints \texttt{Go} to be {\em exactly}
 $\tau+1$). While focusing uniquely on the execution frontier ($\tau+1$
-in this figure), the europa solver took benefit of the exisiting plan
-to evaluate a solution that asumes that the observation is consistent
-with what was decided inside this reactor.
+in Fig. \ref{fig:shop:exec1}), the europa solver took benefit of the
+exisiting plan to evaluate a solution that asumes that the observation
+is consistent with what was decided inside this reactor.
 
 
 This choice is directed not only by some natural heurisitc choices
