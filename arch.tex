@@ -1,8 +1,5 @@
-\section{Planning and execution in the \texttt{T-REX} architecture}
+\section{Planning and execution in the \rx architecture}
 \label{sec:arch}
-
-\subsection{The \rx architecture}
-\label{sec:arch:trex}
 
 % {\em\tiny This section introduces shortly T-REX architecture but move
 %   quickly the focus on a single reactor and gross concepts on the
@@ -21,6 +18,9 @@
 %     planning capabilities in order to do model based planning and
 %     execution with a rich representation of resources and time.
 %   \end{itemize}}
+
+\subsection{Introductory concepts}
+\label{sec:arch:intro}
 
 A prime motivation behind the \rx architecture was to design a
 controller which could bring automated planning closer to low-level
@@ -42,7 +42,7 @@ control behavior or worse do not have any explicit formal agent
 behavior model. The consequent different techniques for specifying
 each layer in the architecture results in duplication of effort and a
 diffusion of knowledge leading to significant design and integration
-issues \cite{ds1report}.  \texttt{IDEA} mitigated most of these issues
+issues \cite{DS1report}.  \texttt{IDEA} mitigated most of these issues
 by tightly integrating planning and execution in a single
 representational and computational framework with a unified
 declarative model. Our approach with \texttt{T-REX} builds on this
@@ -76,7 +76,10 @@ chapter. Coupled interaction between planning and the world on the
 other hand, has a significant implication on how planning can be
 integrated in such frameworks; here we show using the \eu planner can
 be coupled to our framework. First we link concepts in \eu planning
-with the \rx framework.
+with the \rx framework. Note that in the following treatise, we call
+the formal semantic framework of \rx as the 'agent'. Reactors
+constitute an entity within this agent and are standalone blocks of
+inference.
 
 % on should integrate a
 % planner in this framework in general and was applied to the europa
@@ -85,6 +88,9 @@ with the \rx framework.
 % tightly linked through the same plan structure. But before that we
 % need to introduce at least the high leve lconcepts and ideas behind
 % our architecture as a whole.
+
+\subsection{Architectural concepts in \rx}
+\label{sec:arch:trex}
 
 The \rx architecture is structured around the notion of \eu {\em state
   variables} as the fundamental basis of interaction. Additionally it
@@ -129,58 +135,59 @@ by colored boxes) do not have an explicit connection from one to
 another but instead rely on a publish/subscribe model on shared state
 variables. For instance the \textsf{Pilot} reactor needs the {\em
   externally} managed state information from \textsf{Sensor\_Data} and
-\textsf{Nav\_cmd} state variables in order to maintain the internal
-state variables \textsf{Waypoint} and \textsf{Nav\_policy}. This
-relation applies in two ways:
+\textsf{Nav\_cmd} state variables in order to maintain the
+\emph{internal} state variables \textsf{Waypoint} and
+\textsf{Nav\_policy}. This relation applies in two ways:
 
 \begin{itemize}
 
-\item In order to identify its current {\em internal} state values
-  this reactor needs to know the current {\em external} state
-  information it relies on. In this case the current \textsf{Waypoint}
-  the vehicle is heading to can be extracted for example from the
-  current \textsf{Nav\_cmd} executed.
+\item In order to identify its current {\em internal} state values the
+  \textsf{Pilot} \comment{double check this mod} needs to know the
+  current {\em external} state information it relies on. In this case
+  the current \textsf{Waypoint} the vehicle is heading to can be
+  extracted for example from the current \textsf{Nav\_cmd} executed.
 
-\item The future objectives a reactor has on its future \textsf{Internal}
-  state will probably imply sub-objectives to be reported to the
-  owner of its {\em external} depending on their current values. Again
-  if this reactor wants to go ato a specific \textsf{Waypoint} --
-  depending on its current position provided by \textsf{Sensor\_Data}
-  it can identify a sequence of \textsf{Nav\_cmd} that should
-  eventually help him reach this location.
+\item The future objectives a reactor has on \textsf{Internal} state
+  will likely imply sub-objectives to be reported to the owner of its
+  {\em external} state variables depending on their current
+  values. Should the \textsf{Pilot} want to visit a specific
+  \textsf{Waypoint} -- given its current position as provided by
+  \textsf{Sensor\_Data}, it can identify a sequence of
+  \textsf{Nav\_cmd} states that should eventually help it reach this
+  location. \comment{this explanation could do with a figure which I
+    believe we have used previously}
 
 \end{itemize}
 
 \begin{figure}[!htb]
  \centering
  \includegraphics[scale=0.45]{figs/AUV-agent.pdf}
- \caption{\small A \texttt{T-REX} agent is composed of multiple
-   reactors or control loops (rounded boxes) which are connected
-   through state variables provided by one reactor ({\color{blue}blue}
-   solid line) with multiple possible clients ({\color{green}green}
-   dashed lines)}
+ \caption{\small A \rx agent is composed of multiple reactors or
+   control loops (rounded boxes) which are connected through state
+   variables provided by one reactor ({\color{blue}blue} solid line)
+   with multiple possible clients ({\color{green}green} dashed lines)}
   \label{fig:agent}
 \end{figure}
 
-Overall the \rx architecture helps to abstract to the reactor
-interaction to only state variables. Each reactor is practically
-ignoring where its {\em external} state information is managed as long
-as this information is available and properly maintained so they can
-properly manage their own {\em internal} state information which in
-turn may be used by other reactors. Such formalism also constrain
-reactors interaction to state information exchanges which are two
-folds:
+Given the above example, the \rx architecture therefore helps abstract
+reactor interaction by containing them to state variables. Each
+reactor is therefore agnostic where its {\em external} state
+information is managed as long as this information is available and
+properly maintained for managing {\em internal} state
+information. This {\em internal} state in turn may be used by other
+reactors. Such a formalism also constrains reactor interaction to
+state information exchange which comes in two forms:
 
 \begin{itemize}
 
 \item {\em Observation on the current state values}: This information
-  propagates up in the reactor graph at the synchronization phase 
-  and occur at the beginning of every time steps (called
-  ticks). During this phase the agent provides to each reactor 
-  updates on their {\em external} state variables for this tick and
-  ask them to compute their {\em internal} state variables values for
-  this same tick. By doing so we propagate a consistent view of that
-  state of the world throughout all the reactors as time advance.
+  propagates up in the reactor dependency graph at the synchronization
+  phase and occurs at the beginning of every tick. During this phase
+  the agent provides to each reactor updates on their {\em external}
+  state variables for this tick and ask them to compute their {\em
+    internal} state variables values for this same tick. By doing so
+  we propagate a consistent view of that state of the world throughout
+  all the reactors as time advance.
 
 \item {\em Goals request on future state}: This information propagates
   down in the reactor graph. It reflects that, in order to satisfy own
