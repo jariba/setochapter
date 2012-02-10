@@ -12,43 +12,33 @@
 Fig. \ref{fig:europa-architecture} shows the main architectural
 components in \eu and their relationships. 
 
-The Constraint Reasoning Engine (CRE) manages variables, the domains
-from which they can take values, and constraints that define
+The \textbf{Constraint Reasoning Engine} (CRE) manages domain types, and constraints that define
 relationships among variables. It also provides an efficient arc
 consistency mechanism \cite{mackworth77}. The CRE is designed so that
 specialized reasoning algorithms for specific constraints can be easily
-and efficiently plugged in. The Plan Database (PDB) manages object types
-and objects, which are a mechanism to group variables to more naturally
-model the real world in much the same way that object oriented
-programming does. Also manages tokens, which are a mechanism to group
-variables to represent temporally scoped state. Objects and tokens can
-be used to model planning domains in a much more natural and extensible
-way that a pure CSP approach can. The Rules Engine (RE) manages token
-relationships in a planning model. The language modules (NDDL, ANML, and
+and efficiently plugged in. 
+
+The \textbf{Plan Database} (PDB) manages object types
+and objects,
+
+The \textbf{Rules Engine} (RE) manages token
+relationships in a planning model. 
+
+The {Language Modules} (NDDL, ANML, and
 other higher level modeling languages) are used to create domain models
 and problem instances \comment{point advantages over pure programming
-  API approaches, provide snippets}. Finally the API Layer (Fig.
-\ref{fig:europa-api}) makes all the services available so that \eu can
+  API approaches, provide snippets}. 
+  
+  Finally,  the \textbf{API Layer}  makes all the services available so that \eu can
 be used to build applications.
 
-\comment{Is Fig. \ref{fig:europa-api} necessary?}
 
-\begin{figure}
-\centering
-\includegraphics[scale=0.35]{figs/EUROPA-API.jpg}
-\caption{\small EUROPA's Client API}
-\label{fig:europa-api}
-\vskip+0.1cm
-\end{figure}
-
-
-	% \item Extension Modules bundled with EUROPA: Temporal Network, Resources, NDDL, ANML.
-	% 	\begin{enumerate}
-	% 		\item Temporal Network
-	% 		\item Resources
-	% 		\item NDDL
-	% 		\item ANML (TODO:maybe it's better to leave out?)
-	% 	\end{enumerate}
+Extension Modules bundled with EUROPA: Temporal Network, Resources, NDDL, ANML.
+\begin{enumerate}
+	\item Temporal Network
+	\item Resources
+	\\item NDDL. ANML (TODO:maybe it's better to leave out?)
+\end{enumerate}
 
 
 \subsection{Modeling}
