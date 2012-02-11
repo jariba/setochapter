@@ -12,34 +12,29 @@
 Fig. \ref{fig:europa-architecture} shows the main architectural
 components in \eu and their relationships. 
 
-The \textbf{Constraint Reasoning Engine} (CRE) manages domain types, and constraints that define
-relationships among variables. It also provides an efficient arc
+The \textbf{Constraint Reasoning Engine} (CRE) manages domain types, variables and constraints that define
+relationships among them. It also provides an efficient arc
 consistency mechanism \cite{mackworth77}. The CRE is designed so that
 specialized reasoning algorithms for specific constraints can be easily
 and efficiently plugged in. 
 
-The \textbf{Plan Database} (PDB) manages object types
-and objects,
+The \textbf{Plan Database} (PDB) manages object and token types. It also maintains the state of partial plans in terms of object, variable and token instances. This constitutes the data foundation on which end user applications and automated planners are built.
 
-The \textbf{Rules Engine} (RE) manages token
-relationships in a planning model. 
+The \textbf{Rules Engine} (RE) modularly adds the capability to support domain rules that describe dependencies between tokens,
 
-The {Language Modules} (NDDL, ANML, and
-other higher level modeling languages) are used to create domain models
-and problem instances \comment{point advantages over pure programming
-  API approaches, provide snippets}. 
+The \textbf{Solver Module} provides the framework for flaw detection and resolution that is needed to implement search algorithms for planning.
+
+The \textbf {Language Modules}: Describing problem domains and problem instances in terms of objects, variables and domain rules in a programmatic way is cumbersome to the extent of being impractical, that motivated the creation of modeling languages that support those definitions in a much more natural and compact way. NDDL is the main modeling language for \eu and will be described in detail in the Modeling section below. ANML is a language under development that provides a more intuitive syntax \comment{provide ANML citation}.
   
-  Finally,  the \textbf{API Layer}  makes all the services available so that \eu can
-be used to build applications.
+The \textbf{API Layer}  provides access to services from all the different modules in a programmatic way so that \eu can be easily embedded into specialized applications.
 
-
-Extension Modules bundled with EUROPA: Temporal Network, Resources, NDDL, ANML.
+ 
+In an effort to mimimize the amount of work that a user needs to perform to solve specific problems, \eu  also provides extension modules that have been found to be useful in many domains: 
 \begin{enumerate}
-	\item Temporal Network
-	\item Resources
-	\\item NDDL. ANML (TODO:maybe it's better to leave out?)
+	\item \textit{Temporal Network}: Extensions to the CRE module to reason about temporal constraints 
+	\item \textit{Resources}: Extensions to the CRE, PDB and Solver modules to provide out-of-the-box reasoning and search for metric resources.
+	\item \textit{Chronological Backtracking Solver}: A general purpose built-in solver to provide the ability to plan out-of-the-box, problems that require challenging search may require specialized solvers to be built as explained in the Search section below.	
 \end{enumerate}
-
 
 \subsection{Modeling}
 \label{sec:europa:modeling}
