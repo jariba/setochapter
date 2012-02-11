@@ -181,7 +181,7 @@ state information exchange which comes in two forms:
 
 \begin{itemize}
 
-\item {\em Observation on the current state values}: This information
+\item {\em Observation on current state values}: This information
   propagates \emph{up} in the reactor dependency graph at the
   synchronization phase and occurs at the beginning of every
   tick. During this phase the agent provides updates to each reactor
@@ -191,7 +191,7 @@ state information exchange which comes in two forms:
   of the world throughout all the reactors as time
   advances. \comment{could do with a figure here}
 
-\item {\em Goals request on future state}: This information propagates
+\item {\em Goal request on future state}: This information propagates
   \emph{down} in the reactor dependency graph. In order to satisfy own
   {\em internal} objectives, a reactor may have a plan that relies on
   future values of one of its {\em external} state. When such a plan
@@ -202,58 +202,56 @@ state information exchange which comes in two forms:
 \end{itemize}
 
 The choice of representation of state variables, observations and
-goals is directly derieved to the timelines and tokens from europa. 
-such representation is rich enough to allow the exchange of state
-information in a formal and yet flexible way and its transaltion in
-planning frameworks that have an explicit representation of time (such
-as but not limited to europa) is often trivial.
+goals is directly derived from \eu timelines and tokens.  While such a
+rich representation allows exchange of state information in a formal
+yet flexible manner, its translation into planning frameworks that
+have an explicit representation of time (such as but not limited to
+\eu) is often trivial.
 
+\subsection{The Execution Cycle}
+\label{sec:arch:exec}
 
-The overall execution cycle of the agent is also abstracted as a
-continuous planning/deliberation cycle between all the
-reactors. At the agent interface level, each reactor provided
-only two abstract calls that conceptualize their execution:
+The overall execution cycle of the agent is also abstracted out as a
+continuous planning/deliberation cycle between all reactors. At the
+agent interface level, each reactor provides only two abstract calls
+that conceptualize execution:
 
 \begin{itemize}
 
-\item \texttt{synchronize} that takes the last {\em external}
-  observations as argument and will return the {\em internal}
-  observations for this reactor or a failure report.
+\item \texttt{synchronize} takes the last {\em external} observations
+  as an argument and returns the {\em internal} observations for a
+  reactor or a failure report.
 
-\item \texttt{step} that accept new goals requested (if any) on the
-  {\em internal} timeline of this reactor and will execute one step of
-  deliberation. The returned value indicates if a complete plan has
-  been found and in that case will also provide the part of this plan
-  applied to {\em external} timelines of this reactor.
+\item \texttt{step} that accepts new goals requested (if any) on the
+  {\em internal} timeline of a reactor and will execute one step of
+  deliberation \comment{Might be good to articulate what ``one'' step
+    looks like}. The returned value indicates if a complete plan has
+  been found. If so this part \comment{what does 'this part' mean? Can
+    we sketch a figure or make it more formal?} of the plan is
+  provided to {\em external} timelines of this reactor.
 
 \end{itemize}
 
-Both of these two deliberative functions have different scope and
-temporal constraints. The \texttt{synchronize} call is considered as
-atomic and will focus only on state inference from the current tick by
-identifying the current value of the {\em internal} state variables
-from the latest updates on the {\em external} variables. This process
-will then propagate up in the reactor graph at any single tick to
-ensure that all reactors are aware of the current state of the
-world. \texttt{step} relates to a single decision step of the planning
-process which is focused on the future evolution of the state
-variables and it can take multiple steps spanning other multiple ticks
-for a reactor to produce a plan that is both complete and valid. when
-such plan is identified its {\em external} part is then dispatched to
-the corresponding reactors which in turn can start their deliberation
-\texttt{step}s in order to satisfy these new objectives. As a
-consequence physical execution will occur as these goals and planning
-propagate down in the reactor graph until they eventually become goals
-for the lowest level reactor which -- instead of deliberating -- may
-just transform this goal in a physical command execution.
-
-The way the agent interleave planning \texttt{step}s and
-synchronization for a single reactor is illustrated in
-Fig.~\ref{fig:tick-exec}. Synchronization happens at every single tick
-and will interrupt planning allowing this reactor to identify its
-current state that can propagate through the reactor graph in order to
-ensure t aconsitent view of the state of the world between all the
-reactors.
+Both these deliberative functions have different scope and temporal
+constraints. The \texttt{synchronize} call is considered as atomic and
+will focus only on state inference for the current tick by identifying
+the current value of {\em internal} state variables from the latest
+updates on the {\em external} state variables. This process propagates
+up in the reactor dependency graph at any single tick \comment{at
+  every single tick??? maybe} to ensure that all reactors are aware of
+the current state of the world. \texttt{step} relates to a single
+decision step of the planning process which is focused on the future
+evolution of state variables; it can take multiple steps spanning
+multiple ticks for a reactor to produce a plan that is both complete
+and valid. When such plan is identified \comment{how? Is there a
+  terminating condition?} its {\em external} timeline(s) are then
+dispatched to the corresponding reactors which own these times and
+which in turn can start their own deliberation \texttt{step}s to
+satisfy these new objectives. Consequently execution occurs as these
+goals and plans propagate down in the reactor hierarchy until they
+eventually become goals for the lowest level reactor which -- instead
+of deliberating -- may just transform this goal into a command for
+execution in hardware.
 
 \begin{figure}[!htbp]
   \centering
@@ -267,20 +265,27 @@ reactors.
   \vskip-0.8pc
 \end{figure}
 
-This view of the reactor has two parallel tasks allow for long
-planning deliberation while ensuring that the state evolution
-propagates through the agent as time advance. These two tasks 
-intertwined together give the two natural flows (bottom-up for state
-estimation and top to bottom for future plan) that we expect to see in
-a control loop. As they are both conceptualized as inference processes
-it is natural to implement a reactor based on generic automated
-planning. For example in Fig. \ref{fig:agent}, appart \textsf{Shore
-  comm.} and \textsf{Vehicle} acting as interfaces to the system,
-every other reactors (colored in blue) are different instance of our
-europa reactor differntiated only by their model and europa solver
-configurations. 
+The manner in which the agent interleaves planning \texttt{step}s and
+synchronization for a single reactor is illustrated in
+Fig.~\ref{fig:tick-exec}. Synchronization occurs at every tick
+interrupting planning; this allows a reactor to identify its current
+state that can propagate through the reactor hierarchy in order to
+ensure a consistent view of the state of the world between all the
+reactors.
+% This view of a reactor has two parallel tasks allowing for long
+% planning deliberation while ensuring that the state evolution
+% propagates through the agent as time advance.
+These intertwined tasks together provide two natural information flow
+methods (bottom-up for state estimation and top-down for plan
+projection) that we expect to see in a control loop. As they are both
+inference-based processes it is natural to implement a reactor based
+on generic automated planning. For example in Fig. \ref{fig:agent},
+apart from \textsf{Shore comm.} and \textsf{Vehicle} acting as
+interfaces to the system, every other reactor (in blue) are different
+instances of a \eu reactor differentiated only by their model and \eu
+solver configurations.
 
-\subsection{The Europa deliberative reactor}
+\subsection{The  \eu Deliberative Reactor}
 \label{sec:arch:europa}
 
 The \eu reactor is our implementation inside \rx of a reactor that
