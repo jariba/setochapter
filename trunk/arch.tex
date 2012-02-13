@@ -70,10 +70,10 @@ beyond \texttt{IDEA} are in the following ways:
 
 \end{itemize}
 
-\rx provides a formal framework which details partitioning in
-\cite{py10} and \cite{rajan12} and is not the focus of this
-chapter. Coupled interaction between planning and the world on the
-other hand, has a significant implication on how planning can be
+Partitioned inference is a major contribution of \rx. However that is
+not the focus of this chapter; details are in \cite{py10} and
+\cite{rajan12}. Coupled interaction between planning and the world on
+the other hand, has a significant implication on how planning can be
 integrated in such frameworks; here we show using the \eu planner can
 be coupled to our framework. First we link concepts in \eu planning
 with the \rx framework. Note that in the following treatise, we call
@@ -171,7 +171,7 @@ variables. For instance the \textsf{Pilot} reactor needs the {\em
 \end{itemize}
 
 Given the above example, the \rx architecture therefore helps abstract
-reactor interaction by containing them to state variables. Each
+reactor interaction by constraining them to state variables. Each
 reactor is therefore agnostic where its {\em external} state
 information is managed as long as this information is available and
 properly maintained for managing {\em internal} state
@@ -237,37 +237,35 @@ constraints. The \texttt{synchronize} call is considered as atomic and
 will focus only on state inference for the current tick by identifying
 the current value of {\em internal} state variables from the latest
 updates on the {\em external} state variables. This process propagates
-up in the reactor dependency graph at any single tick \comment{at
-  every single tick??? maybe} to ensure that all reactors are aware of
-the current state of the world. \texttt{step} relates to a single
-decision step of the planning process which is focused on the future
-evolution of state variables; it can take multiple steps spanning
-multiple ticks for a reactor to produce a plan that is both complete
-and valid. When such plan is identified \comment{how? Is there a
-  terminating condition?} its {\em external} timeline(s) are then
-dispatched to the corresponding reactors which own these times and
-which in turn can start their own deliberation \texttt{step}s to
-satisfy these new objectives. Consequently execution occurs as these
-goals and plans propagate down in the reactor hierarchy until they
-eventually become goals for the lowest level reactor which -- instead
-of deliberating -- may just transform this goal into a command for
-execution in hardware.
+up in the reactor dependency graph at every tick to ensure that all
+reactors are aware of the current state of the world. \texttt{step}
+relates to a single decision step of the planning process which is
+focused on the future evolution of state variables; it can take
+multiple steps spanning multiple ticks for a reactor to produce a plan
+that is both complete and valid. When such plan is identified
+\comment{how? Is there a terminating condition?} its {\em external}
+timeline(s) are then dispatched to the corresponding reactors which
+own these times and which in turn can start their own deliberation
+\texttt{step}s to satisfy these new objectives. Consequently execution
+occurs as these goals and plans propagate down in the reactor
+hierarchy until they eventually become goals for the lowest level
+reactor which -- instead of deliberating -- may just transform this
+goal into a command for execution in hardware.
 
 \begin{figure}[!htbp]
   \centering
   \vskip-1pc
   \includegraphics[width=0.55\columnwidth]{figs/tick-cycle}
-  \caption{\small \texttt{T-REX} reactor execution cycle: {\em
-      Deliberation} is interrupted by {\em synchronization} at the
-    beginning of every {\em tick} allowing integration of state
-    information.}
+  \caption{\small \rx reactor execution cycle: {\em Deliberation} is
+    interrupted by {\em synchronization} at the beginning of every
+    {\em tick} allowing integration of state information.}
   \label{fig:tick-exec}
   \vskip-0.8pc
 \end{figure}
 
 The manner in which the agent interleaves planning \texttt{step}s and
 synchronization for a single reactor is illustrated in
-Fig.~\ref{fig:tick-exec}. Synchronization occurs at every tick
+Fig.~\ref{fig:tick-exec}. Synchronization occurs at every tick while
 interrupting planning; this allows a reactor to identify its current
 state that can propagate through the reactor hierarchy in order to
 ensure a consistent view of the state of the world between all the
@@ -275,101 +273,94 @@ reactors.
 % This view of a reactor has two parallel tasks allowing for long
 % planning deliberation while ensuring that the state evolution
 % propagates through the agent as time advance.
-These intertwined tasks together provide two natural information flow
-methods (bottom-up for state estimation and top-down for plan
-projection) that we expect to see in a control loop. As they are both
-inference-based processes it is natural to implement a reactor based
-on generic automated planning. For example in Fig. \ref{fig:agent},
-apart from \textsf{Shore comm.} and \textsf{Vehicle} acting as
-interfaces to the system, every other reactor (in blue) are different
-instances of a \eu reactor differentiated only by their model and \eu
-solver configurations.
+These intertwined tasks together provide two natural information flows
+(bottom-up for state estimation and top-down for plan projection) that
+we expect to see in a control loop. As they are both inference-based
+processes it is natural to implement a reactor based on generic
+automated planning. For example in Fig. \ref{fig:agent}, apart from
+\textsf{Shore comm.} and \textsf{Vehicle} acting as interfaces to the
+system, every other reactor (in blue) are different instances of a \eu
+reactor differentiated only by their model and \eu solver
+configurations.
 
 \subsection{The  \eu Deliberative Reactor}
 \label{sec:arch:europa}
 
-The \eu reactor is our implementation inside \rx of a reactor that
-usess automated planning for its execution. This reactor is fully
-based on the europa framework and applies the core idea of \rx we
-described above to implement a reactor for which the sole purpose is
-to deliberate as time advance. The design of this reactor takes cues
-from the IDEA architecture presented on \cite{mus02, mus06} in the
-sense that both planning and execution are based on a single unified
-model. The choice of \eu as the planning framework was directed by the
-fact that this framework provide a rich and highly configurable
-toolset to be able to infer around a rich temporal domain.
-
-This reactor is implemented following the idea that in \rx, the
-whole execution cycle is two deliberation processes. Both of these
-processes are implemented as two europa solvers modifying the same
-plan database and for which the execution is managed by the \rx 
-framework as time advance during the execution of the system:
+Within \rx, an instance of an \eu reactor comes with the sole purpose
+to deliberate. A typical design of such a reactor takes its cues from
+\texttt{IDEA} \cite{mus02, mus06} where both planning and execution
+are based on a single unified model within a rich representation that
+provides support for temporal inference. In \rx, the execution cycle
+consists of two deliberation processes which are implemented as two
+\eu solvers modifying the \emph{same} plan database. %  and for which the
+% execution is managed by the \rx framework as time advance during the
+% execution of the system:
 
 \begin{enumerate}
 
-\item The synchronization solver is a specialized europa solver that
-  will integrate in the plan new information about the evolution of
-  the External state variable and ensure that the reactor propagate
-  these in order to both identify its current state and inform
-  other reactors of any state change on its internal timelines. This
-  solver is summoned at the beginning of every single tick.
+\item The \emph{synchronization solver} is a specialized \eu solver
+  that integrates new information in the plan, the evolution of
+  \emph{external} state variables and ensures that the reactor
+  propagates these to identify the reactors current state as well as
+  to inform other reactors of any state change on its \emph{internal}
+  timelines. This solver is summoned at the beginning of every single
+  tick.
 
-\item The deliberation solver is managing the deliberation process of
-  the reactor in order to produce a new plan or alter its current plan
-  as new goals are given to the reactor or the synchronization solver
-  identifying a conflict between the current state of the world and
-  the expectations of the previous plan. This process can  span other
-  multiple tick and therefore can be interrupted at any single tick in
-  order for the synchronization solver to do its task.
+\item The \emph{deliberation solver} manages the deliberation process
+  of the reactor either to produce a new plan or alter its current
+  plan as new goals are provided or when the synchronization solver
+  identifies a conflict between current state and expectations from a
+  previously generated plan. This process can span multiple ticks and
+  can therefore be interrupted by the synchronization solver.
 
 \end{enumerate}
 
 While the two processes are separate, they share the same plan
-internal to a reactor and therefore at every synchronization cycle the
+internal to a reactor; consequently at every synchronization cycle the
 planning process is informed of the new world state and its impact on
-the plan. Conversely, when the planning process eventually finds a
+the plan. Conversely, when the deliberation process eventually finds a
 solution, synchronization is informed about generating the planned
-state values on the {\em external} state variables. This {\em
-  external} plan defines the set of {\em goals} for this state
-variable managed by another {\em reactor}.
+state values \comment{should this read as ``...is informed about
+  generated state values..'' instead?} on the {\em external} state
+variables. This {\em external} plan defines the set of {\em goals} for
+this state variable managed by another {\em reactor}.
 
-An important challenge for embedding automayted planning i na situated
-agent as always been to go around the asumptions made by most classical
-planners. Specifically one assumption restrict the problem to ``offline
-planning''  defined in \cite{ghallab04} as follow:
+Synchronization offers an important challenge for embedding planning
+in a situated agent, typically %  as always been to go around the asumptions made by
+% most classical planners. Specifically one
+an assumption to restrict the problem to ``offline planning'' defined
+in \cite{ghallab04} as follows:
 
 \begin{quotation}
   The planner is not concerned with any change that may occur in
-  $\Sigma$ \footnote{In this book $\Sigma$ identifies the world modeled
-    by the plan domain} while it is planning; it plans for the given
-  initial and goal states regardless of the current dynamics, if any.
+  $\Sigma$ \footnote{the world modeled by the plan domain} while it is
+  planning; it plans for the given initial and goal states regardless
+  of the current dynamics, if any. 
 \end{quotation}
 
-This assumption, while helpfull to reduce the scope of the planning
-problem, becomes problematic if one wants to embed a planner in a
-real-time system that evolves in a highly dynamic environment. In a
-typical robot this implies that the only point where the planner can
-be informed about the current world state is right before the planning
-is started by giving to the planner the intial state and current
-objectives. During the planning, it is assumed that the agent can
-maintin the world as perceived by the planner as stable. In
-\cite{lemai04, lemai-chenevier2004}, they do attempt to reduce the
-impact of planning by allowing local plan repairs which attempt to
-insert repairing actions in the exisiting plan andf can be done fast
-enough. Still in ythe eventuality that such repair is not possible
-they add to stop their vehicle until the full (re-)planning was
-complete. {\em I may need more examples/refs here}
+This assumption, while helpful to reduce the scope of the planning
+problem, becomes problematic for planning within a highly dynamic
+environment. In a typical robot this implies that the only point where
+the planner can be informed about the current world state is prior to
+the commencement of a planning cycle by giving to the planner the
+initial state and current objectives. During the planning, it is
+assumed that the agent can maintin the world as perceived by the
+planner as stable. \cite{lemai04, lemai-chenevier2004} attempts to
+reduce the impact of planning by allowing local plan repair in the
+existing plan. In the eventuality that such repair is not feasible
+they require that their robot comes to a full stop until (re-)planning
+is complete. \comment{I may need more examples/refs here}. As Fig.
+\ref{fig:tick-exec} shows, this assumption is problematic for our
+architecture. Synchronization that tracks state evolution can occur
+several times during the reactor deliberation process. By making
+synchronization and deliberation share the same plan we provide a
+solution that relaxes this static world assumption. 
 
-Looking back at Fig. \ref{fig:tick-exec}, one can already see that
-this asumtpion is problematic in our architecture. Indeed
-synchronization that tracks state evolution can occur several times
-during the reactor deliberation process. By making synchronization and
-deliberation share the same plan we provide a solution that relax this
-assumption. In the following sections we present how synchronization
-and deliberation are implemented independently first to finally show
-how their interaction through the plan helps relax this assumption by
-making the planning fully integrated to the reactor execution cycle
-while potentially allowing for more informed planning.
+In the following sections we show how synchronization and deliberation
+are implemented independently to show how their interaction through
+the plan helps relax this assumption by making planning fully
+integrated in the reactor execution cycle while potentially allowing
+for more informed planning.
 
 \subsubsection{Synchronization identify internal state evolution}
 \label{sec:arch:synch}
