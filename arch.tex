@@ -365,19 +365,33 @@ for more informed planning.
 \subsubsection{Synchronization identify internal state evolution}
 \label{sec:arch:synch}
 
-For the sake of simplicity we introduce first how a reactor can track
-and identify its state in the context where it does not have any
-compelling need to deliberate. Assume here that we have a reactor that
-have no future goal. {\em Need to develop the reason why it is a
-  necessity: primarily to provide its internal state to whoever
-  observe it but als simply to ensure that its current representation
-  of the world is up to date and still consistent}
+\begin{figure}[!htbp]
+  \centering
+  \includegraphics[width=0.5\columnwidth]{figs/synch-relation}
+  \caption{\small Illustration of the synchronization flaws in a reactor. The
+    reactor receive new observations when they are produced by the
+    owner(s) of its internal timelines. The line after the last token
+    of each timeline represent the domain of possible values for the
+    end of this token. At every tick $\tau$ the reactor needs to
+    integrate the {\em External} state information it received and --
+    based on its model $\mathcal{M}$ -- resolve its {\em Internal}
+    state that will then be provided by the architecture to other
+    reactors using these state variables.}
+  \label{fig:synch:flaw}
+\end{figure}
 
-In the europa based reactor we introduce this requirement as a new
-type of flaw for the europa framework. This flaw enforces at the
-reactor to identify fully its internal state for the current tick. By
-using this new flaw we can describe the synchronization process as
-this general sequence :
+We first show how a reactor can track and identify its state in the
+context where it does not have any compelling need to deliberate. We
+assume that we have a reactor that has no future goal. \comment{Need
+  to develop the reason why it is a necessity: primarily to provide
+  its internal state to whoever observe it but also simply to ensure
+  that its current representation of the world is up to date and still
+  consistent}
+
+We introduce this requirement as a new type of flaw (Section
+\ref{sec:europa:arch}) for the \eu framework. This flaw forces the
+reactor to identify its internal state for the current tick. By using
+this flaw one can describe the synchronization process as:
 
 \begin{enumerate}
 
@@ -391,32 +405,17 @@ this general sequence :
 
 \end{enumerate}
 
-\begin{figure}[!htbp]
-  \centering
-  \includegraphics[width=0.5\columnwidth]{figs/synch-relation}
-  \caption{Illustration of the synchronization flaws in a reactor. The
-    reactor receive new observations when they are produced by the
-    owner(s) of its internal timelines. The line after the last token
-    of each timeline represent the domain of possible values for the
-    end of this token. At every tick $\tau$ the reactor needs to
-    integrate the {\em External} state information it received and --
-    based on its model $\mathcal{M}$ -- resolve its {\em Internal}
-    state that will then be provided by the architecture to other
-    reactors using these state variables.}
-  \label{fig:synch:flaw}
-\end{figure}
-
-The resolution of internal state flaw can be resolved using one of the
-following choices which are evaluated in the given order:
+An internal state flaw can be resolved using one of the following
+choices which are evaluated in order:
 
 \begin{enumerate}
 
-\item Extend the previous state value to end after this tick (ie
-  restrict its end time to $[\tau+1, \infty)$). 
+\item Extend the previous state value to end after this tick (\ie
+  restrict its end time to $[\tau+1, \infty)$). \comment{first use of
+    $\tau$, so needs to be defined earlier}
 
-\item Start the next active token in the timeline and
-  attempt to start it now (ie restrict its start time to the single
-  value $\tau$).
+\item Start the next active token in the timeline 
+  by restricting its start time to the single value $\tau$
 
 \item Create and insert a new token in this timeline that will start
   at the current tick $\tau$ (attempt this for each possible token
@@ -425,14 +424,14 @@ following choices which are evaluated in the given order:
 \end{enumerate}
 
 All of these choices are evaluated sequentially until a consistent
-solution with no more flaw for this tick is identified. In order to do
-so we need to make the assumption that the current state value of an
-internal timeline do not depend on the future or more accurately that
-any choices made during this synchronization will not lead to a future
-inconsistency (meaning no possible solution) for a future
-synchronization. Such assumption deeply impact the set of possible
-domains one the reactor can support while remaining complete. Take for
+solution with no flaws at this tick, is identified. In order to do so
+we need to make the assumption that the current state value of an
+internal timeline does not depend on the future or more accurately
+that any choices made during this synchronization will not lead to a
+future inconsistency. Such an assumption impacts the set of possible
+domains the reactor can support while remaining complete. Take for
 example this rule from our \texttt{Shopping} model :
+
 \begin{verbatim}
  1 Agent::Go {
  2   met_by(condition object.location.At origin);
@@ -446,34 +445,34 @@ example this rule from our \texttt{Shopping} model :
 10   eq(to, destination.loc);
 11 }
 \end{verbatim}
-While this model is perfectly standard and acceptable in the overall
-case. It can become problematic while tied to the
-execution. Specificially it puts a strong tie between the {\em fact} that we
-are \texttt{Going} to a location and the {\em expected} future outcome  of
-ending at this location. This ties is even stronger due to the
-constraint at line 5. Knwoing this aspect assume that the
-\texttt{Agent.location} is {\em external} to the reactor which receive
-the observation \texttt{Going(Home,SuperMarket)} which synchronization
-resolved by producing the observation \texttt{Go(Home, SuperMarket)}
-in the Agent timeline. From this point this means that the only
-possible outcome on \texttt{Agent.location} is to be
-\texttt{At(SuperMarket)} in the directly foreseeable future. In the
-real world the fact that we are \texttt{Going} to a certain location
-does not necessarly imply that we will succeed on ending up there. An
-extreme case could be that due to some exogenous event, the road to
-the \texttt{SuperMarket} is closed which could result on an alternate
-observation \texttt{At(7th st. \& Foo Ave.)}. This observation
-contradicts thre existing plan the reactor maintin and it is important
-here to relaize the temp[oral direction of the causal link that is
-triggereing this inconsitency. Indeed at the time we will observe this
-contradicting \texttt{At}, the rule that generated this conlict is
-connected to the past observations \texttt{Going} and \texttt{Go}
-which cannot be fully retracted without potential global impact in the
-rest of the exisiting reactors -- implying  a huge cost in
-backprogation that would be problematic. 
 
-More generally tying a token
-to future outcomes in a model that is meant to be confronted to rela
+While this model is perfectly standard and acceptable in the overall
+case. It can become problematic when tied to execution. Specifically it
+puts a strong tie between the {\em fact} that we are \texttt{Going} to a
+location and the {\em expected} future outcome of ending at this
+location. This ties is even stronger due to the constraint at line 5.
+Knowing this aspect assume that the \texttt{Agent.location} is {\em
+  external} to the reactor which receive the observation
+\texttt{Going(Home,SuperMarket)} which synchronization resolved by
+producing the observation \texttt{Go(Home, SuperMarket)} in the Agent
+timeline. From this point this means that the only possible outcome on
+\texttt{Agent.location} is to be \texttt{At(SuperMarket)} in the
+directly foreseeable future. In the real world the fact that we are
+\texttt{Going} to a certain location does not necessarly imply that we
+will succeed on ending up there. An extreme case could be that due to
+some exogenous event, the road to the \texttt{SuperMarket} is closed
+which could result on an alternate observation \texttt{At(7th st. \& Foo
+  Ave.)}. This observation contradicts thre existing plan the reactor
+maintin and it is important here to relaize the temp[oral direction of
+the causal link that is triggereing this inconsitency. Indeed at the
+time we will observe this contradicting \texttt{At}, the rule that
+generated this conlict is connected to the past observations
+\texttt{Going} and \texttt{Go} which cannot be fully retracted without
+potential global impact in the rest of the exisiting reactors --
+implying a huge cost in backprogation that would be problematic.
+
+More generally tying a token to future outcomes in a model that is meant
+to be confronted to rela 
 executionis something that is problematic. It may be valid ifg you can
 gurantee that this will always happen (for example the reactor
 managing \texttt{Agent.location} timeline guarantees that the outcome
@@ -482,6 +481,7 @@ location) but should be manipulated while keeping in mind that
 predicting the future is not absolute. In this case one could alter
 this part of the model as follow in order to give the reactor more
 flexibility:
+
 \begin{verbatim}
  1 Agent::Go {
  2   met_by(condition object.location.At origin);
@@ -496,6 +496,7 @@ flexibility:
 11   going meets destination;
 12 }
 \end{verbatim}
+
 The alteration made to relax the constraint on linbe 5 from a strict 
 \texttt{equals} to contains and then add the new constraint at line 11
 that ensure that the last \texttt{Going} done during this \texttt{Go}
