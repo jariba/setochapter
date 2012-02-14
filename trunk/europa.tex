@@ -60,14 +60,14 @@ a powerful tool for describing problem domains are:
 \item It offers declarative constructs to define constraints
   and causality dependencies between actions and effects.
 
-\item It offers procedural constructs to populate \eus plan database
+\item It offers procedural constructs to populate \eu's plan database
   with specific problem instances expressed in terms of objects,
   variables, constraints, facts and goals. 
 
 \end{enumerate}
 
 To understand how the most important elements of NDDL work, let's take a
-look at how the Shopping Agent problem described above would be modeled:
+look at how the Shopping Agent problem could be modeled:
 
 \begin{verbatim}
 
@@ -136,7 +136,21 @@ class Agent {
   	Product product;
   }
 }
+\end{verbatim}
 
+In the model above we can see how the main elements or a problem domain can be mapped to \eu's representation:
+
+\begin{enumerate}
+	\item \textbf{Object Types}: NDDL supports an object-oriented approach, where common data and behavior can be abstracted as a class. In this case, we have the \textit{Product} class represent the products that the Shopping Agent needs, \textit{Location} represents the places where products can be found, \textit{ProductLocation} represents the association arising when a product can be purchased at a location. The Shopping Agent itself is represented by an \textit{Agent} class, which relies on the \textit{AgentLocation} class to keep track of where the agent is at any point in time. NDDL supports a single rooted class hierarchy so that state and behavior can be extended through inheritance. We took advantage of that by making \textit{AgentLocation} inherit from \eu's built-in \textit{Timeline} class which doesn't allow predicates to overlap in time for the same object instance, in this way we can ensure that and agent can only be at one place at a time. 
+	\item \textbf{Predicate Types}: Some classes like \textit{Product}, \textit{Location} and \textit{ProductLocation} are completely static and so don't have any predicate or action types associated with them. The \textit{AgentLocation} class is purely used to keep track of state and so it has \texttt{At} and \texttt{Going} predicate types associated with it. 
+	\item \textbf{Action Types}: The \textit{Agent} class is the only one that has behavior associated with it, consequently, it defines action types to represent when the agent is taking action to \texttt{Go} to a \textit{Location}, or to \texttt{Buy} a \textit{Product}. We'll see how the actual behavior for those actions is specified below.
+	\item \textbf{Variable Types and Instances} : All the object attributes are represented as variables in this model, for instance, it uses integer variables to represent the built-in temporal variables for each token (activity duration, start and end times), string variables to represent Location and Product names, and object reference variables to represent the structural relationships between different objects (for instance, each Agent has variable to keep track of its AgentLocation).
+\end{enumerate}
+
+
+\comment{explain rule definition below}
+
+\begin{verbatim}
 
 // Define the rules for our actions:
 Agent::Go {
@@ -172,18 +186,7 @@ Agent::Buy {
 \end{verbatim}
 
 
-In this model we can see:
-
-\comment{explain variable, object, predicate and action types, including constraints that can be part of them}
-\begin{enumerate}
-	\item Variable Types: This model uses integer (activity duration, start and end times, etc) and string (Location and Product names, etc)
-	\item Object Types:
-	\item Predicate Types:
-	\item Action Types:
-\end{enumerate}
-
- shows how a specific problem instance would be
-specified in NDDL.
+Now, having defined the Shopping agent domain that way, here is how a particular problem instance could be specified:
 
 \begin{verbatim}
 
@@ -239,6 +242,7 @@ leq(horizonStart, atHomeForBreakfast.start);
 leq(atHomeForDinner.end, horizonEnd);
 
 \label{eu:model}
+%\caption{Specifying a problem instance for the Shopping Agent in NDDL}
 \end{verbatim}
 
 \comment{explain variable, object, predicate and constraint instances.
