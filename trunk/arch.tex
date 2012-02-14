@@ -224,12 +224,18 @@ that conceptualize execution:
 
 \item \texttt{step} that accepts new goals requested (if any) on the
   {\em internal} timeline of a reactor and will execute one step of
-  deliberation \comment{Might be good to articulate what ``one'' step
-    looks like}. The returned value indicates if a complete plan has
-  been found. If so this part \comment{what does 'this part' mean? Can
-    we sketch a figure or make it more formal?} of the plan is
-  provided to {\em external} timelines of this reactor.
-
+  deliberation. In the context of Europa for example pone step of
+  deliberation correspod to resolve one sibngle flaw while ensuring
+  that the resulting plan is not proven inconsistent. This implies
+  that it also includes the backtracking of the search in such case. 
+  The returned value by this step function is a boolean which
+  indicates whether the reactor needs some extra step to deliberate or
+  if this last step resulted on a complete plan for the reactor
+  look-ahead. On the later, the part of the plan that concern this
+  reactor {\em external} timelines is provided in order to be
+  dispatched as goals to whichever reactor that is reponsible for
+  these. \comment{By extending I may have saud things I developped
+    below ... will have  to check}
 \end{itemize}
 
 Both these deliberative functions have different scope and temporal
@@ -243,7 +249,8 @@ relates to a single decision step of the planning process which is
 focused on the future evolution of state variables; it can take
 multiple steps spanning multiple ticks for a reactor to produce a plan
 that is both complete and valid. When such plan is identified
-\comment{how? Is there a terminating condition?} its {\em external}
+\comment{how? Is there a terminating condition? No more flaws but I
+  washoping it would have been defined in europa section} its {\em external}
 timeline(s) are then dispatched to the corresponding reactors which
 own these times and which in turn can start their own deliberation
 \texttt{step}s to satisfy these new objectives. Consequently execution
@@ -318,7 +325,23 @@ consists of two deliberation processes which are implemented as two
 While the two processes are separate, they share the same plan
 internal to a reactor; consequently at every synchronization cycle the
 planning process is informed of the new world state and its impact on
-the plan. Conversely, when the deliberation process eventually finds a
+the plan. Conversely, when synchronization occurs after deliberation
+steps, its starting point is the last partial plan resulting from
+deliberation. This gives an initial frame to the problemm that helps
+-- at least initial -- to target the synchronization problem by
+ensuring that the new {\em external} state updates are compatible with
+this plan. If so, the synchronization propagates these events in the
+plan and can uses it as a help on identifying its {\em internal}
+timelines based on this plan. If they are not compatibles, then
+synchronization identifies a plan inconsistency  reflecting that the
+current plan is not valid anymore. \comment{fpy: I am here and will
+  develop further}
+
+\comment{following is not what I intended to express whatsoever
+  ... synchroniuzation od not deal with dispatching but execution
+  tracking ... it is though helped by the structure of the exisiting
+  plan and often identifies execution failures}
+ Conversely, when the deliberation process eventually finds a
 solution, synchronization is informed about generating the planned
 state values \comment{should this read as ``...is informed about
   generated state values..'' instead?} on the {\em external} state
@@ -354,7 +377,9 @@ is complete. \comment{I may need more examples/refs here}. As Fig.
 architecture. Synchronization that tracks state evolution can occur
 several times during the reactor deliberation process. By making
 synchronization and deliberation share the same plan we provide a
-solution that relaxes this static world assumption. 
+solution that relaxes this static world assumption. \comment{Need to
+  talk about IDEA and the fact that they had similar aspect even though
+  they were never very clear nor well articulated in their papers}
 
 In the following sections we show how synchronization and deliberation
 are implemented independently to show how their interaction through
@@ -364,6 +389,58 @@ for more informed planning.
 
 \subsubsection{Synchronization identify internal state evolution}
 \label{sec:arch:synch}
+
+For the sake of simplicity we introduce first how a reactor can track
+and identify its state in the context where it does not have any
+compelling need to deliberate. Assume here that we have a reactor that
+have no future goal. Even in this context, it is a core requirement in
+T-REX (see \cite{py10}) to have each reactor to produce at every
+single tick their {\em internal} state or at least, for the ones not owning
+{\em internal} timelines, make sure that {\em external} observations
+are taken into account for every tick. This requirement is enforced to
+ensure that all the reactors of an agent share a consistent view of
+the world as time advance. 
+
+Taking into account {\em external} state updates is manage d by
+introducing these observation in the plan structure as factsand ensure
+that they remain compatible sewith the current plan mainainted by the
+reactor. The more delicate part of synchronization is to decide of the 
+{\em internla} state values for the current tick. In the Shopping
+example for example we have the following code snippet whihch helps
+identify when we can \texttt{Buy} a product:
+\begin{verbatim}
+Agent::Buy {
+  eq(duration, 10);
+  // [...]
+  contained_by(condition object.location.At currLocation);
+  // [...]
+}
+\end{verbatim}
+If \texttt{object.location} is {\em external} and the \texttt{Agent}
+is {\em internal}. I may encounter the situation where I am at the
+location where I can buy one (possibly among others) product. Already
+there's here  a decision problem related to the state value of the
+\texttt{Agent} timeline where I can either {\em Buy} a specific
+product now, wait a little longer before doing so or just simply not
+buy any product at this location.
+
+In the europa based reactor we introduce this decision reuqirement 
+as a new type of flaw for the europa framework. This flaw enforces at the
+reactor to identify fully its internal state for the current tick. By
+using this new flaw we can describe the synchronization process as
+this general sequence :
+
+\begin{enumerate}
+
+\item Integrate the external state as provided by the owner of each
+  external timeline into the plan database.
+
+\item Propagate this information in the plan database following the
+  model $\mathcal{M}$ of this reactor.
+
+\item Resolve the current state value of each internal timelines.
+
+\end{enumerate}
 
 \begin{figure}[!htbp]
   \centering
