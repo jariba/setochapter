@@ -58,8 +58,9 @@ beyond \texttt{IDEA} are in the following ways:
   scope both functionally (one for example focusing on the conversion
   of high level waypoints into low-level commands) and temporally as
   each reactor declares its planning look-ahead and expected latency
-  before being able to produce plan to the agent depending on where it
-  is located in a reactor dependency graph such as shown in
+  \comment{$\pi \&  \lambda$ both defined for the first time} before
+  being able to produce plan to the agent depending on where it is
+  located in a reactor dependency graph such as shown in
   Fig. \ref{fig:agent}.
 
 \item \emph{Coupling} a tighter integration between the planning
@@ -177,12 +178,12 @@ variables. For instance the \textsf{Pilot} reactor needs the {\em
   \centering
   \includegraphics[width=0.45\columnwidth]{figs/TREX_flow}
   \vskip-1cm
-  \caption{Illustration of state information flow between the
-    \texttt{Pilot} and the \texttt{Vehicle} reactors.
-    Observations transit in a bottom-up during synchronization 
-    and apply to the execution frontier $\tau$. 
-    Goal information flow from the top to the bottom and concern the
-    desired future values of state variables.}
+  \caption{\small Illustration of state information flow between the
+    \texttt{Pilot} and the \texttt{Vehicle} reactors.  Observations
+    transit in a bottom-up during synchronization and apply to the
+    execution frontier $\tau$.  Goal information flow from the top to
+    the bottom and concern the desired future values of state
+    variables.\comment{ Fig should be cited in the text}}
   \label{fig:trex:flow}
 \end{figure}
 
@@ -241,18 +242,19 @@ that conceptualize execution:
 
 \item \texttt{step} that accepts new goals requested (if any) on the
   {\em internal} timeline of a reactor and will execute one step of
-  deliberation. In the context of \eu for example pone step of
-  deliberation correspod to resolve one sibngle flaw while ensuring
-  that the resulting plan is not proven inconsistent. This implies
-  that it also includes the backtracking of the search in such case. 
-  The returned value by this step function is a boolean which
-  indicates whether the reactor needs some extra step to deliberate or
-  if this last step resulted on a complete plan for the reactor
-  look-ahead. On the later, the part of the plan that concern this
-  reactor {\em external} timelines is provided in order to be
-  dispatched as goals to whichever reactor that is reponsible for
-  these. \comment{By extending I may have saud things I developped
-    below ... will have  to check}
+  deliberation. In the context of \eu for example one deliberation
+  step corresponds to a single flaw resolution (Section
+  \ref{sec:europa:arch}) while ensuring that the resulting plan is not
+  proven inconsistent. This implies that it also includes the
+  backtracking of the search in such a case.  The returned value by
+  the \texttt{step} function is a boolean which indicates whether the
+  reactor needs an extra step to deliberate or if this last step
+  resulted in a complete plan within the reactor's look-ahead. On the
+  later, the part of the plan that concern this reactor {\em external}
+  timelines is provided in order to be dispatched as goals to
+  whichever reactor that is reponsible for these. \comment{By
+    extending I may have saud things I developed below ... will have
+    to check}
 \end{itemize}
 
 Both these deliberative functions have different scope and temporal
@@ -407,24 +409,23 @@ for more informed planning.
 \subsubsection{Synchronization identify internal state evolution}
 \label{sec:arch:synch}
 
-For the sake of simplicity we introduce first how a reactor can track
-and identify its state in the context where it does not have any
-compelling need to deliberate. Assume here that we have a reactor that
-have no future goal. Even in this context, it is a core requirement in
-T-REX (see \cite{py10}) to have each reactor to produce at every
-single tick their {\em internal} state or at least, for the ones not owning
-{\em internal} timelines, make sure that {\em external} observations
-are taken into account for every tick. This requirement is enforced to
-ensure that all the reactors of an agent share a consistent view of
-the world as time advance. 
+We first show how a reactor can track and identify state when it does
+not have any compelling need to deliberate with no future goals. Even
+in this condition, \rx requires each reactor to produce at every tick
+its {\em internal} state. For those reactors not owning {\em internal}
+timelines, \rx makes sure that {\em external} observations are taken
+into account for every tick as shown in \cite{py10}. Such a
+requirement is enforced to ensure that all reactors share a consistent
+view of the world with advancing time.
 
-Taking into account {\em external} state updates is manage d by
-introducing these observation in the plan structure as factsand ensure
-that they remain compatible sewith the current plan mainainted by the
-reactor. The more delicate part of synchronization is to decide of the 
-{\em internla} state values for the current tick. In the Shopping
-example for example we have the following code snippet whihch helps
-identify when we can \texttt{Buy} a product:
+{\em External} state updates are managed by introducing these
+observation in the plan structure as facts and ensure that they remain
+compatible with the current plan mainainted by the reactor. The
+challenging part of synchronization is to decide the {\em internal}
+state values for the current tick. In the Shopping example for example
+we have the following code snippet which helps identify when we can
+\texttt{Buy} a product:
+
 \begin{verbatim}
 Agent::Buy {
   eq(duration, 10);
@@ -433,19 +434,20 @@ Agent::Buy {
   // [...]
 }
 \end{verbatim}
-If \texttt{object.location} is {\em external} and the \texttt{Agent}
-is {\em internal}. I may encounter the situation where I am at the
-location where I can buy one (possibly among others) product. Already
-there's here  a decision problem related to the state value of the
-\texttt{Agent} timeline where I can either {\em Buy} a specific
-product now, wait a little longer before doing so or just simply not
-buy any product at this location.
 
-In the \eu based reactor we introduce this decision reuqirement 
-as a new type of flaw for the \eu framework. This flaw enforces at the
-reactor to identify fully its internal state for the current tick. By
-using this new flaw we can describe the synchronization process as
-this general sequence :
+If \texttt{object.location} is {\em external} and the \texttt{Agent}
+is {\em internal}, a robot may encounter the situation where it is at
+the location where it can buy one (possibly among others)
+product. This results om a decision problem related to the state value
+of the \texttt{Agent} timeline where the robot can either {\em Buy} a
+specific product now, wait a little longer before doing so or just
+simply not buy any product at this location.
+
+
+In the \eu based reactor this decision requirement is a new type of
+flaw which forces full identification of internal state of the reactor
+for the current tick. Using this new flaw we can describe the
+synchronization process as:
 
 \begin{enumerate}
 
@@ -482,10 +484,10 @@ assume that we have a reactor that has no future goal. \comment{Need
   that its current representation of the world is up to date and still
   consistent}
 
-We introduce this requirement as a new type of flaw (Section
-\ref{sec:europa:arch}) for the \eu framework. This flaw forces the
-reactor to identify its internal state for the current tick. By using
-this flaw one can describe the synchronization process as:
+We introduce this requirement as a new type of flaw for the \eu
+framework. This flaw forces the reactor to identify its internal state
+for the current tick. By using this flaw one can describe the
+synchronization process as:
 
 \begin{enumerate}
 
@@ -540,41 +542,44 @@ example this rule from our \texttt{Shopping} model :
 11 }
 \end{verbatim}
 
-While this model is perfectly standard and acceptable in the overall
-case. It can become problematic when tied to execution. Specifically it
-puts a strong tie between the {\em fact} that we are \texttt{Going} to a
-location and the {\em expected} future outcome of ending at this
-location. This ties is even stronger due to the constraint at line 5.
-Knowing this aspect assume that the \texttt{Agent.location} is {\em
-  external} to the reactor which receive the observation
-\texttt{Going(Home,SuperMarket)} which synchronization resolved by
-producing the observation \texttt{Go(Home, SuperMarket)} in the Agent
-timeline. From this point this means that the only possible outcome on
-\texttt{Agent.location} is to be \texttt{At(SuperMarket)} in the
-directly foreseeable future. In the real world the fact that we are
-\texttt{Going} to a certain location does not necessarly imply that we
-will succeed on ending up there. An extreme case could be that due to
-some exogenous event, the road to the \texttt{SuperMarket} is closed
-which could result on an alternate observation \texttt{At(7th st. \& Foo
-  Ave.)}. This observation contradicts thre existing plan the reactor
-maintin and it is important here to relaize the temp[oral direction of
-the causal link that is triggereing this inconsitency. Indeed at the
-time we will observe this contradicting \texttt{At}, the rule that
-generated this conlict is connected to the past observations
-\texttt{Going} and \texttt{Go} which cannot be fully retracted without
-potential global impact in the rest of the exisiting reactors --
-implying a huge cost in backprogation that would be problematic.
+While this model is perfectly acceptable for planning it becomes
+problematic when execution is taken into account especially as it puts
+a strong emphasis between an evolving plan and an unknown future
+(\texttt{Going} to a location and the {\em expected} future outcome of
+ending at this location, ties it strongly to the constraint in line
+$5$ above).  So for example, assume that the \texttt{Agent.location}
+is {\em external} to the reactor which receives the observation
+\texttt{Going(Home,SuperMarket)} which synchronization has resolved by
+producing the observation \texttt{Go(Home, SuperMarket)} in the
+\texttt{Agent} timeline. This would imply that the only possible
+outcome on \texttt{Agent.location} is to be \texttt{At(SuperMarket)}
+in the directly foreseeable future. In the real world the fact that we
+are \texttt{Going} to a certain location does not necessarly imply
+that we will succeed on ending up there. In one extreme case due to an
+exogenous event, the road to the \texttt{SuperMarket} is closed which
+could result in an alternate observation that the robot is
+\texttt{At(7th st. \& Main)}. This observation contradicts the
+existing plan the reactor is maintaining. Further, it is important to
+understand the temporal direction of the \emph{causal link} that is
+triggering the inconsistency. At the time the robot observes this
+contradicting the \texttt{At} predicate, the rule that generated this
+conflict is connected to past observations \texttt{Going} and
+\texttt{Go} which cannot be easily retracted without a potential
+global impact to the plan implying a huge cost in back-propagation
+that would be problematic.
 
-More generally tying a token to future outcomes in a model that is meant
-to be confronted to rela 
-executionis something that is problematic. It may be valid ifg you can
-gurantee that this will always happen (for example the reactor
-managing \texttt{Agent.location} timeline guarantees that the outcome
-of the \texttt{Going} will {\em always} result on ending at the traget
-location) but should be manipulated while keeping in mind that
-predicting the future is not absolute. In this case one could alter
-this part of the model as follow in order to give the reactor more
-flexibility:
+More generally tying a token to future outcomes in a model that is
+meant to be confronted by execution is problematic. It might be valid
+if one can guarantee that an outcome is predisposed to occur (for
+example the reactor managing \texttt{Agent.location} timeline
+guarantees that the outcome of the \texttt{Going} will {\em always}
+result on ending at the traget location). However, given the very
+nature of the planning problem and the ability to search outcomes and
+replan, the model should be written so that a future projection can be
+manipulated. %  while keeping in mind that predicting the future is not
+% absolute. 
+In this case one could alter this part of the model in order to give
+the reactor more flexibility as follows:
 
 \begin{verbatim}
  1 Agent::Go {
@@ -591,51 +596,52 @@ flexibility:
 12 }
 \end{verbatim}
 
-The alteration made to relax the constraint on linbe 5 from a strict 
-\texttt{equals} to contains and then add the new constraint at line 11
-that ensure that the last \texttt{Going} done during this \texttt{Go}
-ends up in the location the agent wnats to be. This firts level of
-relaxation will therefore allow the agent to usies multiple
-\texttt{Going} should the first one fail to reach our objective.  The
-probalem can even be relaxed further if needed but this relaxation
-gicves already more felxibility for the reactor to recover from local
-failures.
+We do so by relaxing the constraint in line $5$ from a strict
+\texttt{equals} to a \texttt{contains} and to add the new constraint
+at line $11$ which ensures that the last \texttt{Going} ends up in the
+location the agent actually wants to be at. This first level of
+relaxation will therefore allow the agent to use multiple
+\texttt{Going} tokens should the first one fail to reach the
+objective.  % The problem can even be relaxed further if needed but
+% this relaxation gives already more felxibility for the reactor to
+% recover from local failures.
+As the simple example above shows, synchronization involves a
+deliberation process with the risk that the search for a solution is
+not a straightforward sequence of unit decisions. Since such a process
+is required by the architecture at \emph{every} tick for \emph{every}
+reactor the model needs to be carefully designed.
 
-Synchronization remains here a deliberation process, and for this
-reason there's always the risk that the search of a solution is not a
-straightforward sequence of unit decision. As such process is required
-by the architecture at every ticks for every reactors presently
-running this need to be carefully designed. At the engine level we
-made careful choices in term of both the focus of the search --
-limited only to tokens that can potentially overlap the current tick
--- and its heuristic where the internal state flaw is considered last
-during the search. The later proved to limit the amount of backtrack
-in the search for a solution -- or at least how deep we need to
-backtrack in our decision tree -- similarly the sequence in which we
+At the engine level careful choices were made in both the focus of the
+search -- limited only to tokens that can potentially overlap the
+current tick -- and heuristics where the internal state flaw is
+considered last during the search process. The later limits the amount
+of backtracking for a solution -- or at least how deep one needs to
+backtrack in a decision tree. Similarly the sequence in which we
 evaluate the possible resolution for such a flaw -- presented
-previously -- was selected according to simple assumptions that takes
-benefit of a possibly already existing plan by assuming that if the
-outcome of synchronization appears consistent with our current plan
-then it probably reflects that this reactor plan is executed. Such
-assumption helps direct the internal state evaluation and, in nominal
-cases (where we assume that reactors are acting in concert), proved to
-be a sound solution.
+previously -- was selected according to some simple assumptions that % takes
+% benefit of a possibly assume the existing plan by assuming that 
+if the outcome of synchronization appears consistent with our current
+plan then it probably reflects that the plan has executed
+\comment{that the past is monotonic?}. Such an assumption helps direct
+the internal state evaluation and in nominal cases, proves to be a
+sound solution.
 
-One final aspect to keep into account is that in \rx point of view
-synchronization is the only critical task of a reactor. Indeed, such
+One final aspect to take into account is that from a \rx point of
+view, synchronization is the only critical task of a reactor. Such a
 process is used in order for the agent to identify its current state
-and maintain it consistent throughout the agent life-time. A reactor
-not being able to find a consistent solution during synchronization --
-meaning that after evaluating all the possible solutions provided by
-its model it did not found any plan that is not inconsistent -- not
-only expresses that this reactor is not able anymore to explain the
-state of the world but may jeopardize other reactors that relies on
-its {\em internal} state. For this reason a failure to do
-synchronization immediately result on the agent killing this reactor
-and notifying any reactor that depends on its {\em internal} state
-variables by posting the special observation \textsf{Failed}. By doing
-so we allow for graceful degradation where other reactors can readapt
-their plan as they receive this \textsf{Failed} observation.
+and maintain it consistently throughout the agent's lifetime. For a
+reactor not being able to find a consistent solution during
+synchronization -- implying that after evaluating all possible
+solutions provided by a model it was unable to find a consistent plan
+-- not only indicates that a reactor is unable to explain the state of
+the world, but more importantly it may jeopardize other reactors that
+rely on its {\em internal} state. For this reason a failure to
+synchronize immediately results in the agent killing a reactor and
+notifying any reactor that depends on its {\em internal} state
+variables; it does so by posting the special observation
+\textsf{Failed}. And by doing so we allow for graceful degradation
+where other reactors can readapt their plans as they receive this
+observation.
 
 \subsubsection{Deliberation : planning for future state evolution}
 \label{sec:arch:plan}
