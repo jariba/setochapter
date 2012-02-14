@@ -224,7 +224,7 @@ that conceptualize execution:
 
 \item \texttt{step} that accepts new goals requested (if any) on the
   {\em internal} timeline of a reactor and will execute one step of
-  deliberation. In the context of Europa for example pone step of
+  deliberation. In the context of \eu for example pone step of
   deliberation correspod to resolve one sibngle flaw while ensuring
   that the resulting plan is not proven inconsistent. This implies
   that it also includes the backtracking of the search in such case. 
@@ -250,7 +250,7 @@ focused on the future evolution of state variables; it can take
 multiple steps spanning multiple ticks for a reactor to produce a plan
 that is both complete and valid. When such plan is identified
 \comment{how? Is there a terminating condition? No more flaws but I
-  washoping it would have been defined in europa section} its {\em external}
+  washoping it would have been defined in \eu section} its {\em external}
 timeline(s) are then dispatched to the corresponding reactors which
 own these times and which in turn can start their own deliberation
 \texttt{step}s to satisfy these new objectives. Consequently execution
@@ -424,8 +424,8 @@ there's here  a decision problem related to the state value of the
 product now, wait a little longer before doing so or just simply not
 buy any product at this location.
 
-In the europa based reactor we introduce this decision reuqirement 
-as a new type of flaw for the europa framework. This flaw enforces at the
+In the \eu based reactor we introduce this decision reuqirement 
+as a new type of flaw for the \eu framework. This flaw enforces at the
 reactor to identify fully its internal state for the current tick. By
 using this new flaw we can describe the synchronization process as
 this general sequence :
@@ -624,7 +624,7 @@ their plan as they receive this \textsf{Failed} observation.
 \label{sec:arch:plan}
 
 The planning process inside a reactor is directly based on the way
-europa work which was described in previous section. Still some simple
+\eu work which was described in previous section. Still some simple
 alterations were made in order to both include deliberation
 information one reactor provide to the architecture -- such as its
 deliberation latency and its planning look-ahead both expressed in
@@ -634,7 +634,7 @@ deliberation of other reactors\footnote{Current implementation of \rx
   is running on a single process and it is the responsibility of the
   agent itself to emulate the multi-threading of the reactors
   deliberation and synchronization}. For this reason while the overal
-planning of a europa reactor strictly relies on the europa framework
+planning of a \eu reactor strictly relies on the \eu framework
 plnanning solver, its slices the execution of Algorithm
 \ref{alg:europa:solve} in atomic steps. The interruption is done
 around the recursive call (line \ref{li:recurse}) while always
@@ -744,7 +744,7 @@ were able to develop the way we augment yhe europpa solver to be able
 to propagete {\em external} observations in order to identify the
 reactor {\em internal} state for the same tick. By doing so we were
 able to focus on synchronization as a state evluation process that can
-be resolved within the europa framework with few extensions. simliarly
+be resolved within the \eu framework with few extensions. simliarly
 we presented deliberation at this fairly high level not necessarily
 discussing how the disruptive nature of synchronization in this
 process could impact the way this planning process will evolve.
@@ -757,7 +757,7 @@ will gave a frame for the search process. Therefore this deliberation
 will not only be a model-based estimation uniquely based on the {\em
   external} observations but will also include the reactor intentions
 as described by the plan produced. Consider for example the Shopping
-Agent model described during the europa presentation and that the
+Agent model described during the \eu presentation and that the
 location of the \texttt{agent} is an {\em external} timeline. For
 example as, the reactor add the goal to have \texttt{Own} milk and the
 current {\em external} states indicated that it was \texttt{At(home)}
@@ -777,11 +777,11 @@ goals for the reactor managing this specific state varaiable {\em
   \label{fig:shop:exec0}
 \end{figure}
 
-Now, consider that at the next tick $\tau+1$ the reactor managing the
+Now, consider that at the next tick $\tau' = \tau+1$ the reactor managing the
 agent location was able to change the location state varaibale to the
 \texttt{Going}. \rx informs our reactor of this new observation which
 is added in the plan structure as a fact -- starting exactly at
-$\tau+1$ and lastign for an unlknown duration which is at least 1
+$\tau'$ and lastign for an unlknown duration which is at least 1
 tick. As this new observation is integrated in the plan through
 synchronization the solver can identify the similarity between this
 new observation oand the next token in the existing plan. Which mean
@@ -792,9 +792,9 @@ plan maintained. As a result at the end of synchronization we will
 have the plan depicted in Fig. \ref{fig:shop:exec1}. Which just
 propagated the information provided by the new observation in the
 exisiting plan (restricting in turn the start time of \texttt{Going}
-and by propagtion of the constraints \texttt{Go} to be {\em exactly}
-$\tau+1$). While focusing uniquely on the execution frontier ($\tau+1$
-in Fig. \ref{fig:shop:exec1}), the europa solver took benefit of the
+and by propagation of the constraints \texttt{Go} to be {\em exactly}
+$\tau'$). While focusing uniquely on the execution frontier ($\tau'$
+in Fig. \ref{fig:shop:exec1}), the \eu solver took benefit of the
 exisiting plan to evaluate a solution that asumes that the observation
 is consistent with what was decided inside this reactor.
 
@@ -813,15 +813,15 @@ optimisitic choice in term of the execution/advance in our current
 plan to finally attempt other choices that were not predicted by the
 model. The two first possible choices are strongly directed by the
 exisiting plan which help direct the search within this frame. This
-often allow to have a synchronization that is much more directed and
-i, in nominal situation such as the one we showed resolve the
-deliberation in few steps (often without any backtrack in the search).
+often allow to have a synchronization that is much more directed and, 
+in nominal cases such as the one we showed resolve the deliberation 
+in few steps (often without any backtrack in the search).
 
 \begin{figure}[!htb]
   \centering
   \includegraphics[width=0.7\columnwidth]{figs/shoping_exec_t1}
   \caption{Shopping example : Result of synchronization after the {\em
-      Going} observation was received by the reactor with thew plan
+      Going} observation was received by the reactor with the plan
     showed in Fig. \ref{fig:shop:exec0}.}
   \label{fig:shop:exec1}
 \end{figure}
@@ -849,7 +849,7 @@ of htese timelines to not have to maintain this goal anynmore.
 \begin{figure}[!htbp]
   \centering
   \includegraphics[width=0.7\columnwidth]{figs/shoping_exec_relax}  
-  \caption{Illustration of a conflict suring synchronization and the
+  \caption{Illustration of a conflict during synchronization and the
     resulting relaxed plan for recovery} 
   \label{fig:shop:relax}
 \end{figure}
@@ -889,7 +889,7 @@ it search as it is not compatible with the ``off-line planning''
 assumption.
 
 By our design choices -- both at the architecture level and the
-integration of the europa framework for embedded deliberation -- we
+integration of the \eu framework for embedded deliberation -- we
 were able to implement an architecture that avoid this limitation
 while remaining in a formal frame that still allow for deliberation
 and model-based agent control. We believe that this tighter
