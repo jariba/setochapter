@@ -40,11 +40,11 @@ In an effort to mimimize the amount of work that a user needs to perform to solv
 \label{sec:europa:modeling}
 
 \eu can ingest descriptions of models, plans and goals and thereby can
-be applied to different systems and problems, simply by providing
+be applied to different domains and problems, simply by providing
 different models and goals. Consequently the expressiveness of the
-languages for models, goals and plans is of great importance. For \eu
+language for models, goals and plans is of great importance. For \eu,
 NDDL (New Domain Description Language [pronounced ``noodle'']
-\comment{cite}) allows the user to specify the different components of a
+allows the user to specify the different components of a
 problem domain in a concise way. The main characteristics that make NDDL
 a powerful tool for describing problem domains are:
 
@@ -142,13 +142,10 @@ In the model above we can see how the main elements or a problem domain can be m
 
 \begin{enumerate}
 	\item \textbf{Object Types}: NDDL supports an object-oriented approach, where common data and behavior can be abstracted as a class. In this case, we have the \textit{Product} class represent the products that the Shopping Agent needs, \textit{Location} represents the places where products can be found, \textit{ProductLocation} represents the association arising when a product can be purchased at a location. The Shopping Agent itself is represented by an \textit{Agent} class, which relies on the \textit{AgentLocation} class to keep track of where the agent is at any point in time. NDDL supports a single rooted class hierarchy so that state and behavior can be extended through inheritance. We took advantage of that by making \textit{AgentLocation} inherit from \eu's built-in \textit{Timeline} class which doesn't allow predicates to overlap in time for the same object instance, in this way we can ensure that and agent can only be at one place at a time. 
-	\item \textbf{Predicate Types}: Some classes like \textit{Product}, \textit{Location} and \textit{ProductLocation} are completely static and so don't have any predicate or action types associated with them. The \textit{AgentLocation} class is purely used to keep track of state and so it has \texttt{At} and \texttt{Going} predicate types associated with it. 
+	\item \textbf{Variable Types and Instances} : All object attributes are represented as variables in this model, for instance, it uses integer variables to represent the built-in temporal parameters for each token (activity duration, start and end times), string variables to represent  \textit{Location} and  \textit{Product} names, and object reference variables to represent the structural relationships between different objects (for instance, each Agent has variable to keep track of its  \textit{AgentLocation}).
+	\item \textbf{Predicate Types}: Some classes like \textit{Product}, \textit{Location} and \textit{ProductLocation} are completely static and so don't have any predicate or action types associated with them. The \textit{AgentLocation} class is purely used to keep track of state and so it has \texttt{At} and \texttt{Going} predicate types associated with it. The \textit{Agent} class keeps track of the products it purchases through the \texttt{Own} predicate, having a separate \textit{AgentBag} class with its own predicates would have been an equally valid modeling choice.
 	\item \textbf{Action Types}: The \textit{Agent} class is the only one that has behavior associated with it, consequently, it defines action types to represent when the agent is taking action to \texttt{Go} to a \textit{Location}, or to \texttt{Buy} a \textit{Product}. We'll see how the actual behavior for those actions is specified below.
-	\item \textbf{Variable Types and Instances} : All the object attributes are represented as variables in this model, for instance, it uses integer variables to represent the built-in temporal variables for each token (activity duration, start and end times), string variables to represent Location and Product names, and object reference variables to represent the structural relationships between different objects (for instance, each Agent has variable to keep track of its AgentLocation).
 \end{enumerate}
-
-
-\comment{explain rule definition below}
 
 \begin{verbatim}
 
@@ -185,8 +182,15 @@ Agent::Buy {
 }
 \end{verbatim}
 
+Domain rules can be defined in NDDL in the context of a Predicate or an Action. In the example above we can see the main elements of a rule definition:
 
-Now, having defined the Shopping agent domain that way, here is how a particular problem instance could be specified:
+\begin{enumerate}
+  \item \textbf{Variables}: A Token Type (predicate or action) is part of a class, therefore class attributes (see references to \texttt{object.location} above), Token Type parameters (see references to \texttt{[from, to]}  in \texttt{Agent::Go}, or to \texttt{[duration, product]} in \texttt{Agent::Buy}  and locally declared variables (see \texttt{possibleStores} in \texttt{Agent::Buy}) can all be used in the definition of a Rule. 
+  \item \textbf{Constraints}: restrictions on the values that variables can take inside a Rule are expressed through constraints, in the example above only the \texttt{eq} constraint is used, but in general, any constraint available in \eu's library can be used.
+ \item \textbf{Subgoals}: In \texttt{Agent::Go}, subgoals are used to specify that the Shopping Agent's location must transition from origin to destination in a temporally consistent way. The \texttt{[meets, equals, metby]} operators are used to specify subgoals (Allen operators are explained in more detail below), along with the temporal relationship each token representing a subgoal has with the the token representing the \texttt{Agent::Go} action. Also, \texttt{[condition, effect]} annotations can be used when defining a subgoal inside an action, \eu doesn't immediately associate any semantics with them, but they can be extremely useful for search modules when creating plans. 
+\end{enumerate}
+
+Now, having that we have a specification for the Shopping Agent domain, here is how a particular problem instance could be specified:
 
 \begin{verbatim}
 
@@ -245,15 +249,12 @@ leq(atHomeForDinner.end, horizonEnd);
 %\caption{Specifying a problem instance for the Shopping Agent in NDDL}
 \end{verbatim}
 
-\comment{explain variable, object, predicate and constraint instances.
-explain goals and facts.}
-
+A problem instance consists mainly of 
 \begin{enumerate}
-	\item Variable Instances:
-	\item Object Instances:
-	\item Facts:
-	\item Goals:
-	\item Constraint Instances:
+  \item \textbf{Variables} and \textbf{Objects}: In this case we defined temporal variables that are used to specify the planning horizon (see \texttt{horizonStart} and \texttt{horizonEnd}), and objects are used to specify the locations, products, product-loction associations and the Shopping Agent that we want to plan for.
+  \item \textbf{Facts}: These are used to specify the current state of the world and don't need any support. Facts are represented as tokens in \eu's Plan Database. In this case we use facts to specify that the Shipping Agent is initially at home.
+  \item \textbf{Goals}:  Goals are represented as tokens in \eu's Plan Database, differently from Facts, Goals trigger inference in \eu which determines whether flaws (unresolved subgoals, overloaded resources, etc., flaws will be covered in detail in the search section below) need to be resolved, if that is the case, search modules can be invoked which will look for a plan where all the flaws are resolved.
+  \item \textbf{Constraints}: restrictions on and between actions and goals are specified through constraints, in this case we use temporal constraints to specify when the facts hold and when the goals should be accomplished. As always, all the constraints in \eu's library (built-in, or user defined), can be used to specify these restrictions.
 \end{enumerate}
 
 
@@ -304,18 +305,20 @@ variables and a single constraint. It also shows the resulting DG.
 
 Resources:
 
-Reservoir resources can have both 'consume' and 'produce' tokens. Note
+\begin{enumerate}
+  \item \textbf{Reservoir} resources can have both 'consume' and 'produce' tokens. Note
 that these tokens do NOT have the usual start/end/duration token
 variables, since occur at a single instant in time. Instead, they have a
 single variable, 'time' used to represent that instant.
 
-Reusable resources have 'uses' tokens that use a quantity for the
+  \item \textbf{Reusable} resources have 'uses' tokens that use a quantity for the
 duration of the token. These tokens do have the usual start/end/duration
 variables.
 
-Unary resources are reusable resources with unit quantity and have 'use'
+  \item \textbf {Unary} resources are reusable resources with unit quantity and have 'use'
 tokens (again, with the usual start/end/duration variables).
-    
+\end{enumerate}
+
 \comment{talk about resource envelope computation by using MaxFlow formulation.}
 
 
@@ -369,7 +372,7 @@ time are:
 	\item If all possible resolvers for a particular flaw fail, return failure, otherwise continue until resolving all the flaws.
 \end{enumerate}
 	
-This Plan Space Planning algorithm is translated into \eus
+This Plan Space Planning algorithm is translated into \eu's
 representation as follows:
 
 The initial partial plan is the state of \eus Plan Database after the
@@ -499,7 +502,7 @@ prior to commitment, allowing in some cases a strong look-ahead
 capability which is essential for tractable search. Consistency testing
 is initiated by the isConsistent procedure. The algorithm permits a
 heuristically controlled search by applying orderings for chooseFlaw and
-makeDecisionPoint. It results in a chronologically-backtracking, search.
+makeDecisionPoint. It results in a chronologically-backtracking search.
 
 \comment{expand a little more on how heuristics can be implemented by
   applying ordering/filtering for chooseFlaw and makeDecisionPoint}
