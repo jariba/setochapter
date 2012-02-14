@@ -153,10 +153,13 @@ variables. For instance the \textsf{Pilot} reactor needs the {\em
 \begin{itemize}
 
 \item In order to identify its current {\em internal} state values the
-  \textsf{Pilot} \comment{double check this mod} needs to know the
-  current {\em external} state information it relies on. In this case
-  the current \textsf{Waypoint} the vehicle is heading to can be
-  extracted for example from the current \textsf{Nav\_cmd} executed.
+  \textsf{Pilot} needs to know the current {\em external} state 
+  information it relies on. This information is providede in turn by
+  the reactors that provided these timelines as {\em internal}. In
+  this specific case, the current \texttt{Waypoint} where the vehicle
+  is heading can be evaluated based on the \texttt{Nav\_cmd} executed
+  along with usefull \texttt{Sensor\_Data}, both being provided by the
+  \texttt{Vehicle} reactor.
 
 \item The future objectives a reactor has on \textsf{Internal} state
   will likely imply sub-objectives to be reported to the owner of its
@@ -169,6 +172,20 @@ variables. For instance the \textsf{Pilot} reactor needs the {\em
     believe we have used previously}
 
 \end{itemize}
+
+\begin{figure}[!htbp]
+  \centering
+  \includegraphics[width=0.45\columnwidth]{figs/TREX_flow}
+  \vskip-1cm
+  \caption{Illustration of state information flow between the
+    \texttt{Pilot} and the \texttt{Vehicle} reactors.
+    Observations transit in a bottom-up during synchronization 
+    and apply to the execution frontier $\tau$. 
+    Goal information flow from the top to the bottom and concern the
+    desired future values of state variables.}
+  \label{fig:trex:flow}
+\end{figure}
+
 
 Given the above example, the \rx architecture therefore helps abstract
 reactor interaction by constraining them to state variables. Each
