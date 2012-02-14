@@ -132,13 +132,27 @@ that will propagate down following the same mechanism.
 
 
 \begin{figure}[!htb]
- \centering
- \includegraphics[scale=0.45]{figs/AUV-agent.pdf}
- \caption{\small A \rx agent is composed of multiple reactors or
-   control loops (rounded boxes) which are connected through state
-   variables provided by one reactor ({\color{blue}blue} solid line)
-   with multiple possible clients ({\color{green}green} dashed lines)}
+  \centering
+  \subfloat[\small A \rx agent is composed of multiple reactors or
+    control loops (rounded boxes) which are connected through state
+    variables provided by one reactor ({\color{blue}blue} solid line)
+    with multiple possible clients ({\color{green}green} dashed
+    lines)]{\includegraphics[scale=0.45]{figs/AUV-agent.pdf}
   \label{fig:agent}
+  }
+  \qquad
+  \subfloat[\small State information flow between the
+    \texttt{Pilot} and the \texttt{Vehicle} reactors.
+    Observations transit as a bottom-up flow 
+    and apply to the execution frontier $\tau$. 
+    Goal information flow from the top to the bottom and relates to 
+    desired future values of state variables.]{
+      \includegraphics[width=0.4\columnwidth]{figs/TREX_flow}
+      %\vskip-1cm
+      \label{fig:trex:flow}
+    }
+    \caption{\rx connection of reactors through state variables based on the
+    AUV agent we use at sea.}
 \end{figure}
 
 Consider for example the \rx agent instance we use on our AUV as shown
@@ -169,24 +183,10 @@ variables. For instance the \textsf{Pilot} reactor needs the {\em
   \textsf{Waypoint} -- given its current position as provided by
   \textsf{Sensor\_Data}, it can identify a sequence of
   \textsf{Nav\_cmd} states that should eventually help it reach this
-  location. \comment{this explanation could do with a figure which I
-    believe we have used previously}
+  location. %\comment{this explanation could do with a figure which I
+    %believe we have used previously}
 
 \end{itemize}
-
-\begin{figure}[!htbp]
-  \centering
-  \includegraphics[width=0.45\columnwidth]{figs/TREX_flow}
-  \vskip-1cm
-  \caption{\small Illustration of state information flow between the
-    \texttt{Pilot} and the \texttt{Vehicle} reactors.  Observations
-    transit in a bottom-up during synchronization and apply to the
-    execution frontier $\tau$.  Goal information flow from the top to
-    the bottom and concern the desired future values of state
-    variables.\comment{ Fig should be cited in the text}}
-  \label{fig:trex:flow}
-\end{figure}
-
 
 Given the above example, the \rx architecture therefore helps abstract
 reactor interaction by constraining them to state variables. Each
@@ -195,7 +195,8 @@ information is managed as long as this information is available and
 properly maintained for managing {\em internal} state
 information. This {\em internal} state in turn may be used by other
 reactors. Such a formalism also constrains reactor interaction to
-state information exchange which comes in two forms:
+state information exchange which comes in two forms as illustrated in
+Figure \ref{fig:trex:flow}:
 
 \begin{itemize}
 
@@ -207,7 +208,7 @@ state information exchange which comes in two forms:
   could compute their {\em internal} state variable values for this
   same tick. By doing so we propagate a consistent view of that state
   of the world throughout all the reactors as time
-  advances. \comment{could do with a figure here}
+  advances. %\comment{could do with a figure here}
 
 \item {\em Goal request on future state}: This information propagates
   \emph{down} in the reactor dependency graph. In order to satisfy own
@@ -215,7 +216,7 @@ state information exchange which comes in two forms:
   future values of one of its {\em external} state. When such a plan
   is identified the agent ensures that this part of the plan is given
   as a goal to the owner of the given {\em external} state
-  variable(s). \comment{could do with a figure here}
+  variable(s). %\comment{could do with a figure here}
 
 \end{itemize}
 
