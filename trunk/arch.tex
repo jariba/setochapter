@@ -867,12 +867,14 @@ managing this state variable {\em internally}.
 
 \begin{figure}[!htb]
   \centering
-  \includegraphics[width=0.7\columnwidth]{figs/shoping_exec_t0}
-  \caption{\small Shopping example: A plan produced before
-    synchronization.  Tokens in red indicate observations, tokens in
-    blue the goal that this plan attempts to solve for. Arrows
-    indicate temporal constraints.}
-  \label{fig:shop:exec0}
+  \subfloat[\small A plan produced before synchronization.]{\label{fig:shop:exec0}\includegraphics[width=0.45\columnwidth]{figs/shoping_exec_t0}}
+  \subfloat[\small Result of synchronization after the {\em Going}
+  observation was received by the reactor with the plan showed in
+    \ref{fig:shop:exec0}.]{\label{fig:shop:exec1}\includegraphics[width=0.48\columnwidth]{figs/shoping_exec_t1}}
+    \caption{\small Shopping example: Tokens in red indicate
+      observations, tokens in blue the goal that this plan attempts to
+      solve for. Arrows indicate temporal constraints. }
+  \label{fig:shop:exec}
 \end{figure}
 
 Consider that at the next tick $\tau' = \tau+1$ the reactor managing
@@ -882,55 +884,57 @@ is added in the plan structure as a fact -- starting exactly at
 $\tau'$ and lasting for an unknown duration which is at least 1
 tick. As this new observation is integrated in the plan through
 synchronization, the solver can identify the similarity between this
-new observation and the next token in the existing plan. This implies
-that instead of initiating an exhaustive search of all possible
-implications, the synchronization process starts its execution with
-the assumption that these new observations are consitent with the
-currently maintained plan. As a consequence, at the end of
-synchronization we will likely have the plan depicted in
-Fig. \ref{fig:shop:exec1}. Which just propagated the information
-provided by the new observation in the exisiting plan (restricting in
-turn the start time of \texttt{Going} and by propagation of the
-constraints \texttt{Go} to be {\em exactly} $\tau'$). While focusing
-uniquely on the execution frontier ($\tau'$ in
-Fig. \ref{fig:shop:exec1}), the \eu solver took benefit of the
-exisiting plan to evaluate a solution that asumes that the observation
-is consistent with what was decided inside this reactor.
+observation and the next token in the existing plan. Instead of
+initiating an exhaustive search of all possible implications, the
+synchronization process starts its execution with the assumption that
+these new observations are consistent with the currently maintained
+plan. As a consequence, at the end of synchronization the plan
+depicted in Fig. \ref{fig:shop:exec1} is likely. This is a result of
+propagation of information provided by the new observation in the
+existing plan while restricting the start time of \texttt{Going} and
+propagating temporal constraints, making \texttt{Go} to start {\em
+  exactly} at $\tau'$. In doing so, the \eu solver's focus on the
+execution frontier ($\tau'$ in Fig. \ref{fig:shop:exec1}) takes
+advantage of the existing plan to evaluate a solution that assumes
+that the observation is consistent with what was decided by the
+reactor.
 
-\begin{figure}[!htb]
-  \centering
-  \includegraphics[width=0.7\columnwidth]{figs/shoping_exec_t1}
-  \caption{Shopping example : Result of synchronization after the {\em
-      Going} observation was received by the reactor with the plan
-    showed in Fig. \ref{fig:shop:exec0}.}
-  \label{fig:shop:exec1}
-\end{figure}
+% \begin{figure}[!htb]
+%   \centering
+%   \includegraphics[width=0.7\columnwidth]{figs/shoping_exec_t1}
+%   \caption{Shopping example : Result of synchronization after the {\em
+%       Going} observation was received by the reactor with the plan
+%     showed in Fig. \ref{fig:shop:exec0}.}
+%   \label{fig:shop:exec1}
+% \end{figure}
 
-This choice is directed not only by some natural heurisitc choices
-made in the solver but even more enforced in general by the heuristic
-order of the decision point reolution choices for our {\em internla}
-state flaw presented in section \ref{sec:arch:sync} {\em\color{red}
-  TODO: need to rework the presentation of thee choices so I can refer
-  to them more directly -- algorithm or pseudo theorem should do the
-  trick}. Should such a flaw be revealed during synchronization --
-meaning that the current state of an {\em internal} state varaibale is
-not fully grounded -- the sequencing of the choices will atempt first
-a conservative choice in term of maintaining previous state, then an
-optimisitic choice in term of the execution/advance in our current
-plan to finally attempt other choices that were not predicted by the
-model. The two first possible choices are strongly directed by the
-exisiting plan which help direct the search within this frame. This
-often allow to have a synchronization that is much more directed and, 
-in nominal cases such as the one we showed resolve the deliberation 
-in few steps (often without any backtrack in the search).
+This choice is directed not only by heuristic choices made in the
+solver but also enforced by the heuristic order of the decision point
+resolution choices for the {\em internal} state flaw presented in
+Section \ref{sec:arch:sync} \fcomment{TODO: need to rework the
+  presentation of thee choices so I can refer to them more directly --
+  algorithm or pseudo theorem should do the trick}. Should such a flaw
+be revealed during synchronization -- such that the current state of
+an {\em internal} state variable is not fully grounded -- the
+sequencing of the choices will attempt first a conservative choice in
+maintaining previous state and only then try a more optimistic
+approach in terms of the \comment{I don't follow this last bit. Is
+  this token addition that you're talking about?} execution/advance in
+our current plan to finally attempt other choices that were not
+predicted by the model. The two first possible choices are strongly
+directed by the existing plan which helps direct the search within
+this frame. This often allow to have a synchronization that is much
+more directed and, in nominal cases such as the one we showed resolve
+the deliberation in few steps (often without any backtrack in the
+search) \comment{All this is confusing; probably reword}.
 
-The synchronization process is also in this process supporting fully
-the tracking of the plan execution as it specifies tokens parameters
-such as the time points and allow this to propagate through the plan
-in order to idenitfy if the plan remains valid -- as in our example --
-or that it cannot be executed as it is. The later is often identified
-by the synchronization failing to find a consistent solution. for
-example dshould the \texttt{Going} observation we receive be to the
+The synchronization process also supports the tracking of plan
+execution. It does so by specifying token parameters such as time
+points that are propagated through the plan in order to identify if
+the plan remains valid -- as in our example -- or that it cannot be
+executed as it is. The later is often identified by the
+synchronization failing to find a consistent solution. for example
+dshould the \texttt{Going} observation we receive be to the
 \texttt{hardwareStore}, this would break the current plan of our
 reactor as we cannot go simultaneously at 2 different places as
 illustrated in Fig. \ref{fig:shop:relax}-1. as synchronization is not
