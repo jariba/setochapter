@@ -928,15 +928,23 @@ impact. Most of the heavy dutty work of creating new tokens in the
 plan and schedule them -- both being much more difficult problems 
 to resolve -- have been managed during deliberation steps. In that
 sense we see that most of the time synchronization is limited to very
-few node in \eu search space with often no backtrack required. The
-synchronization may become slightly nore costfull when we need to
+few node in \eu search space with often no backtrack required. 
+Fig. \ref{fig:shop:exec} shows how the existing plan can support the
+synchronization process. In that case, the observation \texttt{Going}
+occuring at $\tau'$ was fully compatible with the one already present
+in our plan, by updating the plan and progating the equality
+constraints, the resolution of the {\em current state flaw} for the
+{\em agent} timeline became obvious as the token \texttt{Go} from 
+the plan presented itself as a natural solution.
+
+The synchronization may become slightly nore costfull when we need to
 identify a new token to be injected by the plan (the 3rd choice in
 Proposition \ref{prop:csf:resolve}) as it needs to explore on tis own
 all the possible token types this timeline accept as value. This is
 the reason this choice is evaluated last in our flaw resolution in
 order to avoid such complex action during synchronization unless 
-necessary. In that sense,  ansd due to carefull choice on our
-synchrponization heurisitic we see that the plan produced during \rx
+necessary. In that sense,  and thanks to the carefull choice on our
+synchronization heurisitic we see that the plan produced during \rx
 deliberation steps helps sthe synchronization process to be more
 efficient. 
 
