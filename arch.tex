@@ -765,7 +765,8 @@ to deliberation:
 \end{enumerate}
 
 \comment{this might be a subsubsection before someplace since it
-  introduces the concept of latency/lookahead.}
+  introduces the concept of latency/lookahead. TODO: yep it needs to
+  move up to the architecture section.}
 These events could potentially produce new flaws to be resolved while
 any single deliberation step will likely reduce the number of flaws
 for resolution. The scope of planning for a reactor also plays a role
@@ -789,7 +790,17 @@ temporal window $[\tau+\lambda, \tau+\lambda+\pi]$ \cite{py10} where:
 
 \end{itemize}
 
-\comment{Insert a figure here [AAMAS?] showing $\pi \lambda$} Such a
+\begin{figure}[!htbp]
+  \centering
+  \includegraphics[width=0.65\columnwidth]{figs/plan_window}
+  \caption{The planning window of the deliberation solver and its
+    relation with the reactor latency and look-ahead. The dark grey tokens
+    with dashed borders are excluded from deliberation as they do not
+    overlap the interval $[\tau, \tau+\lambda+\pi]$}
+  \label{fig:plan:window}
+\end{figure}
+
+As Fig. \ref{fig:plan:window} illustrates,  such a
 scope allows filtering of tokens that are either necessarily ending
 before $\tau$ or necessarily starting after, focusing the planning
 problem on only those tokens that are within a ``reasonable''
