@@ -59,8 +59,9 @@ beyond \texttt{IDEA} are in the following ways:
   scope both functionally (one for example focusing on the conversion
   of high level waypoints into low-level commands) and temporally as
 
-  each reactor declares its planning look-ahead and expected latency
-  \comment{$\pi \& \lambda$ both defined here for the first time}
+  each reactor declares its planning look-ahead $\pi$ and expected
+  latency $\lambda$
+  % \comment{$\pi \& \lambda$ both defined here for the first time}
   before being able to produce plan to the agent depending on where it
   is located in a reactor dependency graph such as shown in
   Fig. \ref{fig:agent}.
@@ -485,7 +486,7 @@ synchronization process as:
 \end{figure}
 
 We introduce this requirement as a new type of flaw for the \eu
-framework defined as follows:
+framework defined as follow:
 
 \begin{definition}
   \label{def:csf}
@@ -529,14 +530,13 @@ proposition.
 
 \end{enumerate}
 \end{proposition}
-
-Intuitively the first choice enforces an intertail value assumption
+Intuitively the first choice enforces an intertial value assumption
 where the reactor will tend to maintain its current as long as the
 model and external observations allow it. The second choice favorise
-the adavnce of the reactor current plan if any; this direct the {\em
+the advance of the reactor current plan if any; this direct the {\em
   synchronization} decision toward assuming that its current plan is
 properly executed. Finally if none of these two choices did provide a
-valid solution -- meaning that both lead to an inconsittant plan --
+valid solution -- meaning that both lead to an inconsistant plan --
 the reactor tries all the possible state values remaining for this
 timeline until it finds one that allows it to identify its state as
 required by \rx architecture.
@@ -546,16 +546,26 @@ for the current tick. By using this flaw one can describe the
 synchronization process as:
 
 \begin{enumerate}
-
 \item Integrate the external state as provided by the owner of each
   external timeline into the plan database.
-
 \item Propagate this information in the plan database following the
   model $\mathcal{M}$ of this reactor.
-
 \item Resolve the current state value of each internal timelines based
   on Proposition \ref{prop:csf:resolve}.
 \end{enumerate}
+
+%%%% Extra paragraph:  targeted to a more AI centric audience
+% The step 1 translates new {\em external} observations received from
+% \rx into europa tokens with a start time restricted to $\tau$ or, for
+% the timelines that did not receive a new observation,  restrict the
+% previous token end time to the interval $[\tau+1, \infty)$. All of
+% these tokens are produced as facts and consequently cannot be 
+% excluded from the plan. They are also maintained by the reactors as
+% observation tokens which will allow to avoid to mistakenly remove 
+% them when one of the two reactor solvers attempt to relax former
+% decisions made.\comment{This relaxation is developed on the last 
+%   subsection further in depth}
+%%%%
 
 Steps $2$ \& $3$ are handled by the \eu solver from algorithm
 \ref{alg:europa:solve}. We only enforce that the {\em current state
@@ -567,13 +577,13 @@ that is {\em necessarily} ending before $\tau$ or starting after
 $\tau+1$ then the solver will ignore it. This helps to reduce the
 scope of the synchronization to exclusively the current state of the
 reactor and reduce dramatically the search space for the {\em
-  synchronization} solver. In order to do so we need to make the
-assumption that the current state value of an {\em internal} timeline
-does not depend on the future or more accurately that any choices made
-during this synchronization will not lead to a future
-inconsistency. Such an assumption impacts the set of possible domains
-the reactor can support while remaining complete. Take for example
-this rule from our \texttt{Shopping} model:
+  synchronization} solver. In order to do so we need to assume 
+that the current state value of an {\em internal} timeline does not 
+depend on the future or more accurately that any choices made during 
+this {\em synchronization} will not lead to a future inconsistency. 
+Such an assumption impacts the set of possible domains the reactor 
+can support while remaining complete. Take for  example this rule from 
+our \texttt{Shopping} model :
 
 \begin{verbatim}
  1 Agent::Go {
@@ -656,7 +666,7 @@ location the agent actually wants to be at. This first level of
 relaxation will therefore allow the agent to use multiple
 \texttt{Going} tokens should the first one fail to reach the
 objective.  % The problem can even be relaxed further if needed but
-% this relaxation gives already more felxibility for the reactor to
+% this relaxation gives already more flexibility for the reactor to
 % recover from local failures.
 As the simple example above shows, synchronization involves a
 deliberation process with the risk that the search for a solution is
@@ -664,27 +674,12 @@ not a straightforward sequence of unit decisions. Since such a process
 is required by the architecture at \emph{every} tick for \emph{every}
 reactor the model needs to be carefully designed.
 
-At the engine level careful choices were made in both the focus of the
-search -- limited only to tokens that can potentially overlap the
-current tick -- and heuristics where the internal state flaw is
-considered last during the search process. The later limits the amount
-of backtracking for a solution -- or at least how deep one needs to
-backtrack in a decision tree. Similarly the sequence in which we
-evaluate the possible resolution for such a flaw -- presented
-previously -- was selected according to some simple assumptions that % takes
-% benefit of a possibly assume the existing plan by assuming that 
-if the outcome of synchronization appears consistent with our current
-plan then it probably reflects that the plan has executed
-\comment{that the past is monotonic?}. Such an assumption helps direct
-the internal state evaluation and in nominal cases, proves to be a
-sound solution.
-
-One final aspect to take into account is that from a \rx point of
-view, \emph{synchronization is the only critical task of a
-  reactor}. Such a process is used in order for the agent to identify
-its current state and maintain it consistently throughout the agent's
-lifetime. For a reactor not being able to find a consistent solution
-during synchronization -- implying that after evaluating all possible
+One critical aspect to take into account is that from a \rx point of
+view, synchronization is the only critical task of a reactor. Such a
+process is used in order for the agent to identify its current state
+and maintain it consistently throughout the agent's lifetime. For a
+reactor not being able to find a consistent solution during
+synchronization -- implying that after evaluating all possible
 solutions provided by a model it was unable to find a consistent plan
 -- not only indicates that a reactor is unable to explain the state of
 the world, but more importantly it may jeopardize other reactors that
@@ -695,6 +690,25 @@ variables; it does so by posting the special observation
 \textsf{Failed}. And by doing so we allow for graceful degradation
 where other reactors can readapt their plans as they receive this
 observation.
+
+Finally, at the engine level careful choices were made in 
+both the focus of the search -- limited only to tokens that 
+can potentially overlap the current tick -- and heuristics where 
+the {\em current state flaw} is considered last during the search
+process. The later limits the amount of backtracking for a solution 
+-- or at least how deep one needs to backtrack in a decision tree. 
+Similarly the sequence in which we evaluate the possible resolution 
+for such a flaw -- presented in Proposition \ref{prop:csf:resolve} -- 
+was selected according to  some simple assumptions that any external 
+observation that is compatible with an existing token in the current
+plan reflects the execution of the plan itself. In other words this
+means that our solver always prefer to use tokens already existing in
+the plan in order to identify its current internal state. By doing so
+we directs the synchronization search by exploiting the structure of
+the plan produced during previous deliberation steps. This implies
+that a deliberation steps have been done and did impact the plan
+structure and calls for a description on how our \eu reactor resolve
+such steps which we are now going to describe further.
 
 \subsubsection{Deliberation: Planning for future state evolution}
 \label{sec:arch:plan}
@@ -820,18 +834,19 @@ one $plan$ structure in the reactor and shared between synchronization
 and planning. This allows these two processes to not only be
 interleaved but how they can impact each other via plan manipulation.
 
-The most obvious case is how synchronization allows propagate of {\em
-  external} observations when a new tick occurs. In our presentation
-of synchronization in Section \ref{sec:arch:synch}, we isolated the
-problem by assuming that the reactor has no future goal or more
-accurateely no plan to enforce.  By doing so we were able to develop
-the way we augment the \eu solver to be able to propagete {\em
-  external} observations in order to identify the reactor {\em
-  internal} state for the same tick. By doing so we were able to focus
-on synchronization as a state evaluation process that can be resolved
-within the \eu framework with few extensions. Similarly we presented
-deliberation as an abstraction while not detailing how the disruptive
-nature of synchronization could impact the way planning could evolve.
+The most obvious case is how synchronization allow propagate of {\em
+  external} observations as a new tick occurs. In our presentation of 
+{\em synchronization}, we isolated the problem by stating
+that we will assume at this point that the reactor has no future goal
+or more accurately no plan to enforce. By doing so we
+were able to develop the way we augment the \eu solver to be able
+to propagate {\em external} observations in order to identify the
+reactor {\em internal} state for the same tick. This allowed us 
+to focus on synchronization as a state evaluation process that can
+be resolved within the \eu framework with few extensions. Similarly
+we presented deliberation at this fairly high level not necessarily
+discussing how the disruptive nature of synchronization in this
+process could impact the way this planning could evolve.
 
 We first analyze the case during which synchronization occurs after
 planning has completed (\ie the last step of deliberation results in a
