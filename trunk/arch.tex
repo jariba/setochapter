@@ -910,23 +910,50 @@ reactor.
 
 This choice is directed not only by heuristic choices made in the
 solver but also enforced by the heuristic order of the decision point
-resolution choices for the {\em internal} state flaw presented in
-Section \ref{sec:arch:sync} \fcomment{TODO: need to rework the
-  presentation of thee choices so I can refer to them more directly --
-  algorithm or pseudo theorem should do the trick}. Should such a flaw
-be revealed during synchronization -- such that the current state of
-an {\em internal} state variable is not fully grounded -- the
-sequencing of the choices will attempt first a conservative choice in
-maintaining previous state and only then try a more optimistic
-approach in terms of the \comment{I don't follow this last bit. Is
-  this token addition that you're talking about?} execution/advance in
-our current plan to finally attempt other choices that were not
-predicted by the model. The two first possible choices are strongly
-directed by the existing plan which helps direct the search within
-this frame. This often allow to have a synchronization that is much
-more directed and, in nominal cases such as the one we showed resolve
-the deliberation in few steps (often without any backtrack in the
-search) \comment{All this is confusing; probably reword}.
+resolution choices for the {\em current  state flaw} presented in
+Proposition \ref{prop:csf:resolve}. Indeed, as we stated then the two
+first choices tend to privilege a conservative view in respect to the
+existing plan. It attempts first to extend the previous observation we
+produced for this {\em internal} timeline in order to avoid to commit
+to early in the plan advance. If the formaer failed it will then
+attempt to start the next exisiting token in the plan which alow the
+reactor to advance its plan execution. Both of these two initial
+choices atetempt to resolve the plan with the least amount of
+perturbation of the plan. They just constrain further the start and
+end time of the exisiting tokens which were provided by the previous 
+deliberations steps. This means that in a nominal situation where the
+plan this reactor produced is properly executed, the synchronization
+remains limited to restrict time points in the plan and progate their
+impact. Most of the heavy dutty work of creating new tokens in the
+plan and schedule them -- both being much more difficult problems 
+to resolve -- have been managed during deliberation steps. In that
+sense we see that most of the time synchronization is limited to very
+few node in \eu search space with often no backtrack required. The
+synchronization may become slightly nore costfull when we need to
+identify a new token to be injected by the plan (the 3rd choice in
+Proposition \ref{prop:csf:resolve}) as it needs to explore on tis own
+all the possible token types this timeline accept as value. This is
+the reason this choice is evaluated last in our flaw resolution in
+order to avoid such complex action during synchronization unless 
+necessary. In that sense,  ansd due to carefull choice on our
+synchrponization heurisitic we see that the plan produced during \rx
+deliberation steps helps sthe synchronization process to be more
+efficient. 
+
+% Should such a flaw be revealed 
+% during synchronization -- such that the current state of
+% an {\em internal} state variable is not fully grounded -- the
+% sequencing of the choices will attempt first a conservative choice in
+% maintaining previous state and only then try a more optimistic
+% approach in terms of the \comment{I don't follow this last bit. Is
+%   this token addition that you're talking about?} execution/advance in
+% our current plan to finally attempt other choices that were not
+% predicted by the model. The two first possible choices are strongly
+% directed by the existing plan which helps direct the search within
+% this frame. This often allow to have a synchronization that is much
+% more directed and, in nominal cases such as the one we showed resolve
+% the deliberation in few steps (often without any backtrack in the
+% search) \comment{All this is confusing; probably reword}.
 
 Synchronization also supports the tracking of plan execution. It does
 so by specifying token parameters such as time points that are
@@ -977,15 +1004,16 @@ influenced by the outcome, but it also influences
 planning. Specifically when synchronization occurs before a complete
 plan is found, it will inject new facts ({\em external} observations
 and resulting {\em internal} state) in the plan database available for
-inference when the next planning \texttt{step} resumes. Therefore they
-\comment{what is the ``they''?} are not integral part of the plan
-resolution (generating potentially new flaws for the planner or
-contributing to resolve previously existing flaws). The planning
-process is therefore perturbed internally and fully informed by how
-the world is evolving even as it is planning.  This specific aspect
-contrasts with other approaches we have which avoid perturbing the
-planner during its search as it is not compatible with the ``off-line
-planning'' assumption.
+inference when the next planning \texttt{step} resumes. On this next
+step the \eu solver used for planning will have these new facts
+included in the partial plan which can introduce new flaws in the plan
+while potetnially having reolved previously exisiting flaw. The
+deliberation process is therefore perturbed externally by the {\em
+  synchronization} and consequently fully informed of the world state
+evolution as it is planning.  This specific aspect contrasts with
+other more classical approaches we have seen, which avoid 
+perturbing the planner during its search as it is not compatible 
+with the ``off-line planning'' assumption.
 
 By our design choices -- both at the architecture level and the
 integration of the \eu framework for embedded deliberation -- we are
