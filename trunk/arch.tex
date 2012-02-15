@@ -928,80 +928,77 @@ more directed and, in nominal cases such as the one we showed resolve
 the deliberation in few steps (often without any backtrack in the
 search) \comment{All this is confusing; probably reword}.
 
-The synchronization process also supports the tracking of plan
-execution. It does so by specifying token parameters such as time
-points that are propagated through the plan in order to identify if
-the plan remains valid -- as in our example -- or that it cannot be
-executed as it is. The later is often identified by the
-synchronization failing to find a consistent solution. for example
-dshould the \texttt{Going} observation we receive be to the
-\texttt{hardwareStore}, this would break the current plan of our
-reactor as we cannot go simultaneously at 2 different places as
-illustrated in Fig. \ref{fig:shop:relax}-1. as synchronization is not
-possible in this context our strategy is to fully relax all decisions
-made by the previous plan steps by just keeping n the plan all the
-past observations in both {\em external} and {\em internal} state
-variables and the exsiting {\em internal} goals received by this
-reactor (\texttt{Own(Milk)} in our example) resulting on the plrtial
-plan sghowned in Fig. \ref{fig:shop:relax}-2. In this process the
-reactor inform the agent that all {\em external} goals it requested
-for the future are note valid anymore which often result in the ownere
-of htese timelines to not have to maintain this goal anynmore.
+Synchronization also supports the tracking of plan execution. It does
+so by specifying token parameters such as time points that are
+propagated through the plan in order to identify if the plan remains
+valid -- as in our example -- or that it cannot be executed as it
+is. The later is often identified by the synchronization failing to
+find a consistent solution. For example should the \texttt{Going}
+observation received be to the \texttt{hardwareStore}, this would
+break the current partial plan in the reactor as the robot cannot
+possible be going simultaneously to $2$ different locations; see
+Fig. \ref{fig:shop:relax1}. As synchronization is not possible in such
+a situation the strategy followed is to relax all decisions made by
+previous plan steps. This is done by keeping all past observations in
+both {\em external} and {\em internal} state variables as well as the
+existing {\em internal} goals (\texttt{Own(Milk)} in this example)
+received by this reactor. The resulting partial plan is shown in
+Fig. \ref{fig:shop:relax2}. In this process the reactor informs the
+agent that all {\em external} goals it requested for the future are no
+longer valid which results in turn, in timeline owners not having to
+maintain such goals.
 
 \begin{figure}[!htbp]
   \centering
-  \includegraphics[width=0.7\columnwidth]{figs/shoping_exec_relax}  
-  \caption{Illustration of a conflict during synchronization and the
-    resulting relaxed plan for recovery} 
-  \label{fig:shop:relax}
+  \subfloat[Conflicting Observation]{\label{fig:shop:relax1}\includegraphics[width=0.7\columnwidth]{figs/shoping_exec_relax-1}}\\
+  \subfloat[Relaxed Partial Plan]{\label{fig:shop:relax2}\includegraphics[width=0.7\columnwidth]{figs/shoping_exec_relax-2}}
+  \caption{\small Illustration of a conflict during synchronization
+    and the resulting relaxed plan for recovery.}
 \end{figure}
 
-As the plan is not anymore in the way the synchronization can resume
-and find a solution as we initial lly described. The newly pending
-goals will enforce at the next \texttt{step} to resumed deliberation
-on this new fully relaxed partial plan. By the simple use of
-synchronization the reactor was not only able to identify that its
-plan was not executable anymore but recover from it while offering a
-new incomplete partial plan to be resolved during the next
-deliberation \texttt{steps}. This on its own ogfer the core
-functionality one should except to close the loop between planning and
-execution in the sense that synchronization plays the role of what is
-typically named as the {\em Executive} in other architectures
-{\em\color{red} references to diverse archis, 3-tiered, laas, claraty,
-  B Wiliams, and many more}.
+As the plan is no longer conflicted, synchronization can resume and
+find a solution described above. Newly pending goals would be enforced
+at the next \texttt{step} to resume deliberation on this relaxed
+partial plan. By using synchronization the reactor was not only able
+to identify that its plan was not consistent but able to recover from
+it by offering a new incomplete partial plan to be resolved in the
+next deliberation \texttt{steps}. % This on its own offer the core
+% functionality one should except to close the loop between planning and
+% execution in the sense that 
+Synchronization plays the role of what is typically termed as the {\em
+  Executive} in other architectures \cite{gat98, alami:1998p820,
+  mus98, williams03, Nesnas:2003do}.
 
-In our case though the interaction between planning and execution does
-not stop at this level. A core point of the overal schedulling of both
-{\em synchronization} and {\em planning} steps resides on our
-architecture enforsincing that the synchroniuzation process can occur
-in between any step of the plan. This lead us to the fact that not
-only synchronization is imnfluenced by the outcome of planning but
-this influence goes also in the alternate direction. Specifically when
-synchronuiation occuers before we found a complete plan, it will
-inject as we described new facts (the {\em external} observations and
-resulting {\em internal} state) in the plan database. This
-informatiuon will be present when the next planning \texttt{step} will
-resume. Therefore they are not intergal part of the plan resolution
-(generating potentially new flaws for the planner or contributing to
-resolve previously exisiting flaws). The planning process is therefore
-perturbed internallyand fully informed on how the world evolves as it
-is planning.  This aspect trueluy contrast to other approaches we have
-identified in the literature which avoid to perturb the planner during
-it search as it is not compatible with the ``off-line planning''
-assumption.
+In \rx however the interaction between planning and execution does not
+stop at this level. The overall scheduling of both {\em
+  synchronization} and {\em planning} is such that the synchronization
+can occur in between any planning step. Not only is synchronization
+influenced by the outcome, but it also influences
+planning. Specifically when synchronization occurs before a complete
+plan is found, it will inject new facts ({\em external} observations
+and resulting {\em internal} state) in the plan database available for
+inference when the next planning \texttt{step} resumes. Therefore they
+\comment{what is the ``they''?} are not integral part of the plan
+resolution (generating potentially new flaws for the planner or
+contributing to resolve previously existing flaws). The planning
+process is therefore perturbed internally and fully informed by how
+the world is evolving even as it is planning.  This specific aspect
+contrasts with other approaches we have which avoid perturbing the
+planner during its search as it is not compatible with the ``off-line
+planning'' assumption.
 
 By our design choices -- both at the architecture level and the
-integration of the \eu framework for embedded deliberation -- we
-were able to implement an architecture that avoid this limitation
-while remaining in a formal frame that still allow for deliberation
-and model-based agent control. We believe that this tighter
-integration of planning and execution allow the system to ba more
-acute of its environment allowing better informaed decision and
-tighter reaction. This is possible while still integrating information
-such as a long latency for the reactors as long as one can ensure that
-synchronization of al the reactors and deliberation steps can be done
-in a time that is resonably small in comparison of the agent tick
-duration.
+integration of the \eu framework for embedded deliberation -- we are
+able to implement an architecture that avoids this critical off-line
+planning limitation while remaining within a formal framework that
+allows for deliberation and model-based agent control. We believe that
+this tight integration of planning and execution allows the system to
+be more acute vis-a-vis the environment allowing informed
+decision-making and a tighter reaction loop. This is possible while
+integrating information despite a long latency for the reactors, as
+long as one can ensure that synchronization of all reactors and
+deliberation steps can be done within a time that is resonably small
+in comparison to the agent tick duration.
 
 
 
