@@ -58,13 +58,10 @@ beyond \texttt{IDEA} are in the following ways:
   decision loops, called {\em reactors}. Each reactor has its own
   scope both functionally (one for example focusing on the conversion
   of high level waypoints into low-level commands) and temporally as
-
   each reactor declares its planning look-ahead $\pi$ and expected
-  latency $\lambda$
-  % \comment{$\pi \& \lambda$ both defined here for the first time}
-  before being able to produce plan to the agent depending on where it
-  is located in a reactor dependency graph such as shown in
-  Fig. \ref{fig:agent}.
+  latency $\lambda$ before being able to produce plan to the agent
+  depending on where it is located in a reactor dependency graph such
+  as shown in Fig. \ref{fig:agent}.
 
 \item \emph{Coupling} a tighter integration between the planning
   process and world evolution to ensure that planning occurs while
@@ -110,18 +107,18 @@ will receive new updates when the owner reactor generates its {\em
   internal} state. 
 
 This {\em synchronization} process propagates the current state
-information at the execution frontier $\tau$ throughout all the 
+information at the execution frontier $\tau$ throughout all the
 reactors. The sequencing of the reactors synchronization is identified
 by traversing the reactor graph from the least dependents reactors --
 the ones with no {\em external} timelines -- to the most dependent
 ones which typicallu do not provide {\em internal} timelines.
-Conversely each reactor can request a future change on one of 
-its {\em external} state variables which will be transfromed as 
-an {\em internal} goal to the owner. 
-Such \emph{goal dispatching} is expected to produce a
-deliberation phase for the receiving reactor which can cyclically and
-in turn, produce a plan impacting its {\em external} state variables' 
-future that will propagate down following the same mechanism.
+Conversely each reactor can request a future change on one of its {\em
+  external} state variables which will be transfromed as an {\em
+  internal} goal to the owner.  Such \emph{goal dispatching} is
+expected to produce a deliberation phase for the receiving reactor
+which can cyclically and in turn, produce a plan impacting its {\em
+  external} state variables' future that will propagate down following
+the same mechanism.
 
 % Taking cues from the IDEA 
 % architecture \cite{mus02}, we designed a core framework that provides a

@@ -1,134 +1,3 @@
-\section{Foundational Concepts}
-\label{sec:concepts}
-
-\texttt{T-REX} is an adaptive, artificial intelligence based
-controller and provides general framework for building reasoning
-systems for real-world autonomous vehicles. At MBARI \texttt{T-REX} is
-used for AUV control; another instantiation of the system is being
-used for control of a terrestrial personal robot \cite{pr2,
-  Meeussen:2010dn}. The development of \texttt{T-REX} has been
-targeted at surveying a number of oceanographic features which are
-dynamic and unpredictable spatio-temporally. Typically this requires
-our AUVs to balance the goals of coverage spatially while
-opportunistically following features of scientific interest and to do
-so while being operationally aware of its own limitations in terms of
-resources (typically the battery state of charge) and overall
-proximity to other observational assets for obtaining scientific
-ground-truth. We are therefore interested in representational
-frameworks that allow robots to pursue long-term objectives while
-choosing short-term gain and can gracefully deal with exogenous or
-endogenous change.
-
-To enable this responsiveness to external observations, the agent has
-to be able to synthesize plans insitu and to re-plan. We use a
-temporal constraint-based planner \eu with a demonstrated legacy of
-having flown on NASA space missions \cite{jonsson00,bresina05,
-  barreiro09}. Our autonomy architecture brings three key innovations
-for AUV adaptation: the use of flexible plan representations,
-compositional control with the use of partitioned networks and
-off-line learning to inform insitu environmental state estimation. In
-this section we detail some of the key concepts relevant to flexible
-plan representation. Section \ref{sec:arch} has details the
-\rx partitioned architecture and estimation driven vehicle
-adaptation.
-
-\subsection{The basics}
-\label{sec:basics}
-
-\eu uses a \emph{domain model} written in a declarative language
-(NDDL: New Domain Description Language), together with initial
-conditions and goals also specified in NDDL, to construct a set of
-temporal relations that must be true at the start time. These models
-include assertions about the physics of the vehicle, i.e how it
-responds to external stimulus and internally driven goals. By
-propagating these relations forward using Simple Temporal Networks
-\cite{dechter91} and applying goal constraints, \eu can select a set
-of conditions that should be true in the future, where some of these
-conditions will correspond to actions the agent must take. The planner
-can backtrack and try another path during search if a goal cannot be
-reached while being capable of discarding unachievable goals.
-
-Traditionally robot execution has relied on dispatching commands at
-precise times. Such linear sequences of precisely timed commands give
-no ability to adjust execution on the basis of sensory
-information. Although some commands can issue tests on sensor
-readings, these tests have the objective of verifying whether expected
-execution conditions are occuring. If not, the state of the system is
-declared off-nominal and execution of the sequence of commands is
-interrupted. More recently, executives have been proposed and
-implemented that significantly broaden the way robots can be commanded
-\cite{mus98,alami:1998p820}. For example, the Remote Agent executive
-interpreted a \textit{temporally flexible plan} which represents each
-start time as a variable and contains an explicit network of bounded
-delay constraints between such variables.
-
-\begin{figure}[!t]
-\centering
-\includegraphics[scale=0.35]{figs/flexible-timelines.pdf}
-\caption{\small Tokens with flexible temporal intervals and parametric
-  constraints between tokens. This example shows the triggering of a
-  water sampler based on a feature threshold while the vehicle
-  Yo-Yo's. The \texttt{Waypoint\_Yo-Yo} token has a flexible duration,
-  start \& end times.}
-\label{fig:flex-timelines}
-\vskip+0.1cm
-\end{figure}
-
-Unlike a traditional fixed time-tagged command sequences, such
-flexible plans leave room for adaptation at execution time. When the
-executive considers when to start a task, it propagates information
-through the constraint network, computes a time bound for the
-variable, selects an actual execution time within the bound, and
-starts the task at that time. Temporally flexible plans therefore,
-express a \textit{range of possible outcomes} of the robots
-interaction with the environment within which the executive can elect
-at run time the most appropriate one for the actual execution
-conditions. The fact that constraints are explicitly represented
-ensures that through constraint propagation the executive will respect
-global limits expressed in the plan (e.g., don't start a task until a
-certain condition has been satisfied but still satisfying some global
-deadline). Such flexibility is critical when dealing with dynamic
-ocean conditions where precise timing of a robotic action might be
-indeterminate. Further, the advantage of flexibility can be contrasted
-with the consequences of the intrinsic inflexibiliy of traditional
-command sequences. Because they are inflexible, sequences must
-necessarily be designed considering worst case scenarios.
-
-\eu uses a \emph{state variable} representation to describe the
-evolution of state over time. The instantiated history of such state
-variable evolution over a temporal horizon we call \emph{timelines}
-and which represent a single thread in the execution of a concurrent
-system. At any given time each thread can execute a single procedure.
-Thus each timeline consists of a sequence of procedures which
-encapsulate and describe state evolution; we call these instantiated
-atomic entities \emph{tokens}.  A token therefore describes a
-procedure invocation, the state variables on which it can occur, the
-parameter values of the procedure, and the time values defining the
-interval. We allow encapsulation of uncertainty within these tokens
-with a range of start and end times and parameters, all of which are
-encoded as variables. A constraint solver in turn manipulates these
-variables defined in a \eu domain model. For example, consider
-a scientific need to take a water samples 100 meters from a hotspot
-while an AUV is performing a Yo-Yo in the water-column. Two samples
-are needed if the feature's signal is above a threshold; one
-otherwise. The token that is capturing the sensory threshold has a
-parametric constraints to the token which fires the requisite water
-sampler. In addition, the start time of the water sampling procedure
-is highly dependant on the variability of sub-sea currents and actual
-speed of the vehicle. Therefore a number of values are possible for
-the start times and duration of the sampling all of which are valid
-combinations for desired outcomes.
-
-
-\begin{figure}
-\centering
-\includegraphics[scale=0.3]{figs/Allen-algebra.pdf}
-\caption{\small Temporal relations defined within the planner are
-  based on \texttt{Allen Algebra} relations shown above.}
-\label{fig:allen-algebra}
-\vskip-0.3cm
-\end{figure}
-
 \subsubsection{\eu Plan Representation}
 \label{sec:europa:pr}
 
@@ -141,22 +10,47 @@ typical to other CAIP-based formalisms.
   describe the problem domain and over which we may want to specify
   constraints. In the Shopping Agent example, the times at which the
   agent needs to leave or be back, or executes a purchase, are all
-  instances where variables representing time would be used. 
-  As explained in the CP section, a variable can take values from a domain. In \eu, domains are defined over a specific data type, the primitive data types supported are:
-  \begin{enumerate}
-    \item \textit{String}: sequences of characters, like "Red", "Spirit", etc 
-    \item \textit{Boolean}: {True,False}
-    \item \textit{Numeric}: integers and floats
-    \item \textit{Object}: reference to an object instance (see below for a description of objects in \eu)
-  \end {enumerate}
-  Two types of variable Domains can be defined over a data type: 
-  \begin{enumerate}
-    \item \textit{Enumerated}: Finite sets over any data type, specified explicitly, for instance: ["Red","Yellow","Green"], [1,18,32], etc
-    \item \textit{Interval}: Only for Numeric data types, they are specified by a [LowerBound,UpperBound] pair, for instance: [1,10], [5.0,100.0], etc.
-  \end {enumerate}
-  \eu's ability to represent and reason over numeric intervals is a very useful characteristic that allow users to create flexible plans. \comment{say more about the benefits of flexibility?}
+  instances where variables representing time would be used.  As
+  explained in the \textsf{CP} section, a variable can take values
+  from a domain. In \eu, domains are defined over a specific data
+  type, the primitive data types supported are:
 
-\item[\textbf{Constraints}] valid plans in most problem domains have to satisfy a number of restrictions, for instance, a Shopping Agent may only be able to perform one task at a time, may have limited time or an energy or fuel budget to perform a task, and so on. In \eu, these restrictions are represented by Constraints, which can be defined over any combination of Variables in a domain. \eu provides a Constraint Library that already implements many useful constraints (temporal, resource, relational, etc), it is also possible to add new constraints if required by a particular domain.
+  \begin{enumerate}
+  \item \textit{String}: sequences of characters, like "Red",
+    "Spirit", etc
+
+  \item \textit{Boolean}: {True,False}
+
+  \item \textit{Numeric}: integers and floats
+
+  \item \textit{Object}: reference to an object instance (see below
+    for a description of objects in \eu)
+  
+\end {enumerate}
+
+Two types of variable Domains can be defined over a data type:
+
+  \begin{enumerate}
+  \item \textit{Enumerated}: Finite sets over any data type, specified
+    explicitly, for instance: ["Red","Yellow","Green"], [1,18,32], etc
+  \item \textit{Interval}: Only for Numeric data types, they are
+    specified by a [LowerBound,UpperBound] pair, for instance: [1,10],
+    [5.0,100.0], etc.
+  \end {enumerate}
+
+  \eu's ability to represent and reason over numeric intervals is a
+  very useful characteristic that allow users to create flexible
+  plans. \comment{say more about the benefits of flexibility?}
+
+\item[\textbf{Constraints}] valid plans in most problem domains have
+  to satisfy a number of restrictions, for instance, a Shopping Agent
+  may only be able to perform one task at a time, may have limited
+  time or an energy or fuel budget to perform a task, and so on. In
+  \eu, these restrictions are represented by Constraints, which can be
+  defined over any combination of Variables in a domain. \eu provides
+  a Constraint Library that already implements many useful constraints
+  (temporal, resource, relational, etc), it is also possible to add
+  new constraints if required by a particular domain.
 
 \item[\textbf{Objects}] The items we wish to describe and refer to in
   a domain are considered Objects. As in the case with object-oriented
@@ -176,14 +70,16 @@ typical to other CAIP-based formalisms.
 
   \end{itemize}
 
-  Objects that have similar state and behavior can be
-  described generically in terms of object types or classes. \eu
-  allows the definition of classes in the same way that it is
-  done in popular object-oriented programming languages, where a class 
-  can have attributes (represented by Variables), and classes can be arranged in a single-parent hierarchy through inheritance. 
-  However, one key aspect needs to be introduced to class definition in \eu that is not found 
-  in object-oriented programming:  to describe state and behavior for the purposes of planning we need to
-  build on the formalism of first order logic as explained below.
+  Objects that have similar state and behavior can be described
+  generically in terms of object types or classes. \eu allows the
+  definition of classes in the same way that it is done in popular
+  object-oriented programming languages, where a class can have
+  attributes (represented by Variables), and classes can be arranged
+  in a single-parent hierarchy through inheritance.  However, one key
+  aspect needs to be introduced to class definition in \eu that is not
+  found in object-oriented programming: to describe state and behavior
+  for the purposes of planning we need to build on the formalism of
+  first order logic as explained below.
 
 \item[\textbf{Tokens}] In first order logic, a predicate defines a
   relation between objects and properties \comment{citation?}.  In
@@ -229,7 +125,8 @@ typical to other CAIP-based formalisms.
   \item \textit {end}: The end of the temporal extent over which the
     predicate is defined.
 
-  \item \textit {duration}: The duration of the temporal extent over which the predicate is defined. The constraint \textit{start} $+$
+  \item \textit {duration}: The duration of the temporal extent over
+    which the predicate is defined. The constraint \textit{start} $+$
     \textit{duration} = \textit{end} is enforced automatically.
 
   \item \textit{object}: The set of objects to which a token might
@@ -242,118 +139,205 @@ typical to other CAIP-based formalisms.
   \item \textit{state}: Tokens can be \texttt{ACTIVE, INACTIVE,
       MERGED}, or \texttt{REJECTED}. The state variable captures the
     token's current state and its reachable states through further
-    restriction.  This is required to support CAIP's approach to planning where goals and subgoals can be satisfied by either adding new intervals (Tokens) to the plan, or by merging with existing intervals. Token State lifecycle is examined in detailed in a separate section below.
+    restriction.  This is required to support CAIP's approach to
+    planning where goals and subgoals can be satisfied by either
+    adding new intervals (Tokens) to the plan, or by merging with
+    existing intervals. Token State lifecycle is examined in detailed
+    in a separate section below.
 
   \end{enumerate}
 
-\item[\textbf{Built-in Object Types}] In a domain model, there may be some classes that don't have any time-dependent state or behavior, and therefore those classes will not have any Token types associated with them, for instance in the Shopping Agent model, the set locations and products are static for the agent's purposes so we may only want to say what they are but not have any state or behavior associated with them.
+\item[\textbf{Built-in Object Types}] In a domain model, there may be
+  some classes that don't have any time-dependent state or behavior,
+  and therefore those classes will not have any Token types associated
+  with them, for instance in the Shopping Agent model, the set
+  locations and products are static for the agent's purposes so we may
+  only want to say what they are but not have any state or behavior
+  associated with them.
 
-However, the most common case in any non-trivial domain model is that Objects will have many associated Tokens in order to describe their state and behavior throughout a plan. There are a couple of Object Types that are so commonly used in domain descriptions, that \eu provides a built-in implementation for them:
-
-\begin{enumerate}
-    \item \textit{Timelines}: Often objects in a domain must be described by exactly one
-    token for every given timepoint in the plan. Any instances of a class derived from \eu's built-in
-    Timeline class will induce ordering requirements among its tokens
-     to ensure no temporal overlap may occur among them  \cite{mus94}. 
-     \comment{add small example?}
-
-    \item \textit{Resources}: Metric resources, e.g. the energy of a battery or the
-    capacity of a cargo hold, are objects with an explicit quantitative
-    state in time and with a circumscribed range of changes that can occur
-     to impact that state i.e. produce, consume, use, change. 
-     Resources are such a common requirement for \eu users that built-in object types (with their corresponding token types to denote production, consumption, etc) are provided for them. Instances of classes derived from a Resource will induce
-     ordering requirements on their Tokens in order to ensure that the
-     level of the resource remains within specified limits.
-     \comment{add small example?}
-\end{enumerate}
-
-\item[\textbf{Token State Model}] In \eu's representation, goals are temporally scoped states that need to be achieved, or actions that must be performed. As a result, \eu internally represents goals as Tokens.  Goals can be posted explicitly, for instance, when a user asks the Shopping Agent to own a specific product by a specific time, or implicitly when subgoals are created as a result of domain compatibilities (described in the CAIP framework above), for instance, when the Shopping Agent must get to a Location where a Product is available before it is able to purchase it, in this case the original goal of purchasing the product will spawn a subgoal of being at a specific location.
-
-Looking at a how a simple Shopping Agent goal would be addresed by \eu helps illustrate how Token States support the planning process.
-
-Let's assume we start with a partial plan that places the Shopping agent at home at time 0 and with no Products in its possession, then we post a goal for the Shopping Agent to own a Drill at time 10.
-
-\comment{Add figure showing an AgentLocation timeline with an At(Home) token with start=0 and end open, an empty AgentBag timeline, and a Own(Drill) token with start=10 floating below both timelines}
-
-Notice that the \texttt{Own(Drill)} token that represents the goal is not immediately placed on the \texttt{AgentBag} timeline since \eu must determine whether it can achieve that goal and how. When the goal is posted and before any decisions are made on it, the  \texttt{Own(Drill)} token is created in an INACTIVE state, then \eu looks at the current partial plan and considers 2 alternatives:
+  However, the most common case in any non-trivial domain model is
+  that Objects will have many associated Tokens in order to describe
+  their state and behavior throughout a plan. There are a couple of
+  Object Types that are so commonly used in domain descriptions, that
+  \eu provides a built-in implementation for them:
 
 \begin{enumerate}
-    \item If there are any tokens in the plan that are compatible with the new goal, \eu may attempt to satisfy the goal by merging it with any of them (if there is more than one it can try them one at a time), in this case, the state of the token would change to MERGED.
-    \item Instead of merging with existing tokens in the plan, \eu may decide to insert the new token into the plan, in that case its state would change to ACTIVE.
+
+\item \textit{Timelines}: Often objects in a domain must be described
+  by exactly one token for every given timepoint in the plan. Any
+  instances of a class derived from \eu's built-in Timeline class will
+  induce ordering requirements among its tokens to ensure no temporal
+  overlap may occur among them \cite{mus94}.  \comment{add small
+    example?}
+
+\item \textit{Resources}: Metric resources, e.g. the energy of a
+  battery or the capacity of a cargo hold, are objects with an
+  explicit quantitative state in time and with a circumscribed range
+  of changes that can occur to impact that state i.e. produce,
+  consume, use, change.  Resources are such a common requirement for
+  \eu users that built-in object types (with their corresponding token
+  types to denote production, consumption, etc) are provided for
+  them. Instances of classes derived from a Resource will induce
+  ordering requirements on their Tokens in order to ensure that the
+  level of the resource remains within specified limits.  \comment{add
+    small example?}
 \end{enumerate}
 
-When a token is merged, all restrictions imposed
-on the merged token are transferred to the active token upon which it is merged. Merging a
+\item[\textbf{Token State Model}] In \eu's representation, goals are
+  temporally scoped states that need to be achieved, or actions that
+  must be performed. As a result, \eu internally represents goals as
+  Tokens.  Goals can be posted explicitly, for instance, when a user
+  asks the Shopping Agent to own a specific product by a specific
+  time, or implicitly when subgoals are created as a result of domain
+  compatibilities (described in the CAIP framework above), for
+  instance, when the Shopping Agent must get to a Location where a
+  Product is available before it is able to purchase it, in this case
+  the original goal of purchasing the product will spawn a subgoal of
+  being at a specific location.
+
+  Looking at a how a simple Shopping Agent goal would be addresed by
+  \eu helps illustrate how Token States support the planning process.
+
+  Let's assume we start with a partial plan that places the Shopping
+  agent at home at time 0 and with no Products in its possession, then
+  we post a goal for the Shopping Agent to own a Drill at time 10.
+
+  \comment{Add figure showing an AgentLocation timeline with an
+    At(Home) token with start=0 and end open, an empty AgentBag
+    timeline, and a Own(Drill) token with start=10 floating below both
+    timelines}
+
+Notice that the \texttt{Own(Drill)} token that represents the goal is
+not immediately placed on the \texttt{AgentBag} timeline since \eu
+must determine whether it can achieve that goal and how. When the goal
+is posted and before any decisions are made on it, the
+\texttt{Own(Drill)} token is created in an INACTIVE state, then \eu
+looks at the current partial plan and considers 2 alternatives:
+
+\begin{enumerate}
+
+\item If there are any tokens in the plan that are compatible with the
+  new goal, \eu may attempt to satisfy the goal by merging it with any
+  of them (if there is more than one it can try them one at a time),
+  in this case, the state of the token would change to MERGED.
+
+\item Instead of merging with existing tokens in the plan, \eu may
+  decide to insert the new token into the plan, in that case its state
+  would change to ACTIVE.
+
+\end{enumerate}
+
+When a token is merged, all restrictions imposed on the merged token
+are transferred to the active token upon which it is merged. Merging a
 token requires finding a target active token that is compatible with
-the inactive token. Two tokens are merge-compatible if they are instances of the same predicate and
-that no intersections between corresponding variables are empty. The
-effect of merging is illustrated in Figure 3.
+the inactive token. Two tokens are merge-compatible if they are
+instances of the same predicate and that no intersections between
+corresponding variables are empty. The effect of merging is
+illustrated in Figure 3.
 
 \comment{Add figure showing the effect of merging}
 
-When a token is activated all compatibilities associated with its token type are evaluated, which may lead to new subgoals being generated. In our example, there should be a compatibility stating that the Shopping Agent must be at the same location as the product it is purchasing. In that case, activating the \texttt{Own(Drill)} token will cause a new  \texttt{At(Drill.location)} to be created in an INACTIVE state, which in turn will have to be dealt with.
+When a token is activated all compatibilities associated with its
+token type are evaluated, which may lead to new subgoals being
+generated. In our example, there should be a compatibility stating
+that the Shopping Agent must be at the same location as the product it
+is purchasing. In that case, activating the \texttt{Own(Drill)} token
+will cause a new \texttt{At(Drill.location)} to be created in an
+INACTIVE state, which in turn will have to be dealt with.
 
-\comment{Add figure showing the effect of activating the token by putting it on the AgentBag timeline, and a new At(Drill.location) token floating below}
+\comment{Add figure showing the effect of activating the token by
+  putting it on the AgentBag timeline, and a new At(Drill.location)
+  token floating below}
 
-If neither activating nor merging works, a token may become REJECTED, this is possible only for goals posted by the end user and specified as optional. Subgoals generated as a result of token activation cannot be rejected, if a subgoal cannot be satisfied through activation or merging then it will cause the original activation decision that spawned it to be retracted (\eu's search mechanisms are explained in detail in a separate section later on).
+If neither activating nor merging works, a token may become REJECTED,
+this is possible only for goals posted by the end user and specified
+as optional. Subgoals generated as a result of token activation cannot
+be rejected, if a subgoal cannot be satisfied through activation or
+merging then it will cause the original activation decision that
+spawned it to be retracted (\eu's search mechanisms are explained in
+detail in a separate section later on).
 
-As we can see, a token's state can go from INACTIVE to ACTIVE, MERGED or REJECTED, this lifecycle is illustrated in the figure below.
+As we can see, a token's state can go from INACTIVE to ACTIVE, MERGED
+or REJECTED, this lifecycle is illustrated in the figure below.
 
 \comment{Add figure showing possible state transitions}
 
-\item[\textbf{Rules}] In order for a plan to be valid, it must comply with all rules and
-regulations pertinent to the application domain in question. Rules
-govern the internal and external relationships of a token. For
-example, consider a parameterized action \texttt{Go(origin,destination)} which describes
-a Shopping Agent traveling from one location ( \textit{origin}) to another ( \textit{destination}). The
-parameters are instantiated on a token as variables whose domain of
-values is the set of all locations in a given problem. A rule
-governing an internal relationship among token variables might
-stipulate that a transition must involve a change in location. This
-can be easily expressed as a constraint on the definition of a
-predicate of the form: \textit{origin != destination}. It makes sense to further
-stipulate that the agent must be located at  \textit{origin} before travel can happen
-and the agent must be located at  \textit{destination} when completed. This is
-an example of a rule governing an external relationship among
-tokens. It specifies a requirement that tokens of the predicate
-\texttt{At} that represent the location state for the Shopping Agent 
-precede and succeed tokens of the predicate \texttt{Go} that represents traveling.
+\item[\textbf{Rules}] In order for a plan to be valid, it must comply
+  with all rules and regulations pertinent to the application domain
+  in question. Rules govern the internal and external relationships of
+  a token. For example, consider a parameterized action
+  \texttt{Go(origin,destination)} which describes a Shopping Agent
+  traveling from one location ( \textit{origin}) to another (
+  \textit{destination}). The parameters are instantiated on a token as
+  variables whose domain of values is the set of all locations in a
+  given problem. A rule governing an internal relationship among token
+  variables might stipulate that a transition must involve a change in
+  location. This can be easily expressed as a constraint on the
+  definition of a predicate of the form: \textit{origin !=
+    destination}. It makes sense to further stipulate that the agent
+  must be located at \textit{origin} before travel can happen and the
+  agent must be located at \textit{destination} when completed. This
+  is an example of a rule governing an external relationship among
+  tokens. It specifies a requirement that tokens of the predicate
+  \texttt{At} that represent the location state for the Shopping Agent
+  precede and succeed tokens of the predicate \texttt{Go} that
+  represents traveling.
 
-\comment{ Add figure showing internal and external relationships from rules on action Go}
+  \comment{ Add figure showing internal and external relationships
+    from rules on action Go}
 
-Figure xx illustrates the entities and relations involved in specifying
-such a rule on a \texttt{Go} action. The token on which the rule applies
-is referred to (\texttt{Go}) as the master. Each  \texttt{At} token required by the
-master is referred to as a slave. All variables are indicated by name
-and their domains are expressed as intervals in the case of temporal
-variables and as enumerations for the remainder. Application of a rule
-on a token can thus cause slave tokens, variables, and constraints to
-be introduced.  
+Figure xx illustrates the entities and relations involved in
+specifying such a rule on a \texttt{Go} action. The token on which the
+rule applies is referred to (\texttt{Go}) as the master. Each
+\texttt{At} token required by the master is referred to as a
+slave. All variables are indicated by name and their domains are
+expressed as intervals in the case of temporal variables and as
+enumerations for the remainder. Application of a rule on a token can
+thus cause slave tokens, variables, and constraints to be introduced.
 
 The capability of a domain rule to cause a slave token to be created
 is a key vehicle through which planning occurs. Semantically, this
-rule imposes a requirement for supporting (slave) tokens to be in the plan in
-order for the master to be valid. 
+rule imposes a requirement for supporting (slave) tokens to be in the
+plan in order for the master to be valid.
 
 \comment {talk about condition/effect annotations?}
 
 
 \end{description}
 
-We have just covered the main elements of \eu's planning representation:
+We have just covered the main elements of \eu's planning
+representation:
 
 \begin{enumerate}
-   \item \textbf{Domains, Variables and Objects} to represent the entities (Objects) and attributes (Variables) needed to represent a problem domain	
-    \item \textbf{Tokens} Temporally scoped predicates to represent states and actions in time. 
-    \item \textbf{Token States} which are necessary for the implementation of planning operations on a partial plan.
-    \item \textbf{Constraints} to describe relationships among attributes of objects and tokens. \eu has a built-in library of constraints that covers time, resources and others that are common in real life problem domains.
-    \item \textbf{Domain Rules} to describe internal and external relationships on and
-     between tokens respectively. Rules are applied to active tokens (master tokens) 
-     referred to as masters and typically produce inactive tokens (slaves) which are a key vehicle through which the planning
-     process evolves. \comment{citation, or perhaps remove this statement?:}The rule structure in \eu differs from the more restrictive commitment to preconditions and effects in classical
-     planning which prohibits durative actions and disembodied effects (i.e. effects which may not occur until some temporal distance after
-     the end of the action).    
-    \item \textbf{Timelines and Resources} are built in implementations of Object types that appear frequently in real life domains.
+\item \textbf{Domains, Variables and Objects} to represent the
+  entities (Objects) and attributes (Variables) needed to represent a
+  problem domain
+
+\item \textbf{Tokens} Temporally scoped predicates to represent states
+  and actions in time.
+
+\item \textbf{Token States} which are necessary for the implementation
+  of planning operations on a partial plan.
+
+\item \textbf{Constraints} to describe relationships among attributes
+  of objects and tokens. \eu has a built-in library of constraints
+  that covers time, resources and others that are common in real life
+  problem domains.
+
+\item \textbf{Domain Rules} to describe internal and external
+  relationships on and between tokens respectively. Rules are applied
+  to active tokens (master tokens) referred to as masters and
+  typically produce inactive tokens (slaves) which are a key vehicle
+  through which the planning process evolves. \comment{citation, or
+    perhaps remove this statement?:}The rule structure in \eu differs
+  from the more restrictive commitment to preconditions and effects in
+  classical planning which prohibits durative actions and disembodied
+  effects (i.e. effects which may not occur until some temporal
+  distance after the end of the action).
+
+\item \textbf{Timelines and Resources} are built in implementations of
+  Object types that appear frequently in real life domains.
+
 \end{enumerate}
 
 
