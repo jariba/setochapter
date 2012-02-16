@@ -251,7 +251,7 @@ Agent::Buy {
   contained_by(condition object.location.At currLocation);
   eq(currLocation.loc, possibleStores.location);
   
-  starts(effect Own purchase);
+  meets(effect Own purchase);
   eq(purchase.product,product);
 }
 \end{verbatim}
