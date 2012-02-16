@@ -233,7 +233,7 @@ and 30 temporal constraints.
 \begin{figure}
 \centering
 \includegraphics[scale=0.35]{figs/Example-UBO0.jpg}
-\caption{\small A \eu solution to an RCPSP \comment{citation} problem.}
+\caption{\small A \eu solution to an RCPSP \cite{Bruckera99} problem.}
 \label{fig:rcpsp-1}
 \vskip+0.1cm
 \end{figure}
@@ -312,7 +312,7 @@ AC-3 algorithm \cite{mackworth77}, a popular implementation, improves
 over the naive approach by ignoring constraints whose variables were
 not affected since the last iteration. \comment{A figure of a
   constraint network preferably of the shopping example would be
-  useful here.}
+  useful here. JB to generate a napkin fig}
 
 Arc Consistency and other, more stringent consistency definitions can
 be used to efficiently prove that a \textsf{CP} problem is
@@ -344,13 +344,31 @@ these formulations are powerful and have allowed researchers to
 develop numerous contributions in automated planning, there are many
 classes of problem domains that are difficult to represent using this
 formalism. In particular, it is hard to represent time, resources,
-mutual exclusion and concurrency using propositions \comment{citation
-  needed}. 
-Constraint Programming is a framework that lends itself very well to represent and reason about all of those elements \comment{Ixtet citation?},
-consequently, there has been a good amount of work building automated planners that take advantage of CP techniques.
-The most common approach in constraint-based planning has been to encode the entire planning problem as a CP problem, 
-where action choices and relationships are represented as variables and/or constraints \comment {citations 158,519,539,556 from malik's book}.
-The advantage of using a pure CP formulation is that standard CP solvers can be then used to solve the planning problem, however, this approach also has a couple of significant drawbacks:
+
+% mutual exclusion and concurrency using propositions
+% \cite{ghallab04}. While CSP representations have traditionally had an
+% edge in formulating and representing planning problems,
+% % It is straightforward to represent and reason about all of
+% % those elements using a CSP representation, as a result there has been
+% % some work on doing automated planning while taking advantage of CSP
+% % (TODO: ref). Traditionally, the entire planning problem is translated
+% % into a CSP and then solved using traditional CSP methods, this
+% leading to a formulation where action choices and relationships are
+% represented as variables and/or constraints, there are at least two
+% major drawbacks:
+
+mutual exclusion and concurrency using propositions
+\comment{ghallab04}.  Constraint Programming is a framework that lends
+itself very well to represent and reason about all of those elements
+\comment{Ixtet citation?}, consequently, there has been a good amount
+of work building automated planners that take advantage of CP
+techniques.  The most common approach in constraint-based planning has
+been to encode the entire planning problem as a CP problem, where
+action choices and relationships are represented as variables and/or
+constraints \comment {citations 158,519,539,556 from malik's book}.
+The advantage of using a pure CP formulation is that standard CP
+solvers can be then used to solve the planning problem, however, this
+approach also has a couple of significant drawbacks:
 
 \begin{enumerate} 
 
