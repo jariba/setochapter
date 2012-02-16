@@ -1,12 +1,19 @@
 \subsubsection{\eu Plan Representation}
 \label{sec:europa:pr}
 
-\comment{Too abrupt; needs a narrative here. It comes across as a list
-of items (given all the enumerates) and needs some prose. Also the
-material should be expository not in a conversational style.}
+\eu follows the representation outlined by the CAIP framework, it also adds a few elements to it that are necessary for an efficient implementation of constraint-based planning. Below is a brief summary of the main elements, followed by a detailed description for each one:
 
-This section describes the fundamental entities within \eu which are
-typical to other CAIP-based formalisms.
+
+\begin{enumerate}
+\item \textbf{Tokens} Temporally scoped entities that correspond to Intervals in the CAIP framework, are used to represent  state and actions in time. A\textbf{Token State model} is defined to support an efficient implementation of plan-space search algorithms.
+
+\item \textbf{Domains, Variables and Constraint} are used to represent restrictions in the problem domain in terms of a CP formulation.
+
+\item \textbf{Domain Rules} are used to describe internal and external relationships on and between tokens, as presecribed by the CAIP framework.
+  
+\item \textbf{Objects} are used to represent problem domains in a more modular and scaleable way. \textbf{Timelines and Resources} are built in implementations of Object types that appear frequently in real life domains.
+
+\end{enumerate}
 
 \begin{description}
 
@@ -306,45 +313,7 @@ plan in order for the master to be valid.
 
 \comment {talk about condition/effect annotations?}
 
-
 \end{description}
-
-We have just covered the main elements of \eu's planning
-representation:
-
-\begin{enumerate}
-\item \textbf{Domains, Variables and Objects} to represent the
-  entities (Objects) and attributes (Variables) needed to represent a
-  problem domain
-
-\item \textbf{Tokens} Temporally scoped predicates to represent states
-  and actions in time.
-
-\item \textbf{Token States} which are necessary for the implementation
-  of planning operations on a partial plan.
-
-\item \textbf{Constraints} to describe relationships among attributes
-  of objects and tokens. \eu has a built-in library of constraints
-  that covers time, resources and others that are common in real life
-  problem domains.
-
-\item \textbf{Domain Rules} to describe internal and external
-  relationships on and between tokens respectively. Rules are applied
-  to active tokens (master tokens) referred to as masters and
-  typically produce inactive tokens (slaves) which are a key vehicle
-  through which the planning process evolves. \comment{citation, or
-    perhaps remove this statement?:}The rule structure in \eu differs
-  from the more restrictive commitment to preconditions and effects in
-  classical planning which prohibits durative actions and disembodied
-  effects (i.e. effects which may not occur until some temporal
-  distance after the end of the action).
-
-\item \textbf{Timelines and Resources} are built in implementations of
-  Object types that appear frequently in real life domains.
-
-\end{enumerate}
-
-
 
 %\begin{figure*}
 %\centering 
