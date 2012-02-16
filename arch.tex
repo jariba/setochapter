@@ -106,19 +106,103 @@ $1$ second. In order to identify its state a reactor can subscribe to
 will receive new updates when the owner reactor generates its {\em
   internal} state. 
 
-This {\em synchronization} process propagates the current state
-information at the execution frontier $\tau$ throughout all the
-reactors. The sequencing of the reactors synchronization is identified
+As the execution frontier -- called $\tau$ -- advance, the \rx agent
+propagates the current state information accross all the reactors states
+variables through the {\em synchronization} process.
+ The sequencing of the reactors synchronization is identified
 by traversing the reactor graph from the least dependents reactors --
 the ones with no {\em external} timelines -- to the most dependent
 ones which typicallu do not provide {\em internal} timelines.
+
+
 Conversely each reactor can request a future change on one of its {\em
-  external} state variables which will be transfromed as an {\em
+  external} state variables which will be transformed as an {\em
   internal} goal to the owner.  Such \emph{goal dispatching} is
 expected to produce a deliberation phase for the receiving reactor
 which can cyclically and in turn, produce a plan impacting its {\em
   external} state variables' future that will propagate down following
-the same mechanism.
+the same mechanism. 
+
+In order to avoid to be overflood by goals that may threats the
+ability of a reactor to process these goals and integrate them in tis
+plan. In order to do so each reactor specifies the two following
+values that apply for the full scope of the agent lifetime:
+\begin{itemize}
+\item $\lambda$ is the specified latency of this reactor, which is an
+  indicator of the maximum expected time for a reactor to produce a
+  plan.\footnote{Note that while it is highly recommended to select a
+    sound value, a failure to produce a plan within a chosen value for
+    this parameter is not considered as a critical failure of the
+    reactor.}
+\item $\pi$ is the planning look-ahead of the reactor. which indicates
+  how many ticks in the future this reactor is looking ahead during
+  deliberation. 
+\end{itemize}
+
+Using this information along with the dependency relation betwen
+reactor \rx defines the notion of execution latency of a state
+variable as follow:
+\begin{definition}
+  The {\em execution latency}  of a {\em state variable} $s$ which is
+    internal to the reactor $r$ is the maximum expected delay before 
+    a goal on this state varabale can be included in its plan and
+    executed by the  reactor $r$. 
+
+    It is defined recursrevely as follow: 
+    \begin{equation*}
+      \lambda_{exec}(s) = \lambda(r) + \max_{e \in exts(r)}
+      \lambda_{exec}(e) 
+  \end{equation*}
+    Where  $exts(r)$ is the set of the state varaibles which are
+    {\em externals} to $r$. 
+\end{definition}
+
+The concept of execution latency is critical at the agent level
+and can also impact the planning/deliberation process on the {\em
+  external} state variables of a reactor. For simplicity sake in the
+future sections more focused in the \eu reactor, we abstract it out 
+as being equivalent to the reactor latency (meaning that we 
+assume that all {\em external} timelines of this reactor have
+$\lambda_{exec} = 0$). At the \rx agent level though this
+ execution latency is used in turn to define the {\em dispatch
+window} of the same state variable:
+\comment{Needed to say that early on but the flow of this paragraph 
+is not very tight}
+\begin{definition}
+  \label{def:dispatch}
+  For every timelines $s$ {\em internals} to the reactor $r$, the {\em 
+    dispatch window} of this timeline at the execution frontier $\tau$
+  is the time interval:
+  \begin{equation*}
+    \Pi(s) = [\tau + \lambda_{exec}(s), \tau+\lambda_{exec}(s)+\pi(r)]
+  \end{equation*}
+\end{definition}
+
+This window is used by \rx in order to identify when to dispatch a
+request to a {\em reactor} as a new goal. This happens only if the
+request start time -- represented as the interval of possible start
+instants -- intersects this window. Requests further in the future 
+are buffered by the agent until this window advanced enough to 
+overlap their start time. This gives a simple mechanism in order to
+request a change from the {\em external} state variable of a a reactor 
+while avoiding to dispatch too much goals at once to the reactor that
+declare this same state variable as {\em internal}. The choice of both
+the latency and look-ahead of a reactor can be delicate as one is
+dependent on the other. Latency also highly dependent on exogenous
+paramaters such as the computing power of the host system and the
+number of reactors needing to deliberate at once. As of today these
+should be evaluated carefully by the system designers and while
+having an important impact in the efficacy of the agent to find and
+execute a global strategy they are just indicative and a failure from
+a reactor to produce a plan in its latency is not considered as a
+critical failure from \rx point of view.
+
+Requests from a reactor can  be {\em recalled} by this reactor when it
+they are not part of its plan anymore. For example if this reactor
+need to replan due to an unexpected event, it will recall ol the
+requests it did propduce that have not been observed yet. These
+recalls are notified to the reactor that received this request as a
+goal in order to remove it from its current objectives. 
 
 % Taking cues from the IDEA 
 % architecture \cite{mus02}, we designed a core framework that provides a
@@ -133,7 +217,6 @@ the same mechanism.
 % of the reactors it is connected to but only focus on the state
 % variables it relies on (called {\em external}) and the state
 % variables it manages and maintains (called {\em internal}). 
-
 
 \begin{figure}[!htb]
   \centering
@@ -744,70 +827,62 @@ goals and keeping only recent observations. % These constraints are yet
 % functionality of a reactor is to resolve successfully its
 % synchronization.
 
-The number of flaws between two steps \comment{between synch. and
-  execution?} can evolve for the following reasons that are exogenous
-to deliberation:
 
+{\em Synchronization} and the dispatching of new {\em goals} from
+\rx can occur between two steps and alter the plan. These alterations
+exogenous to the deliberation process are dynamically impacting the set
+of flaws that need to be resolved. Obviously new flaws are created
+when a new goal is received from \rx and conversely often the recall
+of an objective will remove the corresponding flaws\footnote{although
+  if the flaws of this gaol were previously resolved, the removal of
+  this goal may create new flaws}. The impact of {\em synchronization}
+can be more subtle as its alteration of the plan at the execution
+frontier is much more drastic. We can still give a non exhaustive list
+of possible alterations of the flaws directly related to {\em
+  synchronization}:
 \begin{enumerate}
-
-\item A new goal has been posted on a reactor timeline. This is
-  usually due to another reactor finding a partial plan and posting
-  the corresponding new objective.
-
-\item The outcome of synchronization created new flaws that did not
-  need to be resolved during synchronization.
-
-\item A previously requested goal has be recalled by the initial
-  requester. This can occur when the reactor's initial plan is no
-  longer valid, for instance with synchronization resulting in
-  inconsistency.
-
+\item Previous flaws directly related to the execution frontier have
+  been resolved by the {\em synchronization} solver.
+\item The {\em synchronization} solver may have created new flaws that
+  were outside of its scope but are now part of the {\em deliberation}
+  solver scope.
+\item Last observations proved the current plan to be invalid
+  requiring the {\em synchronization} solver to relax the existing
+  plan in order to identify its current {\em external} state.
 \end{enumerate}
-
-\comment{this might be a subsubsection before someplace since it
-  introduces the concept of latency/lookahead. TODO: yep it needs to
-  move up to the architecture section.}
-These events could potentially produce new flaws to be resolved while
-any single deliberation step will likely reduce the number of flaws
-for resolution. The scope of planning for a reactor also plays a role
-in the deliberation process as we limit deliberation to the sliding
-temporal window $[\tau+\lambda, \tau+\lambda+\pi]$ \cite{py10} where:
-
-\begin{itemize}
-
-\item $\tau$ is the current tick indicative of the execution frontier 
-
-\item $\lambda$ is the specified latency of this reactor, which is an
-  indicator of the maximum expected time for a reactor to produce a
-  plan.\footnote{Note that while it is highly recommended to select a
-    sound value, a failure to produce a plan within a chosen value for
-    this parameter is not considered as a critical failure of the
-    reactor.}
-
-\item $\pi$ is the planning look-ahead of the reactor. which indicates
-  how many ticks in the future this reactor is looking ahead during
-  deliberation. 
-
-\end{itemize}
+Finally as {\em synchronization} occurs when the {\em
+  execution frontier} advances, it implies that the reactor planning
+scope is further in the future. This need to be reflected by the {\em
+  deliberation} solver which need a new deliberation scope one tick
+further in the future.
 
 \begin{figure}[!htbp]
   \centering
   \includegraphics[width=0.65\columnwidth]{figs/plan_window}
-  \caption{The planning window of the deliberation solver and its
-    relation with the reactor latency and look-ahead. The dark grey tokens
-    with dashed borders are excluded from deliberation as they do not
-    overlap the interval $[\tau, \tau+\lambda+\pi]$}
+  \caption{\small The planning window of the deliberation solver and its
+    relation with the {\em dispatch window}. The dark grey
+    tokens   with dashed borders are excluded from deliberation as they do not
+    overlap the interval $[\tau, \tau+\lambda+\pi]$. All the other
+    tokens (in {\color{green} green}) -- along with the goals received from the
+    agent (in {\color{blue} blue}) which can overlap this window are
+    evaluated.}
   \label{fig:plan:window}
 \end{figure}
+
 
 As Fig. \ref{fig:plan:window} illustrates,  such a
 scope allows filtering of tokens that are either necessarily ending
 before $\tau$ or necessarily starting after, focusing the planning
 problem on only those tokens that are within a ``reasonable''
-future. This window is taken into account by the \rx agent which will
-notify a reactor of new {\em internal} goals not only when they
-overlap this reactor specific window but also for the deliberation
-solver in order to reduce the number of tokens to be evaluated to
+future. This filtering window complements the \rx {\em dispatch
+  window} from definition \ref{def:dispatch} which already filters
+out at the agent level the goals that are before the reactor execution
+latency or too far in the future. The planning window inside of the
+reactor refines further this filtering as tokens can be excluded
+dynamically from deliberation as their insertion in the plan and
+scheduling with other tokens generated can reduced their temporal
+scope outside of the planning scope. This helps the deliberation 
+solver reduce the number of tokens to be evaluated and therefore
 reduce deliberation cost and performance. As time advances flaws that
 were initially beyond this temporal horizon will become active which a
 reactor can evaluate. This results in an apparent \emph{continuous
@@ -826,6 +901,7 @@ two effects:
   dispatched as goals, in turn triggering further deliberation.
 
 \end{enumerate}
+
 
 \subsubsection{Intertwining synchronization and execution}
 \label{sec:arch:intertwine}
