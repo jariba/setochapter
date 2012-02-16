@@ -130,7 +130,7 @@ combinations for desired outcomes.
 \section{Fundamentals of  Automated Planning}
 \label{sec:europa}
 
-{\footnotesize
+{\scriptsize
   \begin{quote}
 [Planning] \emph{is an abstract, explicit deliberation process that chooses and
 organizes actions by anticipating their expected outcomes. This
@@ -319,8 +319,8 @@ be used to efficiently prove that a \textsf{CP} problem is
 unsatisfiable. However, they generally cannot prove that a \textsf{CP}
 problem is satisfiable and provide specific variable assignments that
 constitute solutions. For that, search algorithms like global
-backtracking \comment{citation needed} or local search are used; these
-use consistency as an efficient way to prune the search space
+backtracking \cite{hooker05} or local search are used; these use
+consistency as an efficient way to prune the search space
 \cite{cp06}. In theory, solving a \textsf{CP} problem is NP-Hard
 \cite{ghallab04}, but often very efficient in practice using a number
 of consistency and search algorithms that are well understood.
@@ -344,7 +344,6 @@ these formulations are powerful and have allowed researchers to
 develop numerous contributions in automated planning, there are many
 classes of problem domains that are difficult to represent using this
 formalism. In particular, it is hard to represent time, resources,
-
 % mutual exclusion and concurrency using propositions
 % \cite{ghallab04}. While CSP representations have traditionally had an
 % edge in formulating and representing planning problems,
@@ -356,19 +355,18 @@ formalism. In particular, it is hard to represent time, resources,
 % leading to a formulation where action choices and relationships are
 % represented as variables and/or constraints, there are at least two
 % major drawbacks:
-
-mutual exclusion and concurrency using propositions
-\comment{ghallab04}.  Constraint Programming is a framework that lends
-itself very well to represent and reason about all of those elements
-\comment{Ixtet citation?}, consequently, there has been a good amount
-of work building automated planners that take advantage of CP
-techniques.  The most common approach in constraint-based planning has
-been to encode the entire planning problem as a CP problem, where
-action choices and relationships are represented as variables and/or
-constraints \comment {citations 158,519,539,556 from malik's book}.
-The advantage of using a pure CP formulation is that standard CP
-solvers can be then used to solve the planning problem, however, this
-approach also has a couple of significant drawbacks:
+mutual exclusion and concurrency using propositions \cite{ghallab04}.
+Constraint Programming is a framework that lends itself very well to
+represent and reason about all of those elements \cite{ghallab94},
+consequently, there has been a good amount of work building automated
+planners that take advantage of CP techniques.  The most common
+approach in constraint-based planning has been to encode the entire
+planning problem as a CP problem, where action choices and
+relationships are represented as variables and/or constraints
+\cite{do01,vanbeek99,vossen99,wolfman99}.  The advantage of using a
+pure CP formulation is that standard CP solvers can be then used to
+solve the planning problem, however, this approach also has a couple
+of significant drawbacks:
 
 \begin{enumerate} 
 
@@ -389,14 +387,41 @@ approach also has a couple of significant drawbacks:
 
 \end{enumerate}
 
-These drawbacks have been addressed by a small number of planning frameworks like Descartes \comment{citation 289,290 from malik's book}, IxTet \comment{citation  223 from Malik's book}, and CAIP (Constraint-Based Interval and Attribute Planning)\cite{mus94,frank2003}.
-These frameworks take advantage of a CSP representation to deal with time and resources, at the same time maintaining an explicit representation of the elements relevant to planning (action choices, causal relationships, etc). This combination results in a planning approach that can deal with the type of constraints found in real-life problems, while allowing for intuitive problem descriptions and a natural way to express search algorithms and heuristics. \eu is an implementation of the CAIP framework. In CAIP, planning problems are specified in terms of:
+These drawbacks have been addressed by a small number of planning
+frameworks like \texttt{Descartes} \cite{joslin95,joslin96},
+\texttt{IxTet} \cite{ghallab87,lemai04}, and CAIP (Constraint-Based
+Interval and Attribute Planning)\cite{mus94,frank2003}.  These
+frameworks take advantage of a CSP representation to deal with time
+and resources, at the same time maintaining an explicit representation
+of the elements relevant to planning (action choices, causal
+relationships, etc). This combination results in a planning approach
+that can deal with the type of constraints found in real-life
+problems, while allowing for intuitive problem descriptions and a
+natural way to express search algorithms and heuristics. \eu is an
+implementation of the CAIP framework. In CAIP, planning problems are
+specified in terms of:
 
 \begin{enumerate}
-	\item \textbf{Intervals}: entities that have a temporal scope (that is, a beginning and an  end in time) and a set of attributes. Intervals are used to represent actions and states in the planning domain. 
-	\item \textbf{Variables and Constraints}: Variables represent Interval attributes and Constraints enable a direct representation of temporal, resource and any other the restrictions that a valid plan must comply with.
-	\item \textbf{Domain Configuration Rules}: this is an explicit representation of the conceptual relationships between actions and states in the problem domain, for instance, for a Shopping Agent to be able to purchase a product, it must be at a location where the product is available.
+
+\item \textbf{Intervals}: entities that have a temporal scope (that
+  is, a beginning and an end in time) and a set of
+  attributes. Intervals are used to represent actions and states in
+  the planning domain.
+
+\item \textbf{Variables and Constraints}: Variables represent Interval
+  attributes and Constraints enable a direct representation of
+  temporal, resource and any other the restrictions that a valid plan
+  must comply with.
+
+\item \textbf{Domain Configuration Rules}: this is an explicit
+  representation of the conceptual relationships between actions and
+  states in the problem domain, for instance, for a Shopping Agent to
+  be able to purchase a product, it must be at a location where the
+  product is available.
 \end{enumerate}
 
-To generate plans, the CAIP framework uses a plan-space search approach \comment{cite malik's chapter 5}, where a partial plan is evolved until all open goals are achieved, and all inconsistencies are removed, the specific search algorithm used by \eu will be covered in detail below.
+To generate plans, the CAIP framework uses a plan-space search
+approach \cite{ghallab04}, where a partial plan is evolved until all
+open goals are achieved, and all inconsistencies are removed, the
+specific search algorithm used by \eu will be covered in detail below.
 
