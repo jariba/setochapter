@@ -24,33 +24,33 @@
 
 A prime motivation behind the \rx architecture was to design a
 controller which could bring automated planning closer to low-level
-control of the vehicle while maintaining its reactivity. Traditionally
-planning has been deemed computationally expensive with planner
-performance restricting robot reactivity
+control of the vehicle while maintaining its reactivity. 
+
+Traditionally planning has been deemed computationally expensive with
+planner performance restricting robot reactivity
 \cite{ghallab04,Dias:2003ua}. In control architectures where task
 planning is embedded, planning consequently remains at an abstract
 level with the assumption that it would otherwise impede system
 reactiveness and that the environment can change at a faster rate than
-the planner can plan for it. In such a situation, the agent may thrash
-if the internal state of the plan gets out of synch with the actual
-state of the world. As a result the planning problem managed {\em in
-  situ} remains fairly detached from low-level control. Most
-adaptations at the lower-level reactive layers in contrast are managed
-by specialized components (for example LAAS architecture
-\cite{alami:1998p820,Ingrand07} and CLARATy \cite{Nesnas:2003do}
-) that rely on different representations for modeling local
-control behavior or worse do not have any explicit formal agent
-behavior model. The consequent different techniques for specifying
-each layer in the architecture results in duplication of effort and a
-diffusion of knowledge leading to significant design and integration
-issues \cite{DS1report}.  \texttt{IDEA} mitigated most of these issues
-by tightly integrating planning and execution in a single
-representational and computational framework with a unified
-declarative model. Our approach with \texttt{T-REX} builds on this
-design methodology albeit in a substantially systematic manner
-
-The \rx architecture contributes to agent architectures over and
-beyond \texttt{IDEA} are in the following ways:
+the planner can plan for. In such a situation, the agent may thrash if
+the internal state of the plan gets out of synch with the actual state
+of the world. As a result the planning problem managed {\em in situ}
+has traditionally remained fairly detached from low-level
+control. Most adaptations at the lower-level reactive layers in
+contrast are managed by specialized components (for example
+\texttt{LAAS architecture} \cite{alami:1998p820,Ingrand07} and
+\texttt{CLARATy} \cite{Nesnas:2003do}) that rely on different
+representations for modeling local control behavior or worse do not
+have any explicit formal agent behavior model. The consequent
+different techniques for specifying each layer in the architecture
+results in duplication of effort and a diffusion of knowledge leading
+to significant design and integration issues \cite{DS1report}.
+\texttt{IDEA} mitigated most of these issues by tightly integrating
+planning and execution in a single representational and computational
+framework with a unified declarative model. Our approach with \rx
+builds on this design methodology albeit in a substantially systematic
+manner. The \rx architecture contributes to agent architectures over
+and beyond \texttt{IDEA} are in the following ways:
 
 \begin{itemize}
 
@@ -61,26 +61,31 @@ beyond \texttt{IDEA} are in the following ways:
   each reactor declares its planning look-ahead $\pi$ and expected
   latency $\lambda$ before being able to produce plan to the agent
   depending on where it is located in a reactor dependency graph such
-  as shown in Fig. \ref{fig:agent}.
+  as shown in Fig. \ref{fig:agent}. A reactor closer to the hardware
+  in the hierarchy, is expected to deliberate less and be highly
+  responsive to observations from the world. This implies lower values
+  of $\pi$ and $\lambda$ (see Section \ref{sec:arch:trex} below).
 
 \item \emph{Coupling} a tighter integration between the planning
-  process and world evolution to ensure that planning occurs while
-  being continuously informed of state change. By doing so, the
-  planner is better informed in its deliberation despite a larger
-  latency than changing world change state.
+  process and world evolution to ensure that planning occurs
+  \emph{during continuous} state update. By doing so, the planner is
+  better informed in its deliberation despite a larger latency than
+  the changing world.
 
 \end{itemize}
 
-Partitioned inference is a major contribution of \rx. However that is
-not the focus of this chapter; details are in \cite{py10} and
-\cite{rajan12}. Coupled interaction between planning and the world on
-the other hand, has a significant implication on how planning can be
-integrated in such frameworks; here we show using the \eu planner can
-be coupled to our framework. First we link concepts in \eu planning
-with the \rx framework. Note that in the following treatise, we call
-the formal semantic framework of \rx as the 'agent'. Reactors
-constitute an entity within this agent and are standalone blocks of
-inference.
+Systematic partitioned inference is a major contribution of
+\rx. However that is not the focus of this chapter with details
+covered in \cite{py10, rajan12}. Coupled interaction between planning
+and the world on the other hand, has a significant implication on how
+planning can be integrated in such frameworks. In this chapter we show
+how using the \eu planner can be coupled to our framework by first
+linking concepts in temporal planning with the \rx framework. Note
+that in the following treatise, we call the formal semantic framework
+of \rx as the 'agent'. Reactors constitute an entity within this agent
+and are standalone blocks of inference. The scope, detail and number
+of reactors are application specific and outside the scope of this
+chapter.
 
 % on should integrate a
 % planner in this framework in general and was applied to the europa
@@ -95,82 +100,95 @@ inference.
 
 The \rx architecture is structured around the notion of \eu {\em state
   variables} as the fundamental basis of interaction. Additionally it
-comes with a well-defined ownership model associated with each state
-variable. In this framework each reactor is seen as a 'black box'
-providing its own {\em internal} state variables which it is
+comes with a well-defined ownership model associated with each such
+state variable. In this framework each reactor is seen as a 'black
+box' providing its own {\em internal} state variable which it is
 responsible for in order to maintain its value at every instant of
 time. Each such instance is represented by a {\em tick} with a fixed
-duration; in our implementation of \rx on the Dorado, we use a tick of
-$1$ second. In order to identify its state a reactor can subscribe to
-{\em external} state variables owned by other reactors, for which it
-will receive new updates when the owner reactor generates its {\em
-  internal} state. 
+duration; in our implementation of \rx on the Dorado AUV, we use a
+tick of $1$ second. In order to identify its state a reactor can
+subscribe to {\em external} state variables owned by other reactors,
+for which it will receive new updates when the owner reactor generates
+its {\em internal} state.
 
-As the execution frontier -- called $\tau$ -- advance, the \rx agent
-propagates the current state information accross all the reactors states
-variables through the {\em synchronization} process.
- The sequencing of the reactors synchronization is identified
-by traversing the reactor graph from the least dependents reactors --
-the ones with no {\em external} timelines -- to the most dependent
-ones which typicallu do not provide {\em internal} timelines.
+\begin{figure}[!htbp]
+  \centering
+  \includegraphics[scale=0.35]{figs/DAG-hierarchy}
+  \caption{\small An example of a \rx reactor hierarchy which is used
+    to determine a synchronization order for propagation of values in
+    \emph{external} state variables.}
+  \label{fig:reactor-DAG}
+\end{figure}
 
+As the execution frontier, $\tau$ advances, the \rx agent propagates
+the current state information across all reactor state variables
+through the {\em synchronization} process.  The sequencing of the
+reactors synchronization is identified by traversing a reactor
+dependency graph from the least dependent -- ones with no {\em
+  external} timelines -- to the most, \ie which typically do not have
+{\em internal} timelines. Fig. \ref{fig:reactor-DAG} shows an example
+of such a dependency graph implemented as a directed acyclic graph.
 
 Conversely each reactor can request a future change on one of its {\em
   external} state variables which will be transformed as an {\em
-  internal} goal to the owner.  Such \emph{goal dispatching} is
-expected to produce a deliberation phase for the receiving reactor
-which can cyclically and in turn, produce a plan impacting its {\em
-  external} state variables' future that will propagate down following
-the same mechanism. 
+  internal} goal to the owner reactor(s).  Such \emph{goal
+  dispatching} is expected to produce a deliberation phase for the
+receiving reactor which can cyclically in turn, produce a plan
+impacting its {\em external} state variables' future that will
+propagate down following the same mechanism.
 
-In order to avoid to be overflood by goals that may threats the
-ability of a reactor to process these goals and integrate them in tis
-plan. In order to do so each reactor specifies the two following
-values that apply for the full scope of the agent lifetime:
+In such a process, one challenge is to avoid being overwhelmed by
+goals that may threaten the ability of a reactor to process and
+integrate in its evolving partial plan. For that reason, each reactor
+specifies the following two parameters that applied towards the scope
+of the agent lifetime:
+
 \begin{itemize}
+
 \item $\lambda$ is the specified latency of this reactor, which is an
-  indicator of the maximum expected time for a reactor to produce a
-  plan.\footnote{Note that while it is highly recommended to select a
-    sound value, a failure to produce a plan within a chosen value for
-    this parameter is not considered as a critical failure of the
-    reactor.}
-\item $\pi$ is the planning look-ahead of the reactor. which indicates
-  how many ticks in the future this reactor is looking ahead during
-  deliberation. 
+  indicator of the \emph{maximum expected time} for a reactor to
+  produce a plan.\footnote{Note that while it is highly recommended to
+    select a sound value, a failure to produce a plan within a chosen
+    value for this parameter is not considered as a critical failure
+    of the reactor.}
+
+\item $\pi$ is the planning \emph{look-ahead} of the reactor. which is
+  indicative of the number of ticks in the future this reactor is
+  looking ahead during deliberation.
+
 \end{itemize}
 
-Using this information along with the dependency relation betwen
-reactor \rx defines the notion of execution latency of a state
+Using this information along with the dependency relation between
+reactors, \rx defines the notion of execution latency of a state
 variable as follow:
-\begin{definition}
-  The {\em execution latency}  of a {\em state variable} $s$ which is
-    internal to the reactor $r$ is the maximum expected delay before 
-    a goal on this state varabale can be included in its plan and
-    executed by the  reactor $r$. 
 
-    It is defined recursrevely as follow: 
-    \begin{equation*}
-      \lambda_{exec}(s) = \lambda(r) + \max_{e \in exts(r)}
-      \lambda_{exec}(e) 
+\begin{definition}
+  The {\em execution latency} of a {\em state variable} $s$ which is
+  internal to the reactor $r$ is the maximum expected delay before a
+  goal on this state variable can be included in its plan and executed
+  by the reactor $r$. It is defined recursively as: 
+  \begin{equation*}
+    \lambda_{exec}(s) = \lambda(r) + \max_{e \in exts(r)}
+    \lambda_{exec}(e) 
   \end{equation*}
-    Where  $exts(r)$ is the set of the state varaibles which are
-    {\em externals} to $r$. 
+  Where  $exts(r)$ is the set of the state variables which are
+  {\em externals} to $r$. 
 \end{definition}
 
-The concept of execution latency is critical at the agent level
-and can also impact the planning/deliberation process on the {\em
-  external} state variables of a reactor. For simplicity sake in the
-future sections more focused in the \eu reactor, we abstract it out 
-as being equivalent to the reactor latency (meaning that we 
-assume that all {\em external} timelines of this reactor have
-$\lambda_{exec} = 0$). At the \rx agent level though this
- execution latency is used in turn to define the {\em dispatch
-window} of the same state variable:
-\comment{Needed to say that early on but the flow of this paragraph 
-is not very tight}
+For intertwined plan execution, the concept of execution latency is
+critical at the agent level since it can impact the
+planning/deliberation process on {\em external} state variables of a
+reactor. For simplicity we abstract it out as being equivalent to the
+reactor latency implying that we assume that all {\em external}
+timelines of this reactor have $\lambda_{exec} = 0$. At the \rx agent
+level this execution latency is used to define the {\em dispatch
+  window} of the same state variable.% : \comment{Needed to say that
+  % early on but the flow of this paragraph is not very tight}
+\kcomment{Looks fine to me unless you want to clarify further.}
+
 \begin{definition}
   \label{def:dispatch}
-  For every timelines $s$ {\em internals} to the reactor $r$, the {\em 
+  For every timeline $s$ {\em internal} to a reactor $r$, the {\em
     dispatch window} of this timeline at the execution frontier $\tau$
   is the time interval:
   \begin{equation*}
@@ -178,31 +196,34 @@ is not very tight}
   \end{equation*}
 \end{definition}
 
-This window is used by \rx in order to identify when to dispatch a
-request to a {\em reactor} as a new goal. This happens only if the
-request start time -- represented as the interval of possible start
-instants -- intersects this window. Requests further in the future 
-are buffered by the agent until this window advanced enough to 
-overlap their start time. This gives a simple mechanism in order to
-request a change from the {\em external} state variable of a a reactor 
-while avoiding to dispatch too much goals at once to the reactor that
-declare this same state variable as {\em internal}. The choice of both
-the latency and look-ahead of a reactor can be delicate as one is
-dependent on the other. Latency also highly dependent on exogenous
-paramaters such as the computing power of the host system and the
-number of reactors needing to deliberate at once. As of today these
-should be evaluated carefully by the system designers and while
-having an important impact in the efficacy of the agent to find and
-execute a global strategy they are just indicative and a failure from
-a reactor to produce a plan in its latency is not considered as a
-critical failure from \rx point of view.
+This window is used by \rx to identify when to dispatch a request to a
+{\em reactor} as a new goal. This happens only if the request start
+time -- represented as the interval of possible start times --
+intersects this window. Requests further in the future are buffered by
+the agent until this time window advances for an overlap. This
+provides an elegant mechanism to request a change from the {\em
+  external} state variable of a reactor while avoiding flooding the
+owner reactor of this state variable. 
 
-Requests from a reactor can  be {\em recalled} by this reactor when it
-they are not part of its plan anymore. For example if this reactor
-need to replan due to an unexpected event, it will recall ol the
-requests it did propduce that have not been observed yet. These
-recalls are notified to the reactor that received this request as a
-goal in order to remove it from its current objectives. 
+The choice of both the latency and look-ahead of a reactor can be
+delicate as one is dependent on the other. Needless to say, latency is
+highly dependent on exogenous paramaters such as the host computers
+computing power and the number of reactors needing to deliberate at
+once, among others. As the design stands, these variables should be
+evaluated carefully by the system designer balancing agent efficacy.
+
+% efficacy of the agent to find and execute a
+% global strategy they are just indicative and a failure from a reactor
+% to produce a plan in its latency is not considered as a critical
+% failure from \rx point of view.
+
+Requests from a reactor can be {\em recalled} when it is determined
+that they are not part of its projected plan anymore. For example if a
+reactor needs to replan due to an unexpected event, it will recall all
+requests it produced that have not been observed \kcomment{replace
+  ``observed'' with ``not incorporated by the owner reactor''?}
+yet. This recall is sent to the reactor that received the goal(s) to
+remove it/them from its current set of objectives.
 
 % Taking cues from the IDEA 
 % architecture \cite{mus02}, we designed a core framework that provides a
@@ -228,39 +249,37 @@ goal in order to remove it from its current objectives.
   \label{fig:agent}
   }
   \qquad
-  \subfloat[\small State information flow between the
-    \texttt{Pilot} and the \texttt{Vehicle} reactors.
-    Observations transit as a bottom-up flow 
-    and apply to the execution frontier $\tau$. 
-    Goal information flow from the top to the bottom and relates to 
-    desired future values of state variables.]{
-      \includegraphics[width=0.4\columnwidth]{figs/TREX_flow}
-      %\vskip-1cm
-      \label{fig:trex:flow}
-    }
-    \caption{\rx connection of reactors through state variables based on the
-    AUV agent we use at sea.}
+  \subfloat[\small State information flow between the \texttt{Pilot}
+  and the \texttt{Vehicle} reactors in an \rx instance.  Observations
+  transit as a bottom-up flow and apply to the execution frontier
+  $\tau$.  Goal information flow from the top to the bottom and
+  relates to desired future values of state variables.]{
+    \includegraphics[width=0.4\columnwidth]{figs/TREX_flow}
+    \label{fig:trex:flow}
+  }
+\caption{\small \rx reactors and shared state variables.}
 \end{figure}
 
 Consider for example the \rx agent instance we use on our AUV as shown
 in Fig. \ref{fig:agent}. In this instance all the reactors (symbolized
-by colored boxes) do not have an explicit connection from one to
-another but instead rely on a publish/subscribe model on shared state
-variables. For instance the \textsf{Pilot} reactor needs the {\em
-  externally} managed state information from \textsf{Sensor\_Data} and
-\textsf{Nav\_cmd} state variables in order to maintain the
-\emph{internal} state variables \textsf{Waypoint} and
-\textsf{Nav\_policy}. This relation applies in two ways:
+by colored boxes) % do not have an explicit connection from one to
+% another but instead
+rely on a publish/subscribe model on shared state variables. For
+instance the \textsf{Pilot} reactor needs the {\em externally} managed
+state information from \textsf{Sensor\_Data} and \textsf{Nav\_cmd}
+state variables in order to maintain the \emph{internal} state
+variables \textsf{Waypoint} and \textsf{Nav\_policy}. This relation
+applies in two ways:
 
 \begin{itemize}
 
 \item In order to identify its current {\em internal} state values the
-  \textsf{Pilot} needs to know the current {\em external} state 
-  information it relies on. This information is providede in turn by
-  the reactors that provided these timelines as {\em internal}. In
-  this specific case, the current \texttt{Waypoint} where the vehicle
-  is heading can be evaluated based on the \texttt{Nav\_cmd} executed
-  along with usefull \texttt{Sensor\_Data}, both being provided by the
+  \textsf{Pilot} needs to know the current {\em external} state
+  information it relies on. This information is provided in turn by
+  the reactors that define these timelines as {\em internal}. In this
+  specific case, the current \texttt{Waypoint} where the vehicle is
+  heading can be evaluated based on the \texttt{Nav\_cmd} executed
+  along with useful \texttt{Sensor\_Data}, both being provided by the
   \texttt{Vehicle} reactor.
 
 \item The future objectives a reactor has on \textsf{Internal} state
@@ -275,15 +294,14 @@ variables. For instance the \textsf{Pilot} reactor needs the {\em
 
 \end{itemize}
 
-Given the above example, the \rx architecture therefore helps abstract
-reactor interaction by constraining them to state variables. Each
-reactor is therefore agnostic where its {\em external} state
-information is managed as long as this information is available and
-properly maintained for managing {\em internal} state
-information. This {\em internal} state in turn may be used by other
-reactors. Such a formalism also constrains reactor interaction to
-state information exchange which comes in two forms as illustrated in
-Figure \ref{fig:trex:flow}:
+Given the above example, \rx abstracts reactor interaction by
+constraining them to state variables. Each reactor is therefore
+agnostic where its {\em external} state information is managed as long
+as this information is available and properly maintained for managing
+{\em internal} state information. This {\em internal} state in turn
+may be used by other reactors. Such a formalism also constrains
+reactor interaction to state information exchange which comes in two
+forms as illustrated in Fig. \ref{fig:trex:flow}:
 
 \begin{itemize}
 
@@ -291,19 +309,19 @@ Figure \ref{fig:trex:flow}:
   propagates \emph{up} in the reactor dependency graph at the
   synchronization phase and occurs at the beginning of every
   tick. During this phase the agent provides updates to each reactor
-  on their {\em external} state variables for this tick so as they
-  could compute their {\em internal} state variable values for this
-  same tick. By doing so we propagate a consistent view of that state
-  of the world throughout all the reactors as time
-  advances. %\comment{could do with a figure here}
+  on their {\em external} state variables for this tick so they can
+  compute their {\em internal} state variable values for this same
+  tick. By doing so we propagate a consistent view of that state of
+  the world throughout all the reactors as time
+  advances. 
 
 \item {\em Goal request on future state}: This information propagates
   \emph{down} in the reactor dependency graph. In order to satisfy own
   {\em internal} objectives, a reactor may have a plan that relies on
   future values of one of its {\em external} state. When such a plan
-  is identified the agent ensures that this part of the plan is given
-  as a goal to the owner of the given {\em external} state
-  variable(s). %\comment{could do with a figure here}
+  is identified the agent ensures that this part of the plan is
+  provided as a goal to the owner of the given {\em external} state
+  variable(s). 
 
 \end{itemize}
 

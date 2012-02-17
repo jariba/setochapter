@@ -51,7 +51,7 @@ Two types of variable Domains can be defined over a data type:
 
   \eu's ability to represent and reason over numeric intervals is a
   very useful characteristic that allow users to create flexible
-  plans. \comment{say more about the benefits of flexibility?}
+  plans. 
 
 \item[\textbf{Constraints}] valid plans in most problem domains have
   to satisfy a number of restrictions, for instance, a Shopping Agent
@@ -93,7 +93,7 @@ Two types of variable Domains can be defined over a data type:
   first order logic as explained below.
 
 \item[\textbf{Tokens}] In first order logic, a predicate defines a
-  relation between objects and properties \comment{citation?}.  In
+  relation between objects and properties \comment{use Genesereth citation?}.  In
   \eu, we define such relations between variables whose domains are
   sets of objects and sets of properties to describe state and
   behavior. For example, we might use a predicate \texttt{At($a$,$l$)}
@@ -178,7 +178,7 @@ Two types of variable Domains can be defined over a data type:
   by exactly one token for every given timepoint in the plan. Any
   instances of a class derived from \eu's built-in Timeline class will
   induce ordering requirements among its tokens to ensure no temporal
-  overlap may occur among them \cite{mus94}.  \comment{add small
+  overlap may occur among them \cite{mus94}.  \comment{Maybe: add small
     example?}
 
 \item \textit{Resources}: Metric resources, e.g. the energy of a
@@ -190,8 +190,8 @@ Two types of variable Domains can be defined over a data type:
   types to denote production, consumption, etc) are provided for
   them. Instances of classes derived from a Resource will induce
   ordering requirements on their Tokens in order to ensure that the
-  level of the resource remains within specified limits.  \comment{add
-    small example?}
+  level of the resource remains within specified limits.
+  \comment{Maybe: add small example?}
 \end{enumerate}
 
 \item[\textbf{Token State Model}] In \eu's representation, goals are
@@ -213,7 +213,7 @@ Two types of variable Domains can be defined over a data type:
   agent at home at time 0 and with no Products in its possession, then
   we post a goal for the Shopping Agent to own a Drill at time 10.
 
-  \comment{Add figure showing an AgentLocation timeline with an
+  \comment{Use Fig 4 and edit:: Add figure showing an AgentLocation timeline with an
     At(Home) token with start=0 and end open, an empty AgentBag
     timeline, and a Own(Drill) token with start=10 floating below both
     timelines}
@@ -246,8 +246,9 @@ instances of the same predicate and that no intersections between
 corresponding variables are empty. The effect of merging is
 illustrated in Figure 3.
 
-\comment{Add figure showing the effect of merging; all figs on this
-  section are conjoined. JB to sketch it out.}
+\comment{Use previous fig and modify as appropriately:: Add figure
+  showing the effect of merging; all figs on this section are
+  conjoined. JB to sketch it out.}
 
 When a token is activated all compatibilities associated with its
 token type are evaluated, which may lead to new subgoals being
@@ -257,9 +258,10 @@ is purchasing. In that case, activating the \texttt{Own(Drill)} token
 will cause a new \texttt{At(Drill.location)} to be created in an
 INACTIVE state, which in turn will have to be dealt with.
 
-\comment{Add figure showing the effect of activating the token by
-  putting it on the AgentBag timeline, and a new At(Drill.location)
-  token floating below}
+\comment{Use previous fig and modify as appropriately: Add figure
+  showing the effect of activating the token by putting it on the
+  AgentBag timeline, and a new At(Drill.location) token floating
+  below}
 
 If neither activating nor merging works, a token may become REJECTED,
 this is possible only for goals posted by the end user and specified
@@ -272,7 +274,7 @@ detail in a separate section later on).
 As we can see, a token's state can go from INACTIVE to ACTIVE, MERGED
 or REJECTED, this lifecycle is illustrated in the figure below.
 
-\comment{Add figure showing possible state transitions. Need a FSM.}
+\comment{Maybe: Add figure showing possible state transitions. Need a FSM.}
 
 \item[\textbf{Rules}] In order for a plan to be valid, it must comply
   with all rules and regulations pertinent to the application domain
@@ -295,7 +297,8 @@ or REJECTED, this lifecycle is illustrated in the figure below.
   precede and succeed tokens of the predicate \texttt{Go} that
   represents traveling.
 
-  \comment{ Add figure showing internal and external relationships
+  \comment{Use previous fig and modify as appropriately (used as
+    above): Add figure showing internal and external relationships
     from rules on action Go. Need a fig from JB}
 
 Figure xx illustrates the entities and relations involved in
@@ -312,7 +315,6 @@ is a key vehicle through which planning occurs. Semantically, this
 rule imposes a requirement for supporting (slave) tokens to be in the
 plan in order for the master to be valid.
 
-\comment {talk about condition/effect annotations?}
 
 \end{description}
 
