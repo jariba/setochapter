@@ -3,7 +3,7 @@
 
 \eu is implemented as a library that encapsulates all the elements
 described above and makes them easily accessible through modeling and
-API layers.  A user will typically use the modeling facilities to
+Application Programming Interface (API) layers.  A user will typically use the modeling facilities to
 inject a problem domain description, and the API to extract and
 manipulate plans, and to obtain information about plan flaws and
 constraint violations at any stage of the planning process.
@@ -23,7 +23,7 @@ The \textbf{Constraint Reasoning Engine} (CRE) manages domain types,
 variables and constraints that define relationships among them. It
 also provides an efficient arc consistency mechanism
 \cite{mackworth77}. The CRE is designed so that specialized reasoning
-algorithms for specific constraints can be easily and efficiently
+algorithms for new constraints can be easily and efficiently
 plugged in.
 
 The \textbf{Plan Database} (PDB) manages object and token types. It
@@ -31,8 +31,7 @@ also maintains the state of partial plans in terms of object, variable
 and token instances. This constitutes the data foundation on which end
 user applications and automated planners are built.
 
-The \textbf{Rules Engine} (RE) modularly adds the capability to
-support domain rules that describe dependencies between tokens,
+The \textbf{Rules Engine} (RE) modularly adds the semantics of domain rules that describe dependencies between tokens.
 
 The \textbf{Solver Module} provides the framework for flaw detection
 and resolution that is needed to implement search algorithms for
@@ -41,7 +40,7 @@ planning.
 The \textbf {Language Modules}: Describing problem domains and problem
 instances in terms of objects, variables and domain rules in a
 programmatic way is cumbersome to the extent of being impractical,
-that motivated the creation of modeling languages that support those
+this motivated the creation of modeling languages that support those
 definitions in a much more natural and compact way. NDDL is the main
 modeling language for \eu and will be described in detail in the
 Modeling section below. ANML is a language under development that
@@ -53,7 +52,7 @@ embedded into specialized applications.
 
  
 In an effort to mimimize the amount of work that a user needs to
-perform to solve specific problems, \eu also provides extension
+perform to solve specific problems, \eu also bundles extension
 modules that have been found to be useful in many domains:
 
 \begin{enumerate}
@@ -287,8 +286,8 @@ definition:
     useful for search modules when creating plans.
 \end{enumerate}
 
-Now, having that we have a specification for the Shopping Agent
-domain, here is how a particular problem instance could be specified:
+Having that specification for the Shopping Agent
+domain, here is how a particular problem instance could be stated:
 
 \begin{verbatim}
 
@@ -347,7 +346,7 @@ leq(atHomeForDinner.end, horizonEnd);
 %\caption{Specifying a problem instance for the Shopping Agent in NDDL}
 \end{verbatim}
 
-A problem instance consists mainly of 
+A problem instance consists of:
 
 \begin{enumerate}
 
@@ -363,12 +362,11 @@ A problem instance consists mainly of
   that the Shipping Agent is initially at home.
 
 \item \textbf{Goals}: Goals are represented as tokens in \eu's Plan
-  Database, differently from Facts, Goals trigger inference in \eu
+  Database. Differently from Facts, Goals trigger inference in \eu
   which determines whether flaws (unresolved subgoals, overloaded
-  resources, etc., flaws will be covered in detail in the search
-  section below) need to be resolved, if that is the case, search
-  modules can be invoked which will look for a plan where all the
-  flaws are resolved.
+  resources, etc.) need to be resolved, if that is the case, search
+  modules can be invoked which will look for a plan to resolve those
+  flaws.
 
 \item \textbf{Constraints}: restrictions on and between actions and
   goals are specified through constraints, in this case we use
@@ -378,18 +376,21 @@ A problem instance consists mainly of
   these restrictions.
 \end{enumerate}
 
-
 \subsection{Inference}
 \label{sec:europa:inference}
 
-\comment{explain how inference is used to detect perform bounds
-  propagation, domain reduction and to detect constraint violations.} 
-- talk about AC3 implementation and extension mechanisms
-- talk about europa's constraint library
+In \eu,  all the Variables and Constraints from a problem domain domain description are kept inside the Constraint Reasoning Engine (CRE).
+The CRE provides a framework where any number of constraint types can collaborate to perform inference and prune variable domains using Bounds Propagation and Domain Reduction techniques. \eu uses a Propagator pattern, in which a Propagator object keeps track of a set of constraint instances of the same type and is responsible for ensuring that whenever any variable changes or constraints are introduced or dropped, all related variables are updated through inference. 
+
+In a planning problem, variable or constraint changes can come directly from an end user (by introducing new activities or goals and relating them to the rest of the plan through constraints, by changing the start time of an activity, etc), or can come from an automated planner (by expanding subgoals, introducing precedence constraints to resolve mutual exclusion conflicts, etc). When these changes happen, each Propagator is only able to ensure consistency for the constraints that are associated with it.  To maintain global consistency, the CRE implements a variant of the AC-3 algorithm \cite{mackworth77} where it asks Propagators to perform inference until the Constraint Network returns to an stable state.
+
+\comment {add europa's AC-3 algorithm here}
+
+A \eu user can introduce new constraint types by implementing specialized Constraint and Propagator classes in C++, however, \eu provides a built-in with over 25 arithmetic, temporal, set and resource constraint types so that a large number of problem domains can be modeled without having to introduce new constraint types. \comment{insert table from http://code.google.com/p/europa-pso/wiki/ConstraintLibraryReference ? }
+Temporal and resource constraints are specially important to model real-life planning domains, so it is worth going into some more detail about how \eu's built-in support works for those constraint types.
 
 
-The Temporal Network: The notion of time is central to temporal
-planning. \eu uses variables to explicitly represent timepoints for
+\textit{Temporal Constraints:} \eu uses variables to explicitly represent timepoints for
 plan activities and states. Constraints among timepoints provide a
 natural way to express domain axioms. For example, in order to state
 that activity A must occur before activity B we can say that the end
@@ -408,20 +409,9 @@ timepoint of A is $leq$ the start timepoint of B.
 grouped together to form a Simple Temporal Network (STN). Such a
 network can be transformed into a Distance Graph (DG) where the
 outward arc from a node represents the maximum distance from the
-source node to the target node. They also showed that shortest path
-algorithms could be used to propagate values in the network and
-discover a negative cycle. A negative cycle is a path from a node to
-itself that has a path length less than 0. If such a cycle exists, the
-network is inconsistent. It was further shown that a single-source
-shortest path algorithm was sufficient to detect a negative cycle and
-provide sufficient propagation to yield a backtrack-free search. Thus
-we have an efficient and complete algorithm for propagating an
-STN. These results build on the already established notion of a CSP
-and are naturally incorporated into the general representation and
-propagation scheme used in \eu.  The diagram below illustrates a
-simple STN with just 2 variables and a single constraint. It also
+source node to the target node. 
+The diagram below illustrates a simple STN with just 2 variables and a single constraint. It also
 shows the resulting DG.
-
 
 \begin{figure}[!htb]
   \centering
@@ -432,29 +422,45 @@ shows the resulting DG.
   \label{fig:stn}
 \end{figure}
 
-% \comment{ add figure. Use Europa wiki figure; or use conor figure from slides}
+\cite{dechter91} also showed that shortest path
+algorithms could be used to propagate values in the network and
+discover a negative cycle. A negative cycle is a path from a node to
+itself that has a path length less than 0. If such a cycle exists, the
+network is inconsistent. It was further shown that a single-source
+shortest path algorithm was sufficient to detect a negative cycle and
+provide sufficient propagation to yield a backtrack-free search. Thus
+we have an efficient and complete algorithm for propagating an
+STN. \eu's Propagator for temporal constraints is a straight implementation of this algorithm.  
 
-
-Resources:
+\textit{Resource Constraints:} Most real life planning problems have to deal with 
+the fact that plans made up of actions that require resources to be performed typically
+have only a limited amount of those resources available (think of fuel, storage capacity, etc).
+\eu provides built-in support for resources whose availability can be measured with real numbers, 
+in terms of \eu's  representation, resource object types and their related constraints are provided as follows:
 
 \begin{enumerate}
 
-\item \textbf{Reservoir} resources can have both 'consume' and
-  'produce' tokens. Note that these tokens do NOT have the usual
-  start/end/duration token variables, since occur at a single instant
-  in time. Instead, they have a single variable, 'time' used to
-  represent that instant.
+\item \textbf{Reservoir} resources can have both \texttt{consume(resource,time,quantity)} and
+  \texttt{produce(resource,time,quantity)} constraints. Production and consumption is instantaneous (it happens at a single point in time)
 
-\item \textbf{Reusable} resources have 'uses' tokens that use a
-  quantity for the duration of the token. These tokens do have the
-  usual start/end/duration variables.
+\item \textbf{Reusable} resources have \texttt{uses(resource,start,duration,quantity)} constraints that use a
+  quantity of the resource for a specific duration, then release it. 
 
-\item \textbf {Unary} resources are reusable resources with unit
-  quantity and have 'use' tokens (again, with the usual
-  start/end/duration variables).
+\item \textbf {Unary} resources are Reusable resources with capacity=1, which allows \eu to perform 
+some run time savings compared to the generic Reusable class.
 \end{enumerate}
 
-\comment{talk about resource envelope computation by using MaxFlow formulation.}
+\eu offers configuration options so that in addition to the usual constraint violations when a resource is completely depleted, plan flaws can be generated whenever a resource level 
+is outside a specific upper or lower limit, or when instantaneous production or consumption exceeds a specific threshold.
+
+Recall that \eu supports a flexible temporal representation, where time is represented by intervals, instead of single values. In this context, determining whether a resource is the source of a plan flaw or a constraint violation in general is more difficult than just computing a profile 
+of the resource and checking against some limits. 
+In the context of time flexibility, there are many resource profiles that are possible, depending on when exactly each production/consumption event happens out of all the possible values that are in the domain of the variables that represent the time for the event.
+\cite{mus02} proposed an algorithm where the variables that represent the time for production/consumption events are placed in a temporal network, similar to the network used by the Temporal Propagator above, then the constraints on the resource can be seen as quantities flowing through that network. Computing the maximum flow will yield the maximum resource usage, and thus a lower bound on the resource level, and computing a minimum flow will similarly yield an upper bound. Since maximum flow on a temporal network can be computed in polynomial time, \eu takes advantage of this algorithm to efficiently compute upper and lower bound envelopes on the resource level.
+
+\comment{provide snapshot of resource envelopes generated by europa}
+
+Resource envelopes can be very useful when trying to figure how brittle a plan in the face of changing activity durations or start times. They can also be useful when searching for plans, although they are relatively expensive to compute so their ability to prune the search space must be weighted against the ability to search faster \comment{reference Barreiro,Morris, Bresina paper on grounded inference}.
 
 
 \subsection{Search}
@@ -469,10 +475,12 @@ solver can be created. Let's recap what those elements are:
   and action types that are relevant for the problem.
 
 \item A problem instance (also called initial state) that consists of:
-\item Variable and Object instances that exist for the entire planning
+    \begin{enumerate}
+        \item Variable and Object instances that exist for the entire planning
   horizon.
-\item Temporally scoped predicate and action instances.
-\item Temporally scoped goals.
+        \item Temporally scoped predicate and action instances.
+        \item Temporally scoped goals.
+\end{enumerate}
 
 \end{enumerate}
 	
@@ -666,81 +674,47 @@ procedure. The algorithm permits a heuristically controlled search by
 applying orderings for chooseFlaw and makeDecisionPoint. It results in
 a chronologically-backtracking search.
 
-\comment{expand a little more on how heuristics can be implemented by
-  applying ordering/filtering for chooseFlaw and makeDecisionPoint}
-examples:
-- deal with earliest flaws first
-- deal with planning (open condition flaws) before scheduling (threats) ones
+Heuristics can be implemented by applying ordering/filtering policies for
+\texttt{chooseFlaw} and \texttt{makeDecisionPoint}, for instance, by dealing with earliest flaws first, 
+or by making planning decisions (open condition flaws) before scheduling ones (threats), etc.
 
-It should be emphasized that while this algorithm is commonly
-employed, it is only one of many that could be
-implemented. \comment{give examples of local search solvers for
-  scheduling and CSP?}
+It should be emphasized that while this algorithm is commonly employed, it is only one of many that could be
+implemented. As a simple example, consider the following solver for the N-Queens problem, where there is an integer variable 
+Vi to represent the queen in column i, so that for instance, V1=3 means that the variable on column 1 is placed on row 3. 
+non-attack constraints are posted as arithmetic constraints among the Vi variables to ensure that all the rows and diagonals contain only one queen.
 
-N-Queens solver:
 \begin{verbatim}
-    public void solve(int maxIter)
+    public void solve(ConstraintEngine ce, int maxIter)
     {
-    	init();
+    	curIter=0;
     	
-    	for (int i=0;psengine_.getViolation() > 0 && i < maxIter;i++) {
-    	    PSVariable queenToMove = getQueenWithMaxViolation();
-    		int curPos = queenToMove.getSingletonValue().asInt();
+    	while ((ce.getViolations() > 0) && (curIter < maxIter)) {
+	    Variable queenToMove = getQueenWithMaxViolation(ce);
+    	     int curPos = queenToMove.getCurrentValue();
     	    
-    	    boolean moved = false;
-            SortedSet<Move> moves = getMoves(queenToMove,curPos);             
-            for (Move m : moves) {
-            	moved = makeMove(queenToMove,curPos,m,false);
+            SortedSet<int> moves = getMoves(ce,queenToMove,curPos);             
+  	   boolean moved = false;
+            for (int newPos : moves) {
+            	moved = tryMove(queenToMove,curPos,newPos);
             	if (moved)
             	    break;
             }
             
             if (!moved) 
-            	makeMove(queenToMove,curPos,moves.first(),true);
+            	forceMove(queenToMove,curPos,moves.first());
             
             checkSolution(); // See if we have a new best solution            
-            notifyIterationCompleted(curIteration_++);
-            
-            if (curIteration_-bestIter_ > 50) 
-            	restart();
+            curIteration_++;
     	}
     }
 \end{verbatim}
 
-RCPSP solver \comment{Do we need this example?}:
-\begin{verbatim}
-    public void solve(PSEngine psengine,
-    		          long timeout, // in msecs
-    		          int bound)
-    {
-       init(psengine,timeout,bound);
-       
-       for (int i=0; true ; i++) {
-          flatten();
-          updateSolution(i);
-          updateCriticalPrecedences();
-          
-          if ((nbStable_ > maxStable_) || (bestMakespan_ <= makespanBound_))
-             break;
-          
-          if (timer_.getElapsed() > timeout) {
-              timedOut_ = true;
-              break;
-          }
-          
-          relax();
-          curIteration_++;
-       }       
 
-       restoreBestSolution();
-    }
+\eu's Constraint Reasoning Engine can be used to compute the non-attack constraint violations (\texttt{ce.getViolations()} is a straight call on the \eu API), 
+to easily pick the queen that has he most violations by implementing \texttt{getQueenWithMaxViolation(ce)} and to look ahead and see what 
+moves are possible for a queen that would remove its violations by implementing \texttt{getMoves(ce,queenToMove,curPos)}.
 
-\end{verbatim}
-
-
-\comment{explain how other solvers can be built, maybe use NQueens or
-  RCPSP example to illustrate. Or maybe build a little specialized
-  solver for shopping or rover examples.}
+In similar fashion, the constraint violation and flaw reporting mechanisms that \eu provides can be used as building blocks that specialized or general purpose search algorithms can use to construct plans.
 
 
 %%% Local Variables: 
