@@ -951,51 +951,49 @@ solution is found. This has two effects:
 \end{enumerate}
 
 
-\subsubsection{Intertwining synchronization and execution}
+\subsubsection{Interleaving Synchronization and Execution}
 \label{sec:arch:intertwine}
 
-One key aspect of the \rx framework is intertwined plan execution. As
-seen above, it is synchronization which drives planning, so the
+A key aspect of the \rx framework is interleaved plan execution. As
+noted above, it is synchronization which drives planning, so the
 co-mingling between these two processes is critical to maintaining
-state within a robot immersed in a dynamic environment. Also important
-is that \rx maintains 
+state within a robot especially when it is immersed in a dynamic
+environment. Further, it is important that \rx maintain
 % A core aspect of this reactor is that it takes advantage of the
 % specific sequencing enforced by the \rx architecture along with the
 % fact that only 
-one $plan$ structure in the reactor and shared between synchronization
-and planning. This allows these two processes to not only be
-interleaved but how they can impact each other via plan manipulation.
+one $plan$ structure shared between synchronization and planning. This
+allows these two processes to not only be interleaved for agent
+responsiveness, but ensures a viable mechanism to communicate.
 
-The most obvious case is how synchronization allow propagate of {\em
-  external} observations as a new tick occurs. In our presentation of 
-{\em synchronization}, we isolated the problem by stating
-that we will assume at this point that the reactor has no future goal
-or more accurately no plan to enforce. By doing so we
-were able to develop the way we augment the \eu solver to be able
-to propagate {\em external} observations in order to identify the
-reactor {\em internal} state for the same tick. This allowed us 
-to focus on synchronization as a state evaluation process that can
-be resolved within the \eu framework with few extensions. Similarly
-we presented deliberation at this fairly high level not necessarily
-discussing how the disruptive nature of synchronization in this
-process could impact the way this planning could evolve.
+% but also impact
+% each other via plan manipulation.
 
-We first analyze the case during which synchronization occurs after
-planning has completed (\ie the last step of deliberation results in a
-plan that is considered complete for the current look-ahead). As
-synchronization starts with a plan % produced this will gave a frame for
-% the search process. Therefore 
-this deliberation will not only be a model-derived estimation uniquely
-based on {\em external} observations but will also include reactor
-intentions specified in the available partial plan. Consider for
-example the Shopping Agent model described where the \texttt{Agent} is
-an {\em external} timeline. As the reactor adds the goal to
+As noted earlier, synchronization propagates {\em
+  external} observations when a new tick occurs. Earlier, we isolated
+the case when a reactor has no future goal or no plan to enforce. By
+doing so we were able to develop the way we augment the \eu solver to
+propagate {\em external} observations to identify {\em
+  internal} state. This allowed us to focus on synchronization as a
+state evaluation process that can be resolved within the \eu framework
+with few extensions. Similarly we presented deliberation as an
+abstraction without discussing the disruptive nature of
+synchronization and how it impacts the planning process. We first
+analyze the case when synchronization occurs after planning has
+completed (\ie the last step of deliberation results in a plan that is
+considered complete for the current look-ahead). As synchronization
+starts with a plan, this deliberation will not only be a model-derived
+estimation uniquely based on {\em external} observations but will also
+include reactor intentions specified in the available partial plan.
+
+Consider for example the Shopping Agent model where the \texttt{Agent}
+is an {\em external} timeline. As the reactor adds a goal to
 \texttt{Own} milk and the current {\em external} timeline indicates
 that the robot was \texttt{At(home)}, it produces a plan as shown in
 Fig. \ref{fig:shop:exec0}. The {\em external} part of the plan --
 namely the tokens \texttt{Going(home, superMarket)} and
 \texttt{At(SuperMarket)} -- are installed as goals for the reactor
-managing this state variable {\em internally}.
+managing this state variable internally.
 
 \begin{figure}[!htb]
   \centering
@@ -1011,25 +1009,24 @@ managing this state variable {\em internally}.
 
 Consider that at the next tick $\tau' = \tau+1$ the reactor managing
 agent location is able to change the location state variable to
-\texttt{Going}. \rx informs our reactor of this new observation which
-is added in the plan structure as a fact -- starting exactly at
-$\tau'$ and lasting for an unknown duration which is at least 1
-tick. As this new observation is integrated in the plan through
-synchronization, the solver can identify the similarity between this
-observation and the next token in the existing plan. Instead of
-initiating an exhaustive search of all possible implications, the
-synchronization process starts its execution with the assumption that
-these new observations are consistent with the currently maintained
-plan. As a consequence, at the end of synchronization the plan
-depicted in Fig. \ref{fig:shop:exec1} is likely. This is a result of
-propagation of information provided by the new observation in the
-existing plan while restricting the start time of \texttt{Going} and
-propagating temporal constraints, making \texttt{Go} to start {\em
-  exactly} at $\tau'$. In doing so, the \eu solver's focus on the
-execution frontier ($\tau'$ in Fig. \ref{fig:shop:exec1}) takes
-advantage of the existing plan to evaluate a solution that assumes
-that the observation is consistent with what was decided by the
-reactor.
+\texttt{Going}. \rx informs the reactor of this observation which is
+added to the partial plan as a fact -- starting exactly at $\tau'$ and
+lasting for an unknown duration which is at least one tick. As this
+new observation is integrated in the plan through synchronization, the
+solver can identify the similarity between this observation and the
+next token in the existing plan. Instead of initiating an exhaustive
+search of all possible implications, the synchronization process
+starts its execution with the assumption that these new observations
+are consistent with the currently maintained plan. As a consequence,
+at the end of synchronization the plan depicted in Fig.
+\ref{fig:shop:exec1} is likely. This is a result of propagation of
+information provided by the new observation in the existing plan while
+restricting the start time of \texttt{Going} and propagating temporal
+constraints, making \texttt{Go} to start {\em exactly} at $\tau'$. In
+doing so, the \eu solver's focus on the execution frontier ($\tau'$ in
+Fig. \ref{fig:shop:exec1}) takes advantage of the existing plan to
+evaluate a solution that assumes that the observation is consistent
+with what was decided by the reactor.
 
 % \begin{figure}[!htb]
 %   \centering
@@ -1042,43 +1039,40 @@ reactor.
 
 This choice is directed not only by heuristic choices made in the
 solver but also enforced by the heuristic order of the decision point
-resolution choices for the {\em current  state flaw} presented in
-Proposition \ref{prop:csf:resolve}. Indeed, as we stated then the two
-first choices tend to privilege a conservative view in respect to the
-existing plan. It attempts first to extend the previous observation we
-produced for this {\em internal} timeline in order to avoid to commit
-to early in the plan advance. If the formaer failed it will then
-attempt to start the next exisiting token in the plan which alow the
-reactor to advance its plan execution. Both of these two initial
-choices atetempt to resolve the plan with the least amount of
-perturbation of the plan. They just constrain further the start and
-end time of the exisiting tokens which were provided by the previous 
-deliberations steps. This means that in a nominal situation where the
-plan this reactor produced is properly executed, the synchronization
-remains limited to restrict time points in the plan and progate their
-impact. Most of the heavy dutty work of creating new tokens in the
-plan and schedule them -- both being much more difficult problems 
-to resolve -- have been managed during deliberation steps. In that
-sense we see that most of the time synchronization is limited to very
-few node in \eu search space with often no backtrack required. 
-Fig. \ref{fig:shop:exec} shows how the existing plan can support the
-synchronization process. In that case, the observation \texttt{Going}
-occuring at $\tau'$ was fully compatible with the one already present
-in our plan, by updating the plan and progating the equality
-constraints, the resolution of the {\em current state flaw} for the
-{\em agent} timeline became obvious as the token \texttt{Go} from 
-the plan presented itself as a natural solution.
+resolution choices for the {\em current state flaw} shown in
+Proposition \ref{prop:csf:resolve}. As noted, the first two choices
+are biased towards a conservative view with respect to the existing
+plan. The heuristics first attempt to extend the previous observation
+for this {\em internal} timeline to avoid early commitment. If this
+fails \rx attempts to start the next existing token in the plan to
+advance plan execution. Both choices attempt to resolve state with the
+least amount of plan perturbation by constraining further the start
+and end time of existing tokens generated by previous deliberations
+steps. By doing so, in a nominal situation, synchronization remains
+limited to restrict time points in the plan and propagates their
+impact. Most of the computational effort of creating new tokens in the
+plan and scheduling them onto timelines are managed during
+deliberation steps. Consequently, most of the time synchronization is
+limited to very few nodes in the \eu search space often requiring no
+backtracking. Fig. \ref{fig:shop:exec} shows how the existing plan can
+support the synchronization process. The observation \texttt{Going}
+occuring at $\tau'$ is fully compatible with the token already present
+in our plan. By updating the plan and progating equality constraints,
+the resolution of the {\em current state flaw} for the {\em Agent}
+timeline becomes obvious as a solution, as the token \texttt{Go} from
+the plan presents itself.
 
-The synchronization may become slightly nore costfull when we need to
-identify a new token to be injected by the plan (the 3rd choice in
-Proposition \ref{prop:csf:resolve}) as it needs to explore on tis own
-all the possible token types this timeline accept as value. This is
-the reason this choice is evaluated last in our flaw resolution in
-order to avoid such complex action during synchronization unless 
-necessary. In that sense,  and thanks to the carefull choice on our
-synchronization heurisitic we see that the plan produced during \rx
-deliberation steps helps sthe synchronization process to be more
-efficient. 
+Synchronization may become computationally more expensive when we need
+to identify a new token to be injected into the plan (the third choice
+in Proposition \ref{prop:csf:resolve}), as it needs to explore the
+outcome of inserting all possible token types the timeline can accept.
+This is the reason this choice is evaluated last in our flaw
+resolution strategy.
+
+% In that sense, and thanks to the carefull choice on our
+% synchronization heurisitic we see that the plan produced during \rx
+% deliberation steps helps sthe synchronization process to be more
+% efficient.
 
 % Should such a flaw be revealed 
 % during synchronization -- such that the current state of
@@ -1097,23 +1091,23 @@ efficient.
 
 Synchronization also supports the tracking of plan execution. It does
 so by specifying token parameters such as time points that are
-propagated through the plan in order to identify if the plan remains
-valid -- as in our example -- or that it cannot be executed as it
-is. The later is often identified by the synchronization failing to
-find a consistent solution. For example should the \texttt{Going}
+propagated throughout the plan to identify plan validity.
+%  -- as in our example -- or that it cannot be executed as it is. 
+When invalid, identification occurs by synchronization failing to find
+a consistent solution. For example should the \texttt{Going}
 observation received be to the \texttt{hardwareStore}, this would
-break the current partial plan in the reactor as the robot cannot
-possible be going simultaneously to $2$ different locations; see
-Fig. \ref{fig:shop:relax1}. As synchronization is not possible in such
-a situation the strategy followed is to relax all decisions made by
+break the partial plan in the reactor as the robot cannot possible be
+going simultaneously to two different locations; see Fig.
+\ref{fig:shop:relax1}. As synchronization is not possible in such a
+situation the strategy followed is to relax all decisions made by
 previous plan steps. This is done by keeping all past observations in
 both {\em external} and {\em internal} state variables as well as the
 existing {\em internal} goals (\texttt{Own(Milk)} in this example)
-received by this reactor. The resulting partial plan is shown in
-Fig. \ref{fig:shop:relax2}. In this process the reactor informs the
-agent that all {\em external} goals it requested for the future are no
-longer valid which results in turn, in timeline owners not having to
-maintain such goals.
+received by the reactor. The resulting partial plan is shown in Fig.
+\ref{fig:shop:relax2}. In this process the reactor informs the agent
+that all {\em external} goals it requested for the future are no
+longer valid, allowing timeline owners to divest maintaining such
+goals.
 
 \begin{figure}[!htbp]
   \centering
@@ -1123,52 +1117,52 @@ maintain such goals.
     and the resulting relaxed plan for recovery.}
 \end{figure}
 
-As the plan is no longer conflicted, synchronization can resume and
-find a solution described above. Newly pending goals would be enforced
-at the next \texttt{step} to resume deliberation on this relaxed
-partial plan. By using synchronization the reactor was not only able
-to identify that its plan was not consistent but able to recover from
+When the plan is no longer conflicted, synchronization can resume and
+find a solution as described above. Newly pending goals would be
+enforced at the next \texttt{step} to resume deliberation on this
+relaxed partial plan. By using synchronization the reactor is not only
+able to identify that the plan is consistent but able to recover from
 it by offering a new incomplete partial plan to be resolved in the
 next deliberation \texttt{steps}. % This on its own offer the core
 % functionality one should except to close the loop between planning and
 % execution in the sense that 
-Synchronization plays the role of what is typically termed as the {\em
-  Executive} in other architectures \cite{gat98, alami:1998p820,
-  mus98, williams03, Nesnas:2003do}.
+Synchronization therefore, plays the role of what is typically termed
+as the {\em Executive} in other architectures \cite{gat98,
+  alami:1998p820, mus98, williams03, Nesnas:2003do}.
 
 In \rx however the interaction between planning and execution does not
 stop at this level. The overall scheduling of both {\em
   synchronization} and {\em planning} is such that the synchronization
 can occur in between any planning step. Not only is synchronization
-influenced by the outcome, but it also influences
-planning. Specifically when synchronization occurs before a complete
-plan is found, it will inject new facts ({\em external} observations
-and resulting {\em internal} state) in the plan database available for
+influenced by the outcome, but it also influences planning.
+Specifically when synchronization occurs before a complete plan is
+found, it will inject new facts ({\em external} observations and
+resulting {\em internal} state) in the plan database available for
 inference when the next planning \texttt{step} resumes. On this next
 step the \eu solver used for planning will have these new facts
 included in the partial plan which can introduce new flaws in the plan
-while potetnially having reolved previously exisiting flaw. The
-deliberation process is therefore perturbed externally by the {\em
+while potentially having resolved previously existing flaws. The
+deliberation process is therefore perturbed externally by {\em
   synchronization} and consequently fully informed of the world state
-evolution as it is planning.  This specific aspect contrasts with
-other more classical approaches we have seen, which avoid 
-perturbing the planner during its search as it is not compatible 
-with the ``off-line planning'' assumption.
+evolution as it is planning. This contrasts with other classical
+approaches, which avoid perturbing the planner during its search as it
+is not compatible with the ``off-line planning'' assumption, noted in
+Section \ref{sec:arch:europa}.
 
-By our design choices -- both at the architecture level and the
-integration of the \eu framework for embedded deliberation -- we are
-able to implement an architecture that avoids this critical off-line
-planning limitation while remaining within a formal framework that
-allows for deliberation and model-based agent control. We believe that
-this tight integration of planning and execution allows the system to
-be more acute vis-a-vis the environment allowing informed
-decision-making and a tighter reaction loop. This is possible while
-integrating information despite a long latency for the reactors, as
-long as one can ensure that synchronization of all reactors and
-deliberation steps can be done within a time that is resonably small
-in comparison to the agent tick duration.
+By design choices made in the \rx framework -- both at the
+architectural level and the integration of the \eu framework for
+embedded deliberation -- we are able to implement a system that avoids
+this critical off-line planning limitation while enforcing a formal
+framework that allows for deliberation and model-based agent control.
+This tight integration of planning and execution allows the system to
+be more responsive to environmental change allowing informed
+decision-making within a tighter reaction loop and despite reactor
+latency.
 
 
+% As long as one can ensure that synchronization of all
+% reactors and deliberation steps can be done within a time that is
+% resonably small in comparison to the agent tick duration.
 
 
 
