@@ -545,8 +545,7 @@ the plan helps relax this assumption. It does so by integrating
 planning in the reactor execution cycle even while allowing for more
 informed deliberation.
 
-\subsubsection{Synchronization and Identifying Internal State
-  Evolution}
+\subsubsection{Synchronization and Identifying Internal State}
 \label{sec:arch:synch}
 
 We first show how a reactor can track and identify its state in the
@@ -848,24 +847,21 @@ previous deliberation steps.
 \label{sec:arch:plan}
 
 Deliberation inside a reactor is based on \eu capabilities described
-in Section \ref{sec:europa:arch}. However deliberation within \rx
-comes with some augmentation -- deliberation information one reactor
-provide to the architecture such as its deliberation latency and its
-plan look-ahead both expressed in ticks -- and the fact that we
-potentially need to interleave deliberation with not just the
-synchronization process but also with deliberation of other
-reactors\footnote{The current implementation of \rx is running on a
-  single process and it is the responsibility of the agent itself to
-  emulate reactor multi-threading for deliberation and
-  synchronization.}. For this reason while the overall planning of a
-deliberative reactor strictly relies on the \eu framework planning
-solver, it slices the execution of Algorithm \ref{alg:europa:solve} in
-atomic steps. The interruption is done around the recursive call (line
-\ref{li:recurse}) while ensuring that the current partial plan is
-never proven inconsistant at any single step. This can be managed by
-allowing the call to backtrack until a \textsf{DecisionPoInt} that is
-not exhausted (\ie $decision.hasNext()$ is \texttt{true}) is found in
-the call stack.
+in Section \ref{sec:europa:arch}. However this deliberation comes with
+some augmentation namely the reactor's deliberation latency and its
+plan look-ahead both expressed in ticks and that the agent needs to
+interleave deliberation with not just the synchronization but also
+with deliberation of other reactors\footnote{The current
+  implementation of \rx is running on a single process and it is the
+  responsibility of the agent itself to emulate reactor
+  multi-threading for deliberation and synchronization.}.  For this
+reason while the reactor relies on the \eu solver, it slices the
+execution of Algorithm \ref{alg:europa:solve} into atomic steps. This
+interruption occurs around the recursive call line \ref{li:recurse}
+while ensuring that the current partial plan is not inconsistant at
+any single step. This is managed by allowing the call to backtrack
+until a \textsf{DecisionPoInt} that is not exhausted (\ie
+$decision.hasNext()$ is \texttt{true}) is found in the call stack.
 
 A critical aspect of this deliberation step is to ensure that at the
 exit of this call the $plan$ is not inconsistent. % Indeed, it is always
@@ -876,74 +872,71 @@ If the partial plan is found to be inconsistent during a deliberation
 step we either backtrack in the decision stack until a node of the
 tree is found with an alternate solution or the plan is relaxed since
 there is no other alternative solution. We do this by removing all
-goals and keeping only recent observations. % These constraints are yet
-% again related to the fact that for the agent the only crucial
-% functionality of a reactor is to resolve successfully its
-% synchronization.
+goals while keeping only recent observations. 
 
+{\em Synchronization} and the dispatching of new {\em goals} from \rx
+can occur between two steps and alter the plan. These alterations
+exogenous to the deliberation process dynamically impact the set of
+flaws that need to be resolved. New flaws are created when a new goal
+is received from \rx and conversely the recall of an objective could
+remove the corresponding flaws\footnote{However if the flaws related
+  to this goal were resolved, the removal of this goal may likely
+  create new flaws.}. The impact of {\em synchronization} can be more
+subtle as its alteration of the plan at the execution frontier is more
+drastic. We can still give a non exhaustive list of possible
+alterations of the flaws directly related to {\em synchronization}:
 
-{\em Synchronization} and the dispatching of new {\em goals} from
-\rx can occur between two steps and alter the plan. These alterations
-exogenous to the deliberation process are dynamically impacting the set
-of flaws that need to be resolved. Obviously new flaws are created
-when a new goal is received from \rx and conversely often the recall
-of an objective will remove the corresponding flaws\footnote{although
-  if the flaws of this goal were previously resolved, the removal of
-  this goal may create new flaws}. The impact of {\em synchronization}
-can be more subtle as its alteration of the plan at the execution
-frontier is much more drastic. We can still give a non exhaustive list
-of possible alterations of the flaws directly related to {\em
-  synchronization}:
 \begin{enumerate}
+
 \item Previous flaws directly related to the execution frontier have
   been resolved by the {\em synchronization} solver.
+
 \item The {\em synchronization} solver may have created new flaws that
-  were outside of its scope but are now part of the {\em deliberation}
-  solver scope.
-\item Last observations proved the current plan to be invalid
+  were outside of its scope but are now part of the scope of the {\em
+    deliberation} solver.
+
+\item The last observation has proved that the current plan is invalid
   requiring the {\em synchronization} solver to relax the existing
-  plan in order to identify its current {\em external} state. (This
-  case is developed further on the next section)
+  plan to identify its current {\em external} state. (This case is
+  developed further on the next section).
+
 \end{enumerate}
-Finally as {\em synchronization} occurs when the {\em
-  execution frontier} advances, it implies that the reactor planning
-scope is further in the future. This need to be reflected by the {\em
-  deliberation} solver which need a new deliberation scope one tick
-further in the future.
 
 \begin{figure}[!htbp]
   \centering
   \includegraphics[width=0.65\columnwidth]{figs/plan_window}
-  \caption{\small The planning window of the deliberation solver and its
-    relation with the {\em dispatch window}. The dark grey
-    tokens   with dashed borders are excluded from deliberation as they do not
+  \caption{\small The planning window of the deliberation solver and
+    its relation to the {\em dispatch window}. The dark grey tokens
+    with dashed borders are excluded from deliberation as they do not
     overlap the interval $[\tau, \tau+\lambda+\pi]$. All the other
-    tokens (in {\color{green} green}) -- along with the goals received from the
-    agent (in {\color{blue} blue}) which can overlap this window are
+    tokens ({\color{green} green}) along with the goals received from
+    the agent ({\color{blue} blue}) which can overlap this window, are
     evaluated.}
   \label{fig:plan:window}
 \end{figure}
 
-
-As Fig. \ref{fig:plan:window} illustrates,  such a
-scope allows filtering of tokens that are either necessarily ending
+When the {\em execution frontier} advances, the reactor planning scope
+moves further into the future. This is reflected by the {\em
+  deliberation} solver which uses a new deliberation scope one tick
+further in the future. As Fig. \ref{fig:plan:window} illustrates, such
+a scope allows filtering of tokens that are either necessarily ending
 before $\tau$ or necessarily starting after, focusing the planning
-problem on only those tokens that are within a ``reasonable''
-future. This filtering window complements the \rx {\em dispatch
-  window} from definition \ref{def:dispatch} which already filters
-out at the agent level the goals that are before the reactor execution
-latency or too far in the future. The planning window inside of the
-reactor refines further this filtering as tokens can be excluded
-dynamically from deliberation as their insertion in the plan and
-scheduling with other tokens generated can reduced their temporal
-scope outside of the planning scope. This helps the deliberation 
-solver reduce the number of tokens to be evaluated and therefore
-reduce deliberation cost and performance. As time advances flaws that
-were initially beyond this temporal horizon will become active which a
-reactor can evaluate. This results in an apparent \emph{continuous
-  planning} of the reactor. When there are no more flaws present in
-the current planning scope a partial plan solution is found. This has
-two effects:
+problem on only those tokens that are within a ``reasonable'' future.
+This filtering window complements the \rx {\em dispatch
+  window} from Definition \ref{def:dispatch} which filters out at the
+agent level those goals that are before the reactor execution latency
+or too far into the future. The planning window inside of a reactor
+refines this filtering further, as tokens can be excluded dynamically
+from deliberation as their insertion in the plan and scheduling with
+other tokens generated, can reduce their temporal scope outside of the
+planning scope \kcomment{ this last sentence should be reworked}. This
+helps the deliberation solver reduce the number of tokens to be
+evaluated reducing deliberation cost and increasing performance. As
+time advances, flaws that were initially beyond this temporal horizon
+will become active which a reactor can evaluate. This results in an
+apparent \emph{continuous planning} of the reactor. When there are no
+more flaws present in the current planning scope a partial plan
+solution is found. This has two effects:
 
 \begin{enumerate}
 
