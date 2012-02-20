@@ -31,22 +31,23 @@ plan representation. Section \ref{sec:arch} has details the
 \rx partitioned architecture and estimation driven vehicle
 adaptation.
 
-\paragraph {A brief note on \texttt{EUROPA} history and notation} A
-brief word about the history of planning paradigm and its
-implementation in this chapter. The earliest origin of what we will
-call \eu is from the \texttt{HSTS} planner \cite{mus94} which was used
-for a number of demonstrations for space telescopes as noted in
-Section \ref{sec:rabeyond}. \texttt{HSTS} was the
+\paragraph {A brief note on \texttt{EUROPA} history and notation} The
+earliest origin of what we will call \eu in this chapter, is from the
+\texttt{HSTS} planner \cite{mus94} which was used for a number of
+demonstrations for space telescopes as noted in Section
+\ref{sec:rabeyond}. \texttt{HSTS} was the
 \texttt{LISP}-based\footnote{This was the first (and only to our
   knowledge) software ever to been written in \texttt{LISP} to be
   flown in space.} planner that was flown as part of the Remote Agent
 \texttt{RAX} experiment. Concurrent to \texttt{RAX}, a C++ version of
-the planner was designed at NASA Ames which went on to be used for the
-\texttt{MAPGEN} system \cite{bresina05}. A vastly re-factored, higher
+the planner was implemented at NASA Ames which went on to be used for
+the \texttt{MAPGEN} \cite{bresina05} and continues to be used to date,
+in the mission-critical uplink process for the command/control of the
+Mars Exploration Rovers (MER) mission. A vastly re-factored, higher
 performance open source version \cite{europapso} was named \eu and is
 the subject of this chapter. Note however, in using the name \eu, we
 refer to the \emph{fundamental ideas as well as the planning paradigm}
-even if there is a specific implementation online.
+even if there exists a specific implementation.
 
 
 \subsection{The Basics}
@@ -450,3 +451,4 @@ approach \cite{ghallab04}, where a partial plan is evolved until all
 open goals are achieved, and all inconsistencies are removed, the
 specific search algorithm used by \eu will be covered in detail below.
 
+\input{constraints-table}
