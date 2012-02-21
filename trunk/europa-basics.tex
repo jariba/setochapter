@@ -217,17 +217,17 @@ If we define $N$x$N$ variables Q$_{rc}$, $r \in [1,N]$, $c \in [1,N]$,
 Q$_{rc} = 1$ if cell $r,c$ in the chessboard is occupied by a Queen, $0$
 otherwise. Then the following constraints need to be satisfied:
 
-\begin{equation}
- Sum(Q_{rc})= \left\{
-\begin{array}{l l}
-  1 & \forall r \quad \mbox{(only one Queen per row)}\\
-  1 & \forall c \quad \mbox{(only one Queen per column)}\\ 
-\end{array} \right.
-Sum(Q_{r+i,c+i}) = 1\\
-Sum(Q_{r-1,c+i}) = 1 \quad \mbox{(only one Queen on each diagonal)}\\
-\end {equation} 
+\begin{eqnarray*}
+ Sum(Q_{rc}) & = & \left\{
+   \begin{array}{l l}
+     1 & \forall r \quad \mbox{(only one Queen per row)}\\
+     1 & \forall c \quad \mbox{(only one Queen per column)}\\ 
+   \end{array} \right. \\
+Sum(Q_{r+i,c+i}) & = & 1\\
+Sum(Q_{r-i,c+i}) & = & 1 \qquad \mbox{(only one Queen on each diagonal)}\\
+\end{eqnarray*} 
 
-\comment{fix newline and numbering problem above}
+%\comment{fix newline and numbering problem above}
 
 The problem can be solved by finding assignments for all variables
 Q$_{rc}$ that satisfy the above constraints. Fig. \ref{fig:nqueens-2} is
@@ -450,3 +450,8 @@ approach \cite{ghallab04}, where a partial plan is evolved until all
 open goals are achieved, and all inconsistencies are removed, the
 specific search algorithm used by \eu will be covered in detail below.
 
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: "setobook"
+%%% End: 
