@@ -93,22 +93,24 @@ subscribe to {\em external} state variables owned by other reactors,
 for which it will receive new updates when the owner reactor generates
 its {\em internal} state.
 
-\begin{figure}[!htbp]
-  \centering
-  \includegraphics[scale=0.35]{figs/DAG-hierarchy}
-  \caption{\small An example of a \rx reactor hierarchy which is used
-    to determine a synchronization order for propagation of values in
-    \emph{external} state variables.}
-  \label{fig:reactor-DAG}
-\end{figure}
+% \begin{figure}[!htbp]
+%   \centering
+%   \includegraphics[scale=0.35]{figs/DAG-hierarchy}
+%   \caption{\small An example of a \rx reactor hierarchy which is used
+%     to determine a synchronization order for propagation of values in
+%     \emph{external} state variables.}
+%   \label{fig:reactor-DAG}
+% \end{figure}
+\fcomment{I removed this figure as the next one is mucjh more
+  detailed and vehiculate the same idea}
 
 As the execution frontier, $\tau$ advances, the \rx agent propagates
 the current state information across all reactor state variables
 through the {\em synchronization} process.  The sequencing of the
 reactors synchronization is identified by traversing a reactor
 dependency graph from the least dependent -- ones with no {\em
-  external} timelines -- to the most, \ie which typically do not have
-{\em internal} timelines. Fig. \ref{fig:reactor-DAG} shows an example
+  external} state variables -- to the most, \ie which typically do not have
+{\em internal} state variables. Fig. \ref{fig:agent} shows an example
 of such a dependency graph implemented as a directed acyclic graph.
 
 Conversely each reactor can request a future change on one of its {\em
