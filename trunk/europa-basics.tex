@@ -27,22 +27,17 @@ for AUV adaptation: the use of flexible plan representations,
 compositional control with the use of partitioned networks and a
 demonstrated capability at sea in novel ocean observation methods.
 
-% . In
-% this section we detail some of the key concepts relevant to flexible
-% plan representation. Section \ref{sec:arch} has details the \rx
-% partitioned architecture and estimation driven vehicle adaptation.
+The next few sections will cover \eu in a bottom-up fashion, going from the 
+generic theoretical frameworks that underlie \eu, to the specific representation, 
+modeling and algorithms implemented by it. First, a quick introduction to 
+Constraint Programming and Constraint-Based Planning is provided. 
+Next, the specific representation that \eu uses to perform Constraint-Based Planning is presented.
+After that comes an overview of \eu's architecture and how it can be embedded in a planning application
+such as \rx. Finally,  \eu's modeling, inference and search mechanisms are covered in 
+detail so that the reader can understand how \rx can perform deliberative planning and react to
+execution events by embedding and customizing \eu.
 
-
-% \begin{figure}
-% \centering
-% \includegraphics[scale=0.3]{figs/Allen-algebra.pdf}
-% \caption{\small Temporal relations defined within the planner are
-%   based on \texttt{Allen Algebra} relations shown above.}
-% \label{fig:allen-algebra}
-% \vskip-0.3cm
-% \end{figure}
-
-\subsection{Fundamentals of  Automated Planning}
+\subsection{Automated Planning and \eu}
 \label{sec:planningfound}
 
 {\scriptsize
@@ -64,8 +59,6 @@ Traverso \cite{ghallab04}
 \vskip+0.1cm
 \end{figure}
 
-% Planning, for our purposes, can be thought of as determining all the
-% small tasks that must be carried out in order to accomplish a goal.
 To articulate the fundamentals of automated planning briefly and use
 that to motivate the mechanisms we use in our specific form of the
 technique we start with a simple example.
@@ -120,14 +113,12 @@ otherwise. Then the following constraints need to be satisfied:
      1 & \forall c \quad \mbox{(only one Queen per column)}\\ 
    \end{array} \right. \\
 Sum(Q_{r+i,c+i}) & = & 1\\
-Sum(Q_{r-i,c+i}) & = & 1 \qquad \mbox{(only one Queen on each diagonal)}\\
+Sum(Q_{r-i,c-i}) & = & 1 \qquad \mbox{(only one Queen on each diagonal)}\\
 \end{eqnarray*} 
-
-%\comment{fix newline and numbering problem above}
 
 The problem can be solved by finding assignments for all variables
 Q$_{rc}$ that satisfy the above constraints. Fig. \ref{fig:nqueens-2} is
-a solution found by \eu using that formulation and a specialized search
+a solution found by \eu using a compact version of that formulation and a specialized search
 procedure.
 
 \begin{figure}
@@ -191,7 +182,7 @@ constraint reasoning in \eu as its innermost building block.
 \label{sec:europa:cp}
 
 Constraint Satisfaction Programming (also known as Constraint
-Programming (\textsf{CP})) is a discipline that provides a generic framework
+Programming or \textsf{CP}) is a discipline that provides a generic framework
 for representing, solving and making logical inference on
 constraints. A complete treatment of this discipline is given in
 \cite{marriott98,apt03} and very concise introductions are provided in
@@ -220,15 +211,6 @@ two operations:
 
 \end{enumerate}
 
-\begin{figure}[!t]
-\centering
-\includegraphics[scale=0.35]{figs/constraint-net.pdf}
-\caption{\small Illustration of a constraint network as represented as
-a graph.}
-\label{fig:constraintnet}
-\end{figure}
-
-
 A set of constraints and variables that describe a problem domain are
 typically represented as a Constraint Network, where the variables are
 nodes and constraints are arcs between the variables. Having this
@@ -238,12 +220,19 @@ in $y$'s domain that is consistent with all the constraints that
 connect $x$ and $y$.  A naive approach to ensuring arc consistency
 consists of cycling through all the variable pairs and performing
 constraint propagation until there are no variable domain changes. The
-\texttt{AC-3} algorithm \cite{mackworth77}, a popular implementation,
-improves over the naive approach by ignoring constraints whose
-variables were not affected since the last
-iteration. Fig. \ref{fig:constraintnet} shows an example of a
-constraint network with three variables, their domains and the
-constraint relations between them.
+\texttt{AC-3} algorithm \cite{mackworth77}, a popular implementation, improves
+over the naive approach by ignoring constraints whose variables were
+not affected since the last iteration. Fig.  \ref{fig:constraintnet} shows a set of constraints on 3 variables
+($x$, $y$ and $z$) represented as a constraint network, and their domains before arc consistency is enforced.
+After the AC-3 algorithm is executed, the domains for the 3 variables
+would be pruned to x=$\{2$\}, y=$\{2$\}, z=$\{2$\}.
+
+\begin{figure}[!t]
+\centering
+\includegraphics[scale=0.35]{figs/constraint-net.pdf}
+\caption{\small Variables and Constraints represented as a Constraint Network}
+\label{fig:constraintnet}
+\end{figure}
 
 Arc Consistency and other, more stringent consistency definitions can
 be used to efficiently prove that a \textsf{CP} problem is
@@ -275,17 +264,6 @@ these formulations are powerful and have allowed researchers to
 develop numerous contributions in automated planning, there are many
 classes of problem domains that are difficult to represent using this
 formalism. In particular, it is hard to represent time, resources,
-% mutual exclusion and concurrency using propositions
-% \cite{ghallab04}. While CSP representations have traditionally had an
-% edge in formulating and representing planning problems,
-% % It is straightforward to represent and reason about all of
-% % those elements using a CSP representation, as a result there has been
-% % some work on doing automated planning while taking advantage of CSP
-% % (TODO: ref). Traditionally, the entire planning problem is translated
-% % into a CSP and then solved using traditional CSP methods, this
-% leading to a formulation where action choices and relationships are
-% represented as variables and/or constraints, there are at least two
-% major drawbacks:
 mutual exclusion and concurrency using propositions \cite{ghallab04}.
 Constraint Programming is a framework that lends itself very well to
 represent and reason about all of those elements \cite{ghallab94},
@@ -314,13 +292,13 @@ of significant drawbacks:
   represent action choice and relationships between actions), it is
   still hard to write search algorithms as any planning-specific
   insight has to be translated into the CSP representation of
-  variables and constraints \comment{For example?}
-
+  variables and constraints.
+  
 \end{enumerate}
 
 These drawbacks have been addressed by a small number of planning
 frameworks like \texttt{Descartes} \cite{joslin95,joslin96},
-\texttt{IxTet} \cite{ghallab87,lemai04}, and CAIP (Constraint-Based
+\texttt{IxTet} \cite{ghallab87,lemai04}, and \texttt{CAIP} (Constraint-Based
 Interval and Attribute Planning)\cite{mus94,frank2003}.  These
 frameworks take advantage of a CSP representation to deal with time
 and resources, at the same time maintaining an explicit representation
@@ -329,7 +307,7 @@ relationships, etc). This combination results in a planning approach
 that can deal with the type of constraints found in real-life
 problems, while allowing for intuitive problem descriptions and a
 natural way to express search algorithms and heuristics. \eu is an
-implementation of the CAIP framework. In CAIP, planning problems are
+implementation of the \texttt{CAIP} framework. In \texttt{CAIP}, planning problems are
 specified in terms of:
 
 \begin{enumerate}
@@ -351,9 +329,9 @@ specified in terms of:
   product is available.
 \end{enumerate}
 
-To generate plans, the CAIP framework uses a plan-space search
+To generate plans, the \texttt{CAIP} framework uses a plan-space search
 approach \cite{ghallab04}, where a partial plan is evolved until all
-open goals are achieved, and all inconsistencies are removed, the
+open goals are achieved, and all inconsistencies are removed. The
 specific search algorithm used by \eu will be covered in detail below.
 
 
