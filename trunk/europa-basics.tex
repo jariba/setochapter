@@ -31,8 +31,8 @@ plan representation. Section \ref{sec:arch} has details the
 \rx partitioned architecture and estimation driven vehicle
 adaptation.
 
-\paragraph {A brief note on \texttt{EUROPA} history and notation} The
-earliest origin of what we will call \eu in this chapter, is from the
+\paragraph {A brief note on \eu history and notation} The earliest
+origin of what we will call \eu in this chapter, is from the
 \texttt{HSTS} planner \cite{mus94} which was used for a number of
 demonstrations for space telescopes as noted in Section
 \ref{sec:rabeyond}. \texttt{HSTS} was the
@@ -44,7 +44,7 @@ the planner was implemented at NASA Ames which went on to be used for
 the \texttt{MAPGEN} \cite{bresina05} and continues to be used to date,
 in the mission-critical uplink process for the command/control of the
 Mars Exploration Rovers (MER) mission. A vastly re-factored, higher
-performance open source version \cite{europapso} was named \eu and is
+performance open source version \cite{europapso} was named \eut and is
 the subject of this chapter. Note however, in using the name \eu, we
 refer to the \emph{fundamental ideas as well as the planning paradigm}
 even if there exists a specific implementation.
@@ -174,19 +174,18 @@ To articulate the fundamentals of automated planning briefly and use
 that to motivate the mechanisms we use in our specific form of the
 technique we start with a simple example.
 
-\begin{quotation}
-
-  In the near future, a personal robot sets out to buy a gallon of milk
-  This involves a number of tasks: obtain keys, obtain wallet,
-  start car, drive to store, find and obtain milk, purchase milk, etc.
-  The embedded planner has to have a ``model'' of the world in which it
-  lives and has to use the task primitives in this model to structure
-  the actions so it achieves its goal. Constraints control when certain
-  tasks can or cannot occur. For example the robot must obtain the keys
-  and wallet \emph{before} driving to the store and pick up the milk
-  \emph{before} purchasing it.
-
-\end{quotation}
+{\small
+  \begin{quote}
+    In the near future, a personal robot sets out to buy a gallon of
+    milk This involves a number of tasks: obtain keys, obtain wallet,
+    start car, drive to store, find and obtain milk, purchase milk,
+    etc.  The embedded planner has to have a ``model'' of the world in
+    which it lives and has to use the task primitives in this model to
+    structure the actions so it achieves its goal. Constraints control
+    when certain tasks can or cannot occur. For example the robot must
+    obtain the keys and wallet \emph{before} driving to the store and
+    pick up the milk \emph{before} purchasing it.
+\end{quote}
 
 For such a robot the milk buying plan at the store might look like
 that shown in Fig. \ref{fig:shop:shopping}.
