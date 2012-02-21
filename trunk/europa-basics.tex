@@ -11,131 +11,27 @@ oceanographic features which are dynamic and unpredictable
 spatio-temporally. Typically this requires our AUVs to balance the
 goals of coverage spatially while opportunistically following features
 of scientific interest and to do so while being operationally aware of
-its own limitations in terms of resources (typically the battery state
-of charge) and overall proximity to other observational assets for
-obtaining scientific ground-truth. We are therefore interested in
+its own limitations in terms of resources (\eg the battery state of
+charge) and overall proximity to other observational assets for
+obtaining scientific ground-truth. We are interested in
 representational frameworks that allow robots to pursue long-term
 objectives while choosing short-term gain and can gracefully deal with
 exogenous or endogenous change.
 
 To enable this responsiveness to external observations, the agent has
-to be able to synthesize plans insitu and to re-plan. We use a
+to be able to synthesize plans insitu and to re-plan. We use the
 temporal constraint-based planner \eu with a demonstrated legacy of
-having flown on NASA space missions \cite{jonsson00,bresina05,
+having flown on NASA space missions \cite{mus98,jonsson00,bresina05,
   barreiro09}. Our autonomy architecture brings three key innovations
 for AUV adaptation: the use of flexible plan representations,
-compositional control with the use of partitioned networks and
-off-line learning to inform insitu environmental state estimation. In
-this section we detail some of the key concepts relevant to flexible
-plan representation. Section \ref{sec:arch} has details the
-\rx partitioned architecture and estimation driven vehicle
-adaptation.
+compositional control with the use of partitioned networks and a
+demonstrated capability at sea in novel ocean observation methods.
 
-\paragraph {A brief note on \eu history and notation} The earliest
-origin of what we will call \eu in this chapter, is from the
-\texttt{HSTS} planner \cite{mus94} which was used for a number of
-demonstrations for space telescopes as noted in Section
-\ref{sec:rabeyond}. \texttt{HSTS} was the
-\texttt{LISP}-based\footnote{This was the first (and only to our
-  knowledge) software ever to been written in \texttt{LISP} to be
-  flown in space.} planner that was flown as part of the Remote Agent
-\texttt{RAX} experiment. Concurrent to \texttt{RAX}, a C++ version of
-the planner was implemented at NASA Ames which went on to be used for
-the \texttt{MAPGEN} \cite{bresina05} and continues to be used to date,
-in the mission-critical uplink process for the command/control of the
-Mars Exploration Rovers (MER) mission. A vastly re-factored, higher
-performance open source version \cite{europapso} was named \eut and is
-the subject of this chapter. Note however, in using the name \eu, we
-refer to the \emph{fundamental ideas as well as the planning paradigm}
-even if there exists a specific implementation.
+% . In
+% this section we detail some of the key concepts relevant to flexible
+% plan representation. Section \ref{sec:arch} has details the \rx
+% partitioned architecture and estimation driven vehicle adaptation.
 
-
-\subsection{The Basics}
-\label{sec:basics}
-
-\eu uses a \emph{domain model} written in a declarative language
-(NDDL: New Domain Description Language), together with initial
-conditions and goals also specified in NDDL, to construct a set of
-temporal relations that must be true at the start time. These models
-include assertions about the physics of the vehicle, i.e how it
-responds to external stimulus and internally driven goals. By
-propagating these relations forward using Simple Temporal Networks
-\cite{dechter91} and applying goal constraints, \eu can select a set
-of conditions that should be true in the future, where some of these
-conditions will correspond to actions the agent must take. The planner
-can backtrack and try another path during search if a goal cannot be
-reached while being capable of discarding unachievable goals.
-
-Traditionally robot execution has relied on dispatching commands at
-precise times. Such linear sequences of precisely timed commands give
-no ability to adjust execution on the basis of sensory
-information. Although some commands can issue tests on sensor
-readings, these tests have the objective of verifying whether expected
-execution conditions are occuring. If not, the state of the system is
-declared off-nominal and execution of the sequence of commands is
-interrupted. More recently, executives have been proposed and
-implemented that significantly broaden the way robots can be commanded
-\cite{mus98,alami:1998p820}. For example, the Remote Agent executive
-interpreted a \textit{temporally flexible plan} which represents each
-start time as a variable and contains an explicit network of bounded
-delay constraints between such variables.
-
-\begin{figure}[!t]
-\centering
-\includegraphics[scale=0.35]{figs/flexible-timelines.pdf}
-\caption{\small Tokens with flexible temporal intervals and parametric
-  constraints between tokens. This example shows the triggering of a
-  water sampler based on a feature threshold while the vehicle
-  Yo-Yo's. The \texttt{Waypoint\_Yo-Yo} token has a flexible duration,
-  start \& end times.}
-\label{fig:flex-timelines}
-\vskip+0.1cm
-\end{figure}
-
-Unlike a traditional fixed time-tagged command sequences, such
-flexible plans leave room for adaptation at execution time. When the
-executive considers when to start a task, it propagates information
-through the constraint network, computes a time bound for the
-variable, selects an actual execution time within the bound, and
-starts the task at that time. Temporally flexible plans therefore,
-express a \textit{range of possible outcomes} of the robots
-interaction with the environment within which the executive can elect
-at run time the most appropriate one for the actual execution
-conditions. The fact that constraints are explicitly represented
-ensures that through constraint propagation the executive will respect
-global limits expressed in the plan (e.g., don't start a task until a
-certain condition has been satisfied but still satisfying some global
-deadline). Such flexibility is critical when dealing with dynamic
-ocean conditions where precise timing of a robotic action might be
-indeterminate. Further, the advantage of flexibility can be contrasted
-with the consequences of the intrinsic inflexibiliy of traditional
-command sequences. Because they are inflexible, sequences must
-necessarily be designed considering worst case scenarios.
-
-\eu uses a \emph{state variable} representation to describe the
-evolution of state over time. The instantiated history of such state
-variable evolution over a temporal horizon we call \emph{timelines}
-and which represent a single thread in the execution of a concurrent
-system. At any given time each thread can execute a single procedure.
-Thus each timeline consists of a sequence of procedures which
-encapsulate and describe state evolution; we call these instantiated
-atomic entities \emph{tokens}.  A token therefore describes a
-procedure invocation, the state variables on which it can occur, the
-parameter values of the procedure, and the time values defining the
-interval. We allow encapsulation of uncertainty within these tokens
-with a range of start and end times and parameters, all of which are
-encoded as variables. A constraint solver in turn manipulates these
-variables defined in a \eu domain model. For example, consider
-a scientific need to take a water samples 100 meters from a hotspot
-while an AUV is performing a Yo-Yo in the water-column. Two samples
-are needed if the feature's signal is above a threshold; one
-otherwise. The token that is capturing the sensory threshold has a
-parametric constraints to the token which fires the requisite water
-sampler. In addition, the start time of the water sampling procedure
-is highly dependant on the variability of sub-sea currents and actual
-speed of the vehicle. Therefore a number of values are possible for
-the start times and duration of the sampling all of which are valid
-combinations for desired outcomes.
 
 % \begin{figure}
 % \centering
@@ -146,8 +42,8 @@ combinations for desired outcomes.
 % \vskip-0.3cm
 % \end{figure}
 
-\section{Fundamentals of  Automated Planning}
-\label{sec:europa}
+\subsection{Fundamentals of  Automated Planning}
+\label{sec:planningfound}
 
 {\scriptsize
   \begin{quote}
@@ -324,6 +220,15 @@ two operations:
 
 \end{enumerate}
 
+\begin{figure}[!t]
+\centering
+\includegraphics[scale=0.35]{figs/constraint-net.pdf}
+\caption{\small Illustration of a constraint network as represented as
+a graph.}
+\label{fig:constraintnet}
+\end{figure}
+
+
 A set of constraints and variables that describe a problem domain are
 typically represented as a Constraint Network, where the variables are
 nodes and constraints are arcs between the variables. Having this
@@ -333,11 +238,12 @@ in $y$'s domain that is consistent with all the constraints that
 connect $x$ and $y$.  A naive approach to ensuring arc consistency
 consists of cycling through all the variable pairs and performing
 constraint propagation until there are no variable domain changes. The
-AC-3 algorithm \cite{mackworth77}, a popular implementation, improves
-over the naive approach by ignoring constraints whose variables were
-not affected since the last iteration. \comment{A figure of a
-  constraint network preferably of the shopping example would be
-  useful here. JB to generate a napkin fig}
+\texttt{AC-3} algorithm \cite{mackworth77}, a popular implementation,
+improves over the naive approach by ignoring constraints whose
+variables were not affected since the last
+iteration. Fig. \ref{fig:constraintnet} shows an example of a
+constraint network with three variables, their domains and the
+constraint relations between them.
 
 Arc Consistency and other, more stringent consistency definitions can
 be used to efficiently prove that a \textsf{CP} problem is
