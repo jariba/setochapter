@@ -767,31 +767,57 @@ column 1 is placed on row 3.  non-attack constraints are posted as
 arithmetic constraints among the Vi variables to ensure that all the
 rows and diagonals contain only one queen.
 
-\begin{verbatim}
-    public void solve(ConstraintEngine ce, int maxIter)
-    {
-    	curIter=0;
-    	
-    	while ((ce.getViolations() > 0) && (curIter < maxIter)) {
-	    Variable queenToMove = getQueenWithMaxViolation(ce);
-    	     int curPos = queenToMove.getCurrentValue();
-    	    
-            SortedSet<int> moves = getMoves(ce,queenToMove,curPos);             
-  	   boolean moved = false;
-            for (int newPos : moves) {
-            	moved = tryMove(queenToMove,curPos,newPos);
-            	if (moved)
-            	    break;
-            }
-            
-            if (!moved) 
-            	forceMove(queenToMove,curPos,moves.first());
-            
-            checkSolution(); // See if we have a new best solution            
-            curIteration_++;
-    	}
+\begin{algorithm}[H]
+  \KwIn{ConstraintEngine $ce$}
+  \KwIn{int $maxIter$}
+  \Begin{
+    $curIter \leftarrow 0$ \;
+    \While{$\left( ce.getViolations() > 0 \right) ~ \& ~ \left( curIter <
+        maxIter \right)$ }{
+      Variable $queenToMove \leftarrow getQueenWithMaxViolation(ce)$
+      \;
+      SortedSet$<$int$> moves \leftarrow getMoves(ce, queenToMove,
+      curPos)$ \;
+      bool $moved \leftarrow $ \texttt{false} \;
+      \ForEach{int $newPos$ of $moves$}{
+        $moved \leftarrow tryMove(queenToMove, curPos, newPos)$\;
+        \lIf{$moved$}{ \textbf{break} \; }
+      }
+      \lIf{$! moved$}{
+        $forceMove(queenToMove, curPos, moves.first())$ \;
+      }
+      $checkSolution()$ \tcp*{See if we have a new best solution}
+      $curIter++$ \;
     }
-\end{verbatim}
+  }
+  \caption{$solveNQueens(ce, maxIter)$}
+\end{algorithm}
+
+% \begin{verbatim}
+%     public void solve(ConstraintEngine ce, int maxIter)
+%     {
+%     	curIter=0;
+    	
+%     	while ((ce.getViolations() > 0) && (curIter < maxIter)) {
+% 	    Variable queenToMove = getQueenWithMaxViolation(ce);
+%     	     int curPos = queenToMove.getCurrentValue();
+    	    
+%             SortedSet<int> moves = getMoves(ce,queenToMove,curPos);             
+%   	   boolean moved = false;
+%             for (int newPos : moves) {
+%             	moved = tryMove(queenToMove,curPos,newPos);
+%             	if (moved)
+%             	    break;
+%             }
+            
+%             if (!moved) 
+%             	forceMove(queenToMove,curPos,moves.first());
+            
+%             checkSolution(); // See if we have a new best solution            
+%             curIteration_++;
+%     	}
+%     }
+% \end{verbatim}
 
 
 \eus Constraint Reasoning Engine can be used to compute the non-attack
