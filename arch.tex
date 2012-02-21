@@ -1,24 +1,6 @@
 \section{Planning and execution in the \rx architecture}
 \label{sec:arch}
 
-% {\em\tiny This section introduces shortly T-REX architecture but move
-%   quickly the focus on a single reactor and gross concepts on the
-%   architecture:
-%   \begin{itemize}
-%   \item For t-trex the whole decision and control problem is reduced
-%     around the state variables (or timeline construct). 
-%   \item This reduce the execution tracking problem for each reactor on a state
-%     identification problem (deduce internal state from the external
-%     state), and the control problem to goal posting which will trigger
-%     deliberation on the owner of the corresponding timeline. 
-%   \item the architecture itself see each reactor as a black box and
-%     therefore each reactor can implement its own mechanism in order to
-%     resolve both synchronization and deliberation. Still we provide a
-%     reactor based on the europa framework that leverage the automated
-%     planning capabilities in order to do model based planning and
-%     execution with a rich representation of resources and time.
-%   \end{itemize}}
-
 \subsection{Introductory concepts}
 \label{sec:arch:intro}
 
@@ -182,9 +164,7 @@ reactor. For simplicity we abstract it out as being equivalent to the
 reactor latency implying that we assume that all {\em external}
 timelines of this reactor have $\lambda_{exec} = 0$. At the \rx agent
 level this execution latency is used to define the {\em dispatch
-  window} of the same state variable.% : \comment{Needed to say that
-  % early on but the flow of this paragraph is not very tight}
-%\kcomment{Looks fine to me unless you want to clarify further.}
+  window} of the same state variable.
 
 \begin{definition}
   \label{def:dispatch}
@@ -220,12 +200,9 @@ evaluated carefully by the system designer balancing agent efficacy.
 Requests from a reactor can be {\em recalled} when it is determined
 that they are not part of its projected plan anymore. For example if a
 reactor needs to replan due to an unexpected event, it will recall all
-requests it produced that have not been executed yet.
-% \kcomment{replace
-%   ``observed'' with ``not incorporated by the owner reactor''?}
-% yet
- This recall is sent to the reactor that received the goal(s) to
-remove it/them from its current set of objectives.
+requests produced that have yet to be executed.  This recall is also
+sent to the reactor(s) that received the goal(s) to remove it/them
+from its current set of objectives.
 
 % Taking cues from the IDEA 
 % architecture \cite{mus02}, we designed a core framework that provides a
@@ -360,32 +337,26 @@ that conceptualize execution:
   the reactor's look-ahead. The part of the plan that covers the
   reactor's {\em external} timelines is provided to be dispatched as a
   goal.
-% to whichever reactor that is responsible for these. % \comment{By
-    % extending I may have saud things I developed below ... will have
-    % to check}
 
 \end{itemize}
 
-Both these 
-% deliberative \kcomment{``deliberative??''; something else
-%   or remove altogether perhaps?} 
-functions have different scope and temporal constraints. 
-The \texttt{synchronize} call is considered as atomic and will 
-focus only on state inference for the current tick by
-identifying the current value of {\em internal} state variables from
-the latest updates on {\em external} state variables. This process
-propagates up in the reactor dependency graph at every tick to ensure
-that all reactors are aware of the current state of the
-world. \texttt{step} relates to a single decision step of the planning
-process focused on the future evolution of state variables; it can
-take multiple steps spanning multiple ticks for a reactor to produce a
-plan that is both complete and valid. How the reactor identifies that
-its plan is complete and valid is its responsibility and depends on
-the way each reactor resolves its plan at each {\em step}. The general
-idea is that the reactor is able to find a valid strategy in order to
-satisfy as many of its {\em internal} goals as possible. For \eu, this
-means that the solver is unable to identify any further flaws to be
-resolved in the plan.
+Both these functions have different scope and temporal constraints.
+The \texttt{synchronize} call is considered as atomic and will focus
+only on state inference for the current tick by identifying the
+current value of {\em internal} state variables from the latest
+updates on {\em external} state variables. This process propagates up
+in the reactor dependency graph at every tick to ensure that all
+reactors are aware of the current state of the world. \texttt{step}
+relates to a single decision step of the planning process focused on
+the future evolution of state variables; it can take multiple steps
+spanning multiple ticks for a reactor to produce a plan that is both
+complete and valid. How the reactor identifies that its plan is
+complete and valid is its responsibility and depends on the way each
+reactor resolves its plan at each {\em step}. The general idea is that
+the reactor is able to find a valid strategy in order to satisfy as
+many of its {\em internal} goals as possible. For \eu, this means that
+the solver is unable to identify any further flaws to be resolved in
+the plan.
 
 When such plan is identified, its {\em external} timeline(s) are then
 dispatched to the corresponding reactors which own these times and
@@ -465,23 +436,17 @@ stops, its starting point is the last partial plan resulting from
 deliberation. This gives an initial frame to the problem that helps to
 target the synchronization problem by ensuring that the new {\em
   external} state updates are compatible with this plan. If so,
-synchronization propagates these events in the plan and can uses it as
-an aid in resolving its {\em current state flaw} by using the plan
-information on the exepected {\em internal} state evolution nearby the
-execution frontier. 
-% \kcomment{``use it
-%   as an aid to identify'' what though?}
-
+synchronization propagates these events in the plan and can use it as
+an aid in resolving its {\em current state flaw}. It does so by using
+the plan information on the exepected {\em internal} state evolution
+near the execution frontier.
 
 If they are not compatible, then {\em synchronization} identifies a
 plan inconsistency. This results in the retraction of decisions made
-during previous {\em deliberation} steps. % in order to
-% allow {\em synchronization} to identify its {\em internal} state.
-Such a relaxation can be viewed as a backtracking % on the plan search
-% triggered exogenously by the world evolution. It is the way our
-allowing the reactor to identify that its current plan has failed to
-execute triggering further deliberations steps to find an alternate
-strategy.
+during previous {\em deliberation} steps.  Such a relaxation can be
+viewed as a backtracking allowing the reactor to identify that its
+current plan has failed to execute triggering further deliberations
+steps to find an alternate strategy.
 
 Finally, when the deliberation process has identified a complete
 solution for its current {\em internal} goals, a part of its plan that
@@ -592,12 +557,9 @@ state value of the \texttt{Agent} timeline; the robot can either {\em
 just simply not buy any product at this location.
 
 In \texttt{T-REX}'s \eu reactor this decision-making requirement is a
-new type of flaw which requires to identify the value of all the {\em
-  internal} state variables for the current tick.
-% forces identification \kcomment{identification
-%   of what? Probably need a little more explanation here.} of internal
-% state of the reactor for the current tick. 
-This flaw can be defined as:
+new type of flaw which requires identification of all values of {\em
+  internal} state variables for the current tick. This flaw can be
+defined as:
 
 \begin{definition}
   \label{def:csf}
@@ -619,13 +581,13 @@ This flaw can be defined as:
   \includegraphics[width=0.5\columnwidth]{figs/synch-relation}
   \caption{\small Illustration of synchronization flaws in a
     reactor. The reactor receives new observations when they are
-    produced by the owner(s) of its internal timelines. The line
-    \kcomment{what line???} after the last token of each timeline
-    represent the domain of possible values for the end of this
-    token. At every tick $\tau$ the reactor needs to integrate the
-    {\em External} state information it received and -- based on its
-    model $\mathcal{M}$ -- resolve its {\em Internal} state that will
-    then be provided by the agent to other reactors using these state
+    produced by the owner(s) of its internal timelines. The open
+    ``holes'' after the last token of each timeline represents the
+    domain of all possible values for the end of this token. At every
+    tick $\tau$ the reactor needs to integrate the {\em External}
+    state information it received and -- based on its model
+    $\mathcal{M}$ -- resolve its {\em Internal} state that will then
+    be provided by the agent to other reactors using these state
     variables.}
   \label{fig:synch:flaw}
 \end{figure}
@@ -809,14 +771,13 @@ of relaxation will therefore allow the agent to use multiple
 \texttt{Going} tokens should the first one fail to reach the
 objective.  
 
-As the simple example above shows, synchronization involves a
-deliberation process with the risk that the search for a solution is
-not a straightforward sequence of staright-forward decisions where 
-the resolution can be easily identified by the solver as any other
-option would leafd immediately to an inonsistency in the plan.
-% \kcomment{has a unit decision been explained in Europa?}. 
-Since such a process is required by the architecture at \emph{every}
-tick for \emph{every} reactor the model needs to be designed carefully.
+As the example above shows, synchronization involves a deliberation
+process. The risk is such that the search for a solution is not a
+simple sequence of decisions where the resolution can be easily
+identified by the solver as any other option would lead immediately to
+n plan inconsistency. Since such a process is required by the \rx at
+\emph{every} tick for \emph{every} reactor the model needs to be
+designed carefully.
 
 One critical aspect to take into account is that from a \rx point of
 view, synchronization is the only critical task of a reactor. Such a
@@ -934,31 +895,21 @@ further in the future. As Fig. \ref{fig:plan:window} illustrates, such
 a scope allows filtering of tokens that are either necessarily ending
 before $\tau$ or necessarily starting after, focusing the planning
 problem on only those tokens that are within a ``reasonable'' future.
-This filtering window complements the \rx {\em dispatch
-  window} from Definition \ref{def:dispatch} which filters out at the
-agent level those goals that are before the reactor execution latency
-or too far into the future. The planning window reflect this filtering
-of the agent by applying to tokens that are generated internally by the
-reactor during its deliberation or the {\em goals} for which he
-planner decided to postpone after the planning window -- probably
-due to other tasks that needed completion beforehand.
-% The planning window inside of a reactor
-% refines this filtering further, as tokens can be excluded dynamically
-% from deliberation as their insertion in the plan and scheduling with
-% other tokens generated, can reduce their temporal scope outside of the
-% planning scope \kcomment{ this last sentence should be reworked}. 
-This allow the planner to focus on its planning horizon and report
-decision on flawss thgat are beyond this scope on later ticks. As, 
-time advance, these future flaws will eventuallty be part of the
-planning window of the reactor and will be then resolved along with
-potential new goals received from the agent.
-% This helps the deliberation solver reduce the number of tokens to be
-% evaluated reducing deliberation cost and increasing performance. As
-% time advances, flaws that were initially beyond this temporal horizon
-% will become active which a reactor can evaluate.
- This results in an apparent \emph{continuous planning} of the reactor. When there are no
-more flaws present in the current planning scope a partial plan
-solution is found. This has two effects:
+This filtering window complements the \rx {\em dispatch window} from
+Definition \ref{def:dispatch} which filters out at the agent level
+those goals that are before the reactor execution latency or too far
+into the future.  The planning window refines this filtering further,
+as tokens can be excluded dynamically from deliberation as their
+insertion in the plan and scheduling with other generated tokens can
+alter their temporal scope to be outside of the planning window.  This
+allows the planner to focus on its planning horizon and report
+decision on flaws that are beyond this scope. As, time advances, these
+potential future flaws will eventually be part of the planning window
+of the reactor and will be then resolved along with potentially new
+goals.  This in turn, results in an apparent \emph{continuous
+  planning} of the reactor. When there are no more flaws present in
+the current planning scope a partial plan solution is found. This has
+two effects:
 
 \begin{enumerate}
 

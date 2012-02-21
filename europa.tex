@@ -382,12 +382,34 @@ A problem instance consists of:
 In \eu,  all the Variables and Constraints from a problem domain domain description are kept inside the Constraint Reasoning Engine (CRE).
 The CRE provides a framework where any number of constraint types can collaborate to perform inference and prune variable domains using Bounds Propagation and Domain Reduction techniques. \eu uses a Propagator pattern, in which a Propagator object keeps track of a set of constraint instances of the same type and is responsible for ensuring that whenever any variable changes or constraints are introduced or dropped, all related variables are updated through inference. 
 
-In a planning problem, variable or constraint changes can come directly from an end user (by introducing new activities or goals and relating them to the rest of the plan through constraints, by changing the start time of an activity, etc), or can come from an automated planner (by expanding subgoals, introducing precedence constraints to resolve mutual exclusion conflicts, etc). When these changes happen, each Propagator is only able to ensure consistency for the constraints that are associated with it.  To maintain global consistency, the CRE implements a variant of the AC-3 algorithm \cite{mackworth77} where it asks Propagators to perform inference until the Constraint Network returns to an stable state.
+In a planning problem, variable or constraint changes can come
+directly from an end user (by introducing new activities or goals and
+relating them to the rest of the plan through constraints, by changing
+the start time of an activity, etc), or can come from an automated
+planner (by expanding subgoals, introducing precedence constraints to
+resolve mutual exclusion conflicts, etc). When these changes happen,
+each Propagator is only able to ensure consistency for the constraints
+that are associated with it.  To maintain global consistency, the CRE
+implements a variant of the \texttt{AC-3} algorithm \cite{mackworth77}
+where it asks Propagators to perform inference until the Constraint
+Network returns to an stable state.
 
 \comment {add europa's AC-3 algorithm here}
 
-A \eu user can introduce new constraint types by implementing specialized Constraint and Propagator classes in C++, however, \eu provides a built-in with over 25 arithmetic, temporal, set and resource constraint types so that a large number of problem domains can be modeled without having to introduce new constraint types. \comment{insert table from http://code.google.com/p/europa-pso/wiki/ConstraintLibraryReference ? }
-Temporal and resource constraints are specially important to model real-life planning domains, so it is worth going into some more detail about how \eu's built-in support works for those constraint types.
+\input{constraints-table}
+
+A \eu user can introduce new constraint types by implementing
+specialized Constraint and Propagator classes in C++, however, \eu
+provides a built-in with over 25 arithmetic, temporal, set and
+resource constraint types so that a large number of problem domains
+can be modeled without having to introduce new constraint
+types. Tables \ref{{tab:calconst, tab:setconst,
+    tab:objhierarchy,tab:misc} show the constraint types.
+
+
+Temporal and resource constraints are specially important to model
+real-life planning domains, so it is worth going into some more detail
+about how \eu's built-in support works for those constraint types.
 
 
 \textit{Temporal Constraints:} \eu uses variables to explicitly represent timepoints for
