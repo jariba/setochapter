@@ -165,8 +165,7 @@ operational marine platform anywhere being used for routine scientific
 surveys with onboard plan synthesis.
 
 \begin{figure}[t]
-  \centering
-  \vskip-5pt
+  \centering \vskip-5pt
   \includegraphics[scale=0.1]{figs/MBARI-AUV.jpg}
   \caption{\small The MBARI \emph{Dorado} AUV on its support vessel
     the R/V \emph{Zephyr}.}
@@ -175,6 +174,25 @@ surveys with onboard plan synthesis.
 \end{figure}
 
 This chapter is organized as follows. We start with some foundational
-concepts in our Planning framework in Section
-\ref{sec:concepts}. \comment{add others} We conclude with Section
-\ref{sec:conclusion}.
+concepts in our Planning framework in Section~\ref{sec:concepts} which
+includes a brief overview of AI Planning in
+Section~\ref{sec:planningfound}. In Section~\ref{sec:basics} we go
+deeper into the \eu framework itself, the basis of all deliberation
+within \rx. A key portion is Section~\ref{sec:europa:pr} which details
+the Internal plan representation essential to planning within a
+situated agent like \rx. Modeling (Section~\ref{sec:europa:modeling}),
+Inference (Section~\ref{sec:europa:inference}) and Search
+(Section~\ref{sec:europa:search}) further detail the important details
+associated with \eu for the reader. With these foundational elements
+out of the way, we transition to \rx in Section~\ref{sec:arch}, bring
+out architectural details in Section~\ref{sec:arch:trex}, deal with
+the execution cycle in Section~\ref{sec:arch:exec}, highlight how \rx
+deliberates in Section~\ref{sec:arch:europa} finally delving deeper
+into the key concept of synchronization in
+Section~\ref{sec:arch:synch}. Further details on deliberation within
+\rx (Section~\ref{sec:arch:plan}) and how planning and execution are
+interleaved are shown in Section~\ref{sec:arch:intertwine}. We offer
+results from our experiments at sea in Section~\ref{sec:results},
+offer some insights into the near-term future goals of our research in
+Section~\ref{sec:future} and conclude with
+Section~\ref{sec:conclusion}.

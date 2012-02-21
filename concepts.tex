@@ -1,4 +1,113 @@
-\subsubsection{\eu Plan Representation}
+\section{\eu Basics}
+\label{sec:basics}
+
+\paragraph {A brief note on \eu history and notation} The earliest
+origin of what we will call \eu in this chapter, is from the
+\texttt{HSTS} planner \cite{mus94} which was used for a number of
+demonstrations for space telescopes as noted in Section
+\ref{sec:rabeyond}. \texttt{HSTS} was also the
+\texttt{LISP}-based\footnote{This was the first (and only to our
+  knowledge) software ever to been written in \texttt{LISP} to be
+  flown in space.} planner that was flown as part of the Remote Agent
+\texttt{RAX} experiment. Concurrent to \texttt{RAX}, a C++ version of
+the planner was implemented at which went on to be used for the
+\texttt{MAPGEN} \cite{bresina05} system and continues to be used to
+date, in the mission-critical uplink process for the command/control
+of the Mars Exploration Rovers (\texttt{MER}) mission. A vastly
+re-factored, higher performance open source version \cite{europapso}
+was named \eut and is the subject of this chapter and used onboard
+MBARI's Dorado platform. Note however, in using the name \eu, we refer
+to the \emph{fundamental ideas as well as the planning paradigm} even
+if there exists a specific implementation.
+
+\subsection{Introduction}
+\label{sec:euintro}
+
+\eu uses a \emph{domain model} written in a declarative language,
+together with initial conditions and goals also in that specified
+language, to construct a set of temporal relations that must be true
+at the start time. These models include assertions about the physics
+of the vehicle, i.e how it responds to external stimulus and
+internally driven goals. By propagating these relations forward using
+Simple Temporal Networks \cite{dechter91} and applying goal
+constraints, \eu can select a set of conditions that should be true in
+the future, where some of these conditions will correspond to actions
+the agent must take. The planner can backtrack and try another path
+during search if a goal cannot be reached while being capable of
+discarding unachievable goals.
+
+Traditionally robot execution has relied on dispatching commands at
+precise times. Such linear sequences of precisely timed commands give
+no ability to adjust execution on the basis of sensory
+information. Although some commands can issue tests on sensor
+readings, these tests have the objective of verifying whether expected
+execution conditions are occuring. If not, the state of the system is
+declared off-nominal and execution of the sequence of commands is
+interrupted. More recently, executives have been proposed and
+implemented that significantly broaden the way robots can be commanded
+\cite{mus98,alami:1998p820}. For example, the Remote Agent executive
+interpreted a \textit{temporally flexible plan} which represents each
+start time as a variable and contains an explicit network of bounded
+delay constraints between such variables.
+
+\begin{figure}[!t]
+\centering
+\includegraphics[scale=0.35]{figs/flexible-timelines.pdf}
+\caption{\small Tokens with flexible temporal intervals and parametric
+  constraints between tokens. This example shows the triggering of a
+  water sampler based on a feature threshold while the vehicle
+  Yo-Yo's. The \texttt{Waypoint\_Yo-Yo} token has a flexible duration,
+  start \& end times.}
+\label{fig:flex-timelines}
+\vskip+0.1cm
+\end{figure}
+
+Unlike a traditional fixed time-tagged command sequences, such
+flexible plans leave room for adaptation at execution time. When the
+executive considers when to start a task, it propagates information
+through the constraint network, computes a time bound for the
+variable, selects an actual execution time within the bound, and
+starts the task at that time. Temporally flexible plans therefore,
+express a \textit{range of possible outcomes} of the robots
+interaction with the environment within which the executive can elect
+at run time the most appropriate one for the actual execution
+conditions. The fact that constraints are explicitly represented
+ensures that through constraint propagation the executive will respect
+global limits expressed in the plan (e.g., don't start a task until a
+certain condition has been satisfied but still satisfying some global
+deadline). Such flexibility is critical when dealing with dynamic
+ocean conditions where precise timing of a robotic action might be
+indeterminate. Further, the advantage of flexibility can be contrasted
+with the consequences of the intrinsic inflexibiliy of traditional
+command sequences. Because they are inflexible, sequences must
+necessarily be designed considering worst case scenarios.
+
+\eu uses a \emph{state variable} representation to describe the
+evolution of state over time. The instantiated history of such state
+variable evolution over a temporal horizon we call \emph{timelines}
+and which represent a single thread in the execution of a concurrent
+system. At any given time each thread can execute a single procedure.
+Thus each timeline consists of a sequence of procedures which
+encapsulate and describe state evolution; we call these instantiated
+atomic entities \emph{tokens}.  A token therefore describes a
+procedure invocation, the state variables on which it can occur, the
+parameter values of the procedure, and the time values defining the
+interval. We allow encapsulation of uncertainty within these tokens
+with a range of start and end times and parameters, all of which are
+encoded as variables. A constraint solver in turn manipulates these
+variables defined in a \eu domain model. For example, consider
+a scientific need to take a water samples 100 meters from a hotspot
+while an AUV is performing a Yo-Yo in the water-column. Two samples
+are needed if the feature's signal is above a threshold; one
+otherwise. The token that is capturing the sensory threshold has a
+parametric constraints to the token which fires the requisite water
+sampler. In addition, the start time of the water sampling procedure
+is highly dependant on the variability of sub-sea currents and actual
+speed of the vehicle. Therefore a number of values are possible for
+the start times and duration of the sampling all of which are valid
+combinations for desired outcomes.
+
+\subsection{\eu Plan Representation}
 \label{sec:europa:pr}
 
 \eu follows the representation outlined by the CAIP framework, it also
@@ -66,7 +175,7 @@ Two types of variable Domains can be defined over a data type:
 
   \end {enumerate}
 
-  \eu's ability to represent and reason over numeric intervals is a
+  \eus ability to represent and reason over numeric intervals is a
   very useful characteristic that allow users to create flexible
   plans.
 
@@ -193,7 +302,7 @@ Two types of variable Domains can be defined over a data type:
 
 \item \textit{Timelines}: Often objects in a domain must be described
   by exactly one token for every given timepoint in the plan. Any
-  instances of a class derived from \eu's built-in Timeline class will
+  instances of a class derived from \eus built-in Timeline class will
   induce ordering requirements among its tokens to ensure no temporal
   overlap may occur among them \cite{mus94}.  \comment{Maybe: add
     small example?}
@@ -211,7 +320,7 @@ Two types of variable Domains can be defined over a data type:
   \comment{Maybe: add small example?}
 \end{enumerate}
 
-\item[\textbf{Token State Model}] In \eu's representation, goals are
+\item[\textbf{Token State Model}] In \eus representation, goals are
   temporally scoped states that need to be achieved, or actions that
   must be performed. As a result, \eu internally represents goals as
   Tokens.  Goals can be posted explicitly, for instance, when a user
@@ -286,7 +395,7 @@ this is possible only for goals posted by the end user and specified
 as optional. Subgoals generated as a result of token activation cannot
 be rejected, if a subgoal cannot be satisfied through activation or
 merging then it will cause the original activation decision that
-spawned it to be retracted (\eu's search mechanisms are explained in
+spawned it to be retracted (\eus search mechanisms are explained in
 detail in a separate section later on).
 
 As we can see, a token's state can go from \texttt{INACTIVE} to
