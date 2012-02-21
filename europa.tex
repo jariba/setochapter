@@ -771,7 +771,7 @@ rows and diagonals contain only one queen.
   \KwIn{ConstraintEngine $ce$}
   \KwIn{int $maxIter$}
   \Begin{
-    $curIter \leftarrow 0$ \;
+    int $curIter \leftarrow 0$ \;
     \While{$\left( ce.getViolations() > 0 \right) ~ \& ~ \left( curIter <
         maxIter \right)$ }{
       Variable $queenToMove \leftarrow getQueenWithMaxViolation(ce)$
@@ -787,7 +787,7 @@ rows and diagonals contain only one queen.
         $forceMove(queenToMove, curPos, moves.first())$ \;
       }
       $checkSolution()$ \tcp*{See if we have a new best solution}
-      $curIter++$ \;
+      $curIter$\texttt{++} \;
     }
   }
   \caption{$solveNQueens(ce, maxIter)$}
