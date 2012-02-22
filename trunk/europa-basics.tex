@@ -153,8 +153,9 @@ instance with 10 activities, 5 resources and 30 temporal constraints.
 \end{figure}
 
 
-\paragraph \textit{Planning}: In the Shopping Agent Problem
-\cite{russelnorvig} an agent needs to purchase a set of products
+\paragraph \textit{Planning}: The Shopping Agent Problem
+\cite{russelnorvig} is a variation of the problem with which we started this chapter.
+In this problem, an agent needs to purchase a set of products
 (milk, drill, etc) that are available at specific locations
 (supermarket, hardware store, etc) and the agent is subject to
 temporal (must complete tasks by specific deadlines) and resource
@@ -290,12 +291,12 @@ couple of significant drawbacks:
 
 \item If the structure of a planning model (actions, conditions,
   effects, dependencies at the action level) is not explicitly
-  maintained by the CSP planner, the search algorithms are deprived of
+  maintained by the \textsf{CP} planner, the search algorithms are deprived of
   critical information to make better decisions. If that structure is
   maintained (for instance, by internally marking variables that
   represent action choice and relationships between actions), it is
   still hard to write search algorithms as any planning-specific
-  insight has to be translated into the CSP representation of
+  insight has to be translated into the \textsf{CP} representation of
   variables and constraints.
   
 \end{enumerate}
@@ -304,7 +305,7 @@ These drawbacks have been addressed by a number of planning frameworks
 like \texttt{Descartes} \cite{joslin95,joslin96}, \texttt{IxTet}
 \cite{ghallab87,lemai04} and \texttt{CAIP} (Constraint-Based Interval
 and Attribute Planning) \cite{mus94,frank2003}.  These frameworks take
-advantage of a CSP representation to deal with time and resources, at
+advantage of a \textsf{CP} representation to deal with time and resources, at
 the same time maintaining an explicit representation of the elements
 relevant to planning (action choices, causal relationships, etc). This
 combination results in a planning approach that can deal with the type
