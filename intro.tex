@@ -42,7 +42,7 @@ advection as well as diffusion with the water mass it resides in.
 At the Monterey Bay Aquarium Research Institute (MBARI), a unique
 inter-disciplinary collaboration between biologists, ecologists,
 geneticists and roboticists on the \can (Controlled Agile Novel
-Observation Network) \cite{canon} has driven autonomous system
+Observation Network) program \cite{canon} has driven autonomous system
 exploration and control. Fundamental questions related to sampling
 strategies have driven the use cases for advanced concepts in
 autonomy, specifically to Artificial Intelligence (AI) Planning and
@@ -89,15 +89,16 @@ utilized; one consequence for instance, is any off-nominal condition
 results in a \emph{fail-safe} surface mode to radio for help. Further
 these approaches, words to the contrary are not only hard to maintain,
 are not 'adaptive' enough. Despite vigorous defense by Brooks early on
-\cite{Brooks91intelligencewithoutrea,Brooks91intelligencewithoutrep}
-require a model if not of the world then of the \emph{physics} of the
-vehicle when it interacts with the world.
+\cite{Brooks91intelligencewithoutrea,Brooks91intelligencewithoutrep},
+autonomous systems require a model if not of the world then of the 
+\emph{physics} of the vehicle when it interacts with the world.
 
 Persistent and early legitimate criticism of deliberation on the other
 hand also well articulated by Brooks
 \cite{Brooks91intelligencewithoutrea,Brooks91intelligencewithoutrep}
 was targeting the performance of in-situ deliberation. Terrestrial
-robotic platforms were well-known to frequently stop and ``plan''. In
+robotic platforms were well-known to frequently stop and ``plan''; 
+assuming in the meantime that the world will remain static. In
 the marine robotics world, such a situation would simply not be
 permissible given the need to make continuous observations without
 stopping an under-articulated robotic platform such as an AUV. However
@@ -141,21 +142,32 @@ from this rich legacy involved the following:
 
 We have developed, tested and deployed the Teleo-Reactive EXecutive
 (\texttt{T-REX}) an on-board adaptive control system that integrates
-AI based planning and probabilistic state estimation in a hybrid
-executive \cite{mcgann08a,mcgann08b,py10}.  Probabilistic state
-estimation integrates a number of science observations to produce a
-likelihood that the vehicle sensors perceive a feature of
-interest. Onboard planning and execution enables adaptation of
-navigation and instrument control based on the probability of having
-detected such a phenomenon. It further enables goal-directed
+AI based planning and %\sout{probabilistic} 
+state estimation in a hybrid executive\cite{mcgann08a,mcgann08b,py10}. 
+%  \sout{Probabilistic state estimation integrates a number of science observations to produce a
+% likelihood that the vehicle sensors perceive a feature of
+% interest}.\fcomment{\rx {\em does not} integrate probabilistic state
+%   estimation! ... The HMM estimation was coded on top of \eu model but
+%   neither \eu or \rx had explicit management of it} 
+State estimation allow the system to keep track of the world evolution
+as time advances based on a formal model distributed through the architecture.
+Onboard planning and execution enables adaptation of
+navigation and instrument control based on the state identified during
+state estimation.
+% \sout{the probability of having detected such a phenomenon} 
+It further enables goal-directed
 commanding within the context of projected mission state and allows
 for replanning for off-nominal situations and opportunistic science
 events. The framework in addition to being used on an AUV, is general
 enough be used for controlling a personal robot \cite{mcgann2009} and
 is deployed on a European planetary rover testbed
-\cite{goac11}. Probabilistic state estimation is discussed elsewhere
-\cite{mcgann08d} and out of scope for this chapter. Deliberation and
-reaction are integrated systematically over different temporal and
+\cite{goac11}. While it is possible to integrate probabilistic
+estimation on top of this framework \cite{mcgann08d}, such aspect is
+out of scope of this chapter.
+% Probabilistic state estimation through modeling within 
+% this framework can be done is discussed elsewhere
+% \cite{mcgann08d} and out of scope for this chapter. 
+Deliberation and reaction are integrated systematically over different temporal and
 functional scopes within a single agent and a single model that covers
 the needs of high-level mission management, low-level navigation,
 instrument control, and detection of unstructured and poorly
