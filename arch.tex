@@ -794,7 +794,9 @@ rely on its {\em internal} state. For this reason a failure to
 synchronize immediately results in the \rx agent killing a reactor and
 notifying any reactor that depends on its {\em internal} state
 variables; it does so by posting the special observation
-\textsf{Failed}. By so doing we allow for graceful degradation where
+\textsf{Failed}. This special state is a special predicate which is
+acceptable for all the {\em internal} and {\em external} timelines of
+a \eu reactor.  By so doing we allow for graceful degradation where
 other reactors can readapt their plans on receipt of this observation.
 
 Finally, at the engine level careful choices were made in both the
@@ -961,8 +963,9 @@ starts with a plan, this deliberation will not only be a model-derived
 estimation uniquely based on {\em external} observations but will also
 include reactor intentions specified in the available partial plan.
 
-Consider for example the Shopping Agent model where the \texttt{Agent}
-is an {\em external} timeline. As the reactor adds a goal to
+Consider for example the Shopping Agent model where the timeline 
+\texttt{Agent.position} is {\em external} while \texttt{Agent} is
+implemented a an {\em internal} timeline. As the reactor adds a goal to
 \texttt{Own} milk and the current {\em external} timeline indicates
 that the robot was \texttt{At(home)}, it produces a plan as shown in
 Fig. \ref{fig:shop:exec0}. The {\em external} part of the plan --
@@ -972,10 +975,11 @@ managing this state variable internally.
 
 \begin{figure}[!htb]
   \centering
-  \subfloat[\small A plan produced before synchronization.]{\label{fig:shop:exec0}\includegraphics[width=0.45\columnwidth]{figs/shoping_exec_t0}}
+  \subfloat[\small A plan produced before
+  synchronization.]{\label{fig:shop:exec0}\includegraphics[width=0.7\columnwidth]{figs/shoping_exec_t0}} \\
   \subfloat[\small Result of synchronization after the {\em Going}
   observation was received by the reactor with the plan showed in
-    \ref{fig:shop:exec0}.]{\label{fig:shop:exec1}\includegraphics[width=0.48\columnwidth]{figs/shoping_exec_t1}}
+    \ref{fig:shop:exec0}.]{\label{fig:shop:exec1}\includegraphics[width=.7\columnwidth]{figs/shoping_exec_t1}}
     \caption{\small Shopping example: Tokens in red indicate
       observations, tokens in blue the goal that this plan attempts to
       solve for. Arrows indicate temporal constraints. }
