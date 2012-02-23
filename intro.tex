@@ -141,41 +141,30 @@ from this rich legacy involved the following:
 \end{itemize}
 
 We have developed, tested and deployed the Teleo-Reactive EXecutive
-(\texttt{T-REX}) an on-board adaptive control system that integrates
-AI based planning and %\sout{probabilistic} 
-state estimation in a hybrid executive\cite{mcgann08a,mcgann08b,py10}. 
-%  \sout{Probabilistic state estimation integrates a number of science observations to produce a
-% likelihood that the vehicle sensors perceive a feature of
-% interest}.\fcomment{\rx {\em does not} integrate probabilistic state
-%   estimation! ... The HMM estimation was coded on top of \eu model but
-%   neither \eu or \rx had explicit management of it} 
-State estimation allow the system to keep track of the world evolution
-as time advances based on a formal model distributed through the architecture.
-Onboard planning and execution enables adaptation of
-navigation and instrument control based on the state identified during
-state estimation.
-% \sout{the probability of having detected such a phenomenon} 
-It further enables goal-directed
-commanding within the context of projected mission state and allows
-for replanning for off-nominal situations and opportunistic science
-events. The framework in addition to being used on an AUV, is general
-enough be used for controlling a personal robot \cite{mcgann2009} and
-is deployed on a European planetary rover testbed
-\cite{goac11}. While it is possible to integrate probabilistic
-estimation on top of this framework \cite{mcgann08d}, such
-representation is not explicitly handled by the framework and is
-out of scope of this chapter.
-% Probabilistic state estimation through modeling within 
-% this framework can be done is discussed elsewhere
-% \cite{mcgann08d} and out of scope for this chapter. 
-Deliberation and reaction are integrated systematically over different temporal and
+(\rx) an on-board adaptive control system that integrates AI based
+planning and state estimation in a hybrid
+executive\cite{mcgann08a,mcgann08b,py10}.  State estimation allows the
+system to keep track of world evolution as time advances based on a
+formal model distributed through the architecture.  Onboard planning
+and execution enables adaptation of navigation and instrument control
+based on the state identified during state estimation.  It further
+enables goal-directed commanding within the context of projected
+mission state and allows for replanning for off-nominal situations and
+opportunistic science events. The framework in addition to being used
+on an AUV, is general enough be used for controlling a personal robot
+\cite{pr2,Meeussen:2010dn,mcgann2009} and is deployed on a European
+planetary rover testbed \cite{goac11}. While it is possible to
+integrate probabilistic estimation on top of this framework
+\cite{mcgann08d}, such representation is not explicitly handled by the
+framework and is out of scope of this chapter.  Deliberation and
+reaction are integrated systematically over different temporal and
 functional scopes within a single agent and a single model that covers
 the needs of high-level mission management, low-level navigation,
 instrument control, and detection of unstructured and poorly
-understood phenomena. \rx is deployed on MBARI's Dorado AUV shown in
-Fig. \ref{fig:auv-fig}, which to the best of our knowledge is the only
-operational marine platform anywhere being used for routine scientific
-surveys with onboard plan synthesis.
+understood phenomena. \rx is deployed on MBARI's \emph{Dorado} AUV
+shown in Fig. \ref{fig:auv-fig}, which to the best of our knowledge is
+the only operational marine platform anywhere being used for routine
+scientific surveys with onboard plan synthesis.
 
 \begin{figure}[t]
   \centering \vskip-5pt
