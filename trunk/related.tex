@@ -126,7 +126,7 @@ contrast in providing a distinct set of advantages:
 
 \end{enumerate}
 
-There are costs associated with such inference based control are also
+There are costs associated with such inference based control which are 
 not inconsequential. Foremost among them is the steep learning curve
 that comes with the design of the domain model. With limited support
 tools necessary for knowledge capture and design of the constraints
@@ -134,7 +134,7 @@ often in stylized higher-level languages (see \cite{NDDL} for an
 example), it requires the modeler to think in alternative ways to do
 problem solving. More importantly it is often necessary for the
 modeler to be exposed to the internal representation of the planner
-and how it performs search. THe level of expertise is often well above
+and how it performs search. The level of expertise is often well above
 what would be expected of a typical well-rounded Computer Science
 graduate student.
 
@@ -143,7 +143,12 @@ scientific and engineering goals associated with adaptive and
 persistent observation for marine robots whether for civil or military
 applications. Given the general problem-solving nature of such
 deliberative systems, there is also a substantial overall benefit for
-the field of robotics.
+the field of robotics. 
+\fcomment{Though it woulfd  be usefull to emphasize this ...}
+The cost of modeling put aduring the intial design, for example,
+should be balanced against the cost of redesigning
+a new mission script eate every new deployment in more ``classical''
+script-based controllers. 
 
 \subsection{Evolution of AI-based Robotic Planning: A Necessary Digression}
 
@@ -152,7 +157,7 @@ robotics. Early motivation of building computational mechanisms for
 decision making were intended to be deployed on robotic devices by
 very definition. The seminal volume \cite{computersthought} very
 clearly articulates how physical manifestation of robots could be
-controlled for task planning and execution. The very first planner
+controlled by task planning and execution. The very first planner
 \cite{green69} was an exercise in computational theorem proving with
 early state space planners popularized by \texttt{STRIPS}
 \cite{strips71} dominating the academic landscape. An early
@@ -174,7 +179,8 @@ Architecture \cite{alami:1998p820}, the Remote Agent Experiment
 \texttt{RAX} \cite{mus98} and the Autonomous Spacecraft Experiment
 \texttt{ASE} \cite{chien99} (see \cite{Knight01} for a survey). Early
 efforts were cognizant of if absent with, dealing with time and
-resources for such experiments.
+resources for such experiments.\fcomment{This sentence does not make
+  sence to me}
 
 Representationally, the first paper on managing time systematically
 within AI Planning frameworks was \cite{dean87}; subsequent efforts by
@@ -371,8 +377,10 @@ structure is fundamental to making the approach effective in practice.
 
 Our system, \texttt{T-REX}, the focus of this chapter, is an agent
 control structure formally defined as a composition of coordinated
-control loops with a recurring sense-plan-act (SPA) cycle with
-deliberation at its core. \texttt{T-REX} was designed after carefully
+control loops where sensing, planning and acting are resulting from 
+concurrent deliberating tasks within a formal framework. \fcomment{Got
+  rid of sense-plan-act reference here. \rx plan/sense while sensing/planning.}
+\texttt{T-REX} was designed after carefully
 evaluating lessons learned from \texttt{IDEA} and owes substantially
 to the notion of partitioned problem solving from that effort. However
 this partitioning is systematic and methodologically principled where
@@ -399,3 +407,8 @@ a real platform for control.
 % ``The whole partition must be accordingly reorganized: this kind of
 % construction does not scale well over a large variety of missions,
 % missing the objective of a versatile architecture for robots.''
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: "setobook"
+%%% End: 
