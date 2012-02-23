@@ -83,11 +83,11 @@ the planning components. Using object classes and instances is a
 time-tested approach to naturally describe problem domains
 \cite{rumbaugh}. It offers declarative constructs to define
 constraints and causality dependencies between actions and effects and
-finally it offers procedural constructs to populate \eus plan
-database with specific problem instances expressed in terms of
-objects, variables, constraints, facts and goals. To articulate
-important elements of \texttt{NDDL}, we show how the Shopping Agent
-problem could be modeled:
+finally it offers procedural constructs to populate \eus \texttt{PDB}
+with specific problem instances expressed in terms of objects,
+variables, constraints, facts and goals. To articulate important
+elements of \texttt{NDDL}, we show how the Shopping Agent problem
+could be modeled:
 
 \begin{verbatim}
 
@@ -342,18 +342,33 @@ are used to specify the planning horizon (\texttt{horizonStart} and
 \texttt{horizonEnd}) and objects are used to specify locations,
 products, product-location associations and the Shopping Agent that we
 want to plan for. Facts are used to specify the current state of the
-world and do not need any support and are represented as tokens in
-\eus plan database. In this case we use facts to specify that the
-Shipping Agent is initially at home. Goals are also represented as
-tokens in \eus plan database. Different from facts, goals trigger
-inference in \eu which determines whether flaws (unresolved subgoals,
-overloaded resources, etc.) need to be resolved; if so, search modules
-can be invoked to resolve those flaws as part of the deliberation
+world and do not need any support and are represented as tokens in the
+\texttt{PDB}. In this case we use facts to specify that the Shipping
+Agent is initially at home. Goals are also represented as tokens in
+the \texttt{PDB}. Different from facts, goals trigger inference in \eu
+which determines whether flaws (unresolved subgoals, overloaded
+resources, etc.) need to be resolved; if so, search modules can be
+invoked to resolve those flaws as part of the deliberation
 process. Finally, constraints are restrictions on and between actions
 and goals. In the example above, we use temporal constraints to
 specify when facts hold and when the goals should be
 accomplished. % As
 % always, all constraints in \eus library could be used.
+
+\begin{figure}[!htb]
+\centering
+\includegraphics[scale=0.3]{figs/Allen-algebra.pdf}
+\caption{\small Temporal relations defined within the planner are
+  based on \texttt{Allen Algebra} relations shown above.}
+\label{fig:allen-algebra}
+\end{figure}
+
+In \eu, problem domains use \texttt{Allen Algebra} \cite{allen84}
+temporal relations shown in Fig. \ref{fig:allen-algebra} which allow
+encoding of temporal constraint relationships between tokens on
+concurrent timelines. \kcomment{This para could do with a little
+  embellishment especially since it is the only material that actually
+  talks about the kinds of constraints and their origin.}
 
 
 \subsection{Automated Inference}
@@ -366,282 +381,242 @@ collaborate to perform inference and prune variable domains using
 Bounds Propagation and Domain Reduction techniques \kcomment{citation
   needed}. \eu uses a Propagator pattern which keeps track of a set of
 constraint instances of the same type and is responsible for ensuring
-that whenever any variable is modified or constraints are introduced
-or dropped, all related variables are updated through inference.
+variables are inferentially updated with change (modifications or
+constraint addition/deletion).
+
+% that whenever any variable is modified or constraints are introduced
+% or dropped, all related variables are updated through inference.
 
 In a planning problem, variable or constraint changes can come
 directly from an end user (by introducing new activities or goals and
 relating them to the rest of the plan through constraints, by changing
-the start time of an activity, etc), or can come from an automated
-planner (by expanding subgoals, introducing precedence constraints to
-resolve mutual exclusion conflicts, etc). When these changes happen,
-each Propagator is only able to ensure consistency for the constraints
-that are associated with it.  To maintain global consistency, the
+the start time of an activity, etc), or from an automated planner (by
+expanding subgoals, introducing precedence constraints to resolve
+mutual exclusion conflicts, etc). When these changes occur, each
+propagator is only able to ensure consistency for the constraints that
+are associated with it.  To maintain global consistency, the
 \texttt{CRE} implements a variant of the \texttt{AC-3} algorithm
-\cite{mackworth77} where it asks Propagators to perform inference
-until the Constraint Network returns to an stable state.
+\cite{mackworth77} where propagators are triggered to infer to ensure
+the constraint network returns to a quiescent state.
 
-\input{constraints-table}
+\subsubsection{Constraint Formulation}
+\label{sec:europa:constraints}
 
-A \eu user can introduce new constraint types by implementing
-specialized Constraint and Propagator classes in C++, however, \eu
-provides a built-in Constraint Library with over 25 arithmetic, temporal, set and
-resource constraint types so that a large number of problem domains
-can be modeled without having to introduce new constraint
+An \eu user can introduce new constraint types by implementing
+specialized constraint and propagator classes; however, \eu provides a
+built-in constraint library with a range of arithmetic, temporal, set
+and resource constraint types so that a large number of problem
+domains can be modeled without having to introduce new constraint
 types. Tables \ref{tab:calconst}, \ref{tab:setconst},
 \ref{tab:objhierarchy} and \ref{tab:misc} show various constraint
 types.
 
-Temporal and resource constraints are specially important to model
-real-life planning domains, so it is worth going into some more detail
-about how \eus built-in support works for those constraint types.
+\input{constraints-table}
 
-\textit{Temporal Constraints:} \eu uses variables to explicitly
-represent timepoints for plan activities and states. Constraints among
-timepoints provide a natural way to express domain axioms. For
-example, in order to state that activity $A$ must occur before
-activity $B$ we can say that the end timepoint of $A$ is $leq$ the
-start timepoint of $B$.
-
-\begin{figure}
-\centering
-\includegraphics[scale=0.3]{figs/Allen-algebra.pdf}
-\caption{\small Temporal relations defined within the planner are
-  based on \texttt{Allen Algebra} relations shown above.}
-\label{fig:allen-algebra}
-\vskip-0.3cm
-\end{figure}
-
+Temporal and resource constraints are especially important to model
+real-world planning domains. % so it is worth going into some more
+% detail about how \eus built-in support works for those constraint
+% types.
+\eu uses variables to explicitly represent timepoints for plan
+activities and states. Constraints among timepoints provide a natural
+way to express domain axioms. For example, in order to state that
+activity $A$ must occur before activity $B$ we can say that the end
+timepoint of $A$ is $leq$ the start timepoint of $B$.
 \cite{dechter91} proposed that constraints among timepoints can be
-grouped together to form a Simple Temporal Network (STN). Such a
-network can be transformed into a Distance Graph (DG) where the
-outward arc from a node represents the maximum distance from the
-source node to the target node.  The diagram below illustrates a
-simple STN with just 2 variables and a single constraint. It also
-shows the resulting DG.
-
-reflected by the use of the \texttt{Allen Algebra} \cite{allen84}
-temporal relations shown in Fig. \ref{fig:allen-algebra}. Interval
-arithmetic in the EUROPA$_2$ domain model using \texttt{Allen Algebra}
-allows encoding of temporal constraint relationships between tokens on
-concurrent timelines. See \cite{jonsson00} for additional details
-including propagation algorithms and interval logic.
-
+grouped together to form a Simple Temporal Network
+(\texttt{STN}). Such a network can be transformed into a Distance
+Graph (\texttt{DG}) where the outward arc from a node represents the
+maximum distance from the source node to the target node.
+Fig. \ref{fig:stn} illustrates an \texttt{STN} with $2$ variables and
+a single constraint along with the resulting \texttt{DG}.
+\cite{dechter91} also showed that shortest path algorithms could be
+used to propagate values in the network and discover a negative cycle:
+namely a path from a node to itself that has a path length less than
+$0$. If such a cycle exists, the network is inconsistent. It was
+further shown that a single-source shortest path algorithm was
+sufficient to detect a negative cycle and provide sufficient
+propagation to yield a backtrack-free search. \eus propagator for
+temporal constraints is a straight implementation of this algorithm.
 
 \begin{figure}[!htb]
   \centering
   \subfloat[\small A Simple Temporal Network (STN)]{\label{fig:stn1}\includegraphics[width=0.4\columnwidth]{figs/stn-graph.pdf}}
   \subfloat[\small Resulting distance graph from \ref{fig:stn1}.]{\label{fig:stn2}\includegraphics[width=0.4\columnwidth]{figs/distance-graph.pdf}}
-    \caption{\small An illustration of a STN and its corresponding
-      distance graph.}
+  \caption{\small An illustration of a STN and its corresponding
+    distance graph.}
   \label{fig:stn}
 \end{figure}
 
-\cite{dechter91} also showed that shortest path algorithms could be
-used to propagate values in the network and discover a negative
-cycle. A negative cycle is a path from a node to itself that has a
-path length less than 0. If such a cycle exists, the network is
-inconsistent. It was further shown that a single-source shortest path
-algorithm was sufficient to detect a negative cycle and provide
-sufficient propagation to yield a backtrack-free search. Thus we have
-an efficient and complete algorithm for propagating an STN. \eus
-Propagator for temporal constraints is a straight implementation of
-this algorithm.
+Most real-world planning problems need to deal with plans made up of
+actions that typically depend upon limited resources (\eg fuel,
+storage capacity, battery state of charge, data buffers).  \eu
+provides built-in support for resource computation. In \eus
+representation resource object types come in three forms with related
+constraints. \textbf{Reservoir} resources can have both
+\texttt{consume(resource,time,quantity)} and
+\texttt{produce(resource,time,quantity)} constraints. Production and
+consumption is instantaneous. \textbf{Reusable} resources have
+\texttt{uses(resource,start,duration,quantity)} constraints that use a
+quantity of the resource for a specific duration, which are then
+released. \textbf {Unary} resources are reusable with capacity$ = 1$,
+which allows \eu to perform run time savings in comparison to the
+generic reusable class. Configuration options are offered such that in
+addition to the usual constraint violations when a resource is
+completely depleted, plan flaws can be generated whenever a resource
+level is outside a specific upper or lower bound, or when
+instantaneous production or consumption exceeds a specific threshold.
 
-\textit{Resource Constraints:} Most real life planning problems have
-to deal with the fact that plans made up of actions that require
-resources to be performed typically have only a limited amount of
-those resources available (think of fuel, storage capacity, etc).  \eu
-provides built-in support for resources whose availability can be
-measured with real numbers, in terms of \eus representation, resource
-object types and their related constraints are provided as follows:
-
-\begin{enumerate}
-
-\item \textbf{Reservoir} resources can have both
-  \texttt{consume(resource,time,quantity)} and
-  \texttt{produce(resource,time,quantity)} constraints. Production and
-  consumption is instantaneous (it happens at a single point in time)
-
-\item \textbf{Reusable} resources have
-  \texttt{uses(resource,start,duration,quantity)} constraints that use
-  a quantity of the resource for a specific duration, then release it.
-
-\item \textbf {Unary} resources are Reusable resources with
-  capacity=1, which allows \eu to perform some run time savings
-  compared to the generic Reusable class.
-
-\end{enumerate}
-
-\eu offers configuration options so that in addition to the usual
-constraint violations when a resource is completely depleted, plan
-flaws can be generated whenever a resource level is outside a specific
-upper or lower limit, or when instantaneous production or consumption
-exceeds a specific threshold.
-
-Recall that \eu supports a flexible temporal representation, where
-time is represented by intervals, instead of single values. In this
-context, determining whether a resource is the source of a plan flaw
-or a constraint violation in general is more difficult than just
+Since \eu supports a flexible temporal representation, where time is
+represented by intervals, instead of single values, determining
+whether a resource is the source of a plan flaw or a constraint
+violation in general is substantially more difficult than just
 computing a profile of the resource and checking against some limits.
-In the context of time flexibility, there are many resource profiles
-that are possible, depending on when exactly each
-production/consumption event happens out of all the possible values
-that are in the domain of the variables that represent the time for
-the event.  \cite{mus02} proposed an algorithm where the variables
-that represent the time for production/consumption events are placed
-in a temporal network, similar to the network used by the Temporal
-Propagator above, then the constraints on the resource can be seen as
+With temporal flexibility, a number of resource profiles could be
+possible depending on precisely when each production/consumption event
+occurs out of a range of possible values that are in the domain of the
+variables that represent the temporal extant for the event.
+\cite{Muscettola04,Muscettola06} proposed an algorithm where the
+variables that represent the time for production/consumption events
+are placed in a temporal network, similar to the network used by the
+temporal propagator; constraints on the resource can then be seen as
 quantities flowing through that network. Computing the maximum flow
-will yield the maximum resource usage, and thus a lower bound on the
-resource level, and computing a minimum flow will similarly yield an
-upper bound. Since maximum flow on a temporal network can be computed
-in polynomial time, \eu takes advantage of this algorithm to
-efficiently compute upper and lower bound envelopes on the resource
-level.
+then, yields the maximum resource usage and thus a lower bound on the
+resource level; computing a minimum flow will similarly yield an upper
+bound. Since maximum flow on a temporal network can be computed in
+polynomial time, \eu takes advantage of this algorithm to efficiently
+compute upper and lower bound envelopes on the resource
+level. Fig. \ref{fig:resenvelopes} shows an example of such a resource
+computation.
 
 \begin{figure}
 \centering
 \includegraphics[scale=0.2]{figs/europa-resource-envelopes.png}
-\caption{\small Resource Envelopes computed by  \eu}
+\caption{\small An example of resource envelopes computed by \eu.}
 \label{fig:resenvelopes}
-\vskip+0.1cm
 \end{figure}
 
-Resource envelopes can be very useful when trying to figure how
-brittle a plan in the face of changing activity durations or start
-times. They can also be useful when searching for plans, although they
-are relatively expensive to compute so their ability to prune the
-search space must be weighted against the ability to search faster
+Resource envelopes can be useful when trying to evaluate plan
+brittleness in the face of changing activity durations or start
+times. They can also be useful when searching for plans; however they
+are relatively expensive to compute. Therefore their ability to prune
+the search space must be weighted against the ability to search faster
 \cite{6007772}.
 
 
 \subsection{Search in \eu}
 \label{sec:europa:search}
 
-Given the above elements, an automated problem solver can be
-created using:
+Given the above, an automated problem solver can be created using, a
+\emph{domain model} that describes the variable, object, predicate and
+action types that are relevant for the problem, a \emph{problem
+  instance} or initial state that consists of variable and object
+instances that exist for the entire planning horizon, \emph{temporally
+  scoped predicate and action} instances and \emph{temporally scoped
+  goals}. This information is retained in \eus \texttt{PDB} so that
+inference and search mechanisms can be used to look for a problem
+solution.
 
-\begin{enumerate}
+Since temporal intervals may extend indefinitely in both positive and
+negative directions, for problems with a temporal dimension it is also
+common to specify a \emph{planning horizon} when invoking a solver;
+any decisions that fall completely outside of the horizon can be
+ignored. This is particularly useful for recurrent activities;
+consider for instance a model where a medical checkup has to occur
+every $3$ months. The user can model a recurring activity and then use
+the horizon to ensure that a finite number of medical checkup
+activities are generated as part of a plan. This is also useful to
+ignore activities that may occur far in the future or in the past to
+be relevant for a particular plan, ensuring that the solver is making
+as few commitments as necessary and making planning tractable.
 
-\item A domain model that describes the variable, object, predicate
-  and action types that are relevant for the problem.
-
-\item A problem instance (also called initial state) that consists of:
-
-    \begin{enumerate}
-
-    \item Variable and Object instances that exist for the entire
-      planning horizon.
-
-    \item Temporally scoped predicate and action instances.
-
-    \item Temporally scoped goals.
-
-\end{enumerate}
-
-\end{enumerate}
-	
-This information is kept in \eus Plan Database so that inference and
-search mechanisms can be used to look for a problem solution.
-
-Given that temporal intervals may extend indefinitely in both positive
-and negative directions, for problems with a temporal dimension it is
-also common to specify a Planning Horizon when invoking a solver. The
-Planning Horizon is the temporal interval that a problem solver has to
-worry about, any decisions that fall completely outside of the
-Planning Horizon can be ignored. This is very useful for recurrent
-activities, consider for instance a model where a medical checkup has
-to occur every 3 months, the user can model a recurring activity and
-then use the Planning Horizon to ensure that a finite number of
-medical checkup activities are generated as part of a plan. This is
-also useful to ignore activities that may happen too far in the future
-or in the past to be relevant for a particular plan, this way the user
-can ensure that the solver is making as few commitments as necessary.
-
-\eu provides a built-in solver that performs Plan Space Planning
-\cite{ghallab04} in this approach, the initial state is considered a
-partial plan that needs to be refined toward a solution plan that
-achieves the goals. The operations to refine the partial plan PP at
+\eu provides a built-in solver that performs \emph{Plan Space
+  Planning} \cite{ghallab04}; the initial state is considered a
+partial plan that needs to be refined toward a solution that achieves
+stated goals. The operations to refine the partial plan \texttt{PP} at
 any time are:
 
 \begin{enumerate}
 
-\item Find the flaws of PP, that is the conditions that prevent it
-  from being a solution plan (flaw types are explained below).
+\item Find flaws of \texttt{PP}, \ie conditions that prevent it from
+  being a solution plan.
 
-\item Select one such flaw
+\item Select one such flaw.
 
-\item Select a resolver for the flaw
+\item Select a resolver for the flaw.
 
-\item Refine PP by applying the resolver
+\item Refine \texttt{PP} by applying the resolver.
 
 \item If an inconsistency is found, try another resolver.
 
 \item If all possible resolvers for a particular flaw fail, return
-  failure, otherwise continue until resolving all the flaws.
+  failure, otherwise continue until resolving all flaws.
 
 \end{enumerate}
 	
-This Plan Space Planning algorithm is translated into \eus
-representation as follows:
+% This Plan Space Planning algorithm is translated into \eus
+% representation as follows:
 
 The initial partial plan is the state of \eus Plan Database after the
-initial state has been instantiated, this results in a set of
+initial state has been instantiated. This results in a set of
 variable, object and token instances. Inference then takes place to
-detect flaws in the partial plan, there are 3 kinds of flaws that can
-be detected:
+detect flaws in the partial plan; the three kinds of flaws that can be
+detected are:
 
-\begin{enumerate}
+\begin{description}
 
-\item Unbound Variable: a variable in the partial plan whose domain is
-  not a singleton. Unbound Variables are resolved by specification of
-  a value from the domain of the variable.
+\item[\textbf{Unbound Variable}]: a variable in the partial plan whose
+  domain is not a singleton. Unbound Variables are resolved by value
+  selection from their domain.
 
-\item Open Condition: an open condition is an inactive token. Inactive
-  tokens can be generated by explicitly posted goals, or when a token
-  is activated, rules may fire that create inactive slave tokens as
-  described in section \comment{point to EUROPA Plan Representation
-    section}.  Open Conditions can be resolved in three ways:
+\item[\textbf{Open Condition}]: an open condition is an
+  \texttt{INACTIVE} token. \texttt{INACTIVE} tokens can be generated
+  by explicitly posted goals, or when a token is activated, rules may
+  activate the creation of \texttt{INACTIVE} slave tokens as described
+  in Section \ref{sec:europa:pr}. Open Conditions can be resolved in
+  three ways:
 
-  \begin{enumerate}
+  \begin{description}
 
-  \item Merging: A free activity is merged with a matching activity
-    already in the plan. An activity a is said to match an activity a?
-    if a and a? unify and the temporal constraints involving a are
-    satisﬁed by a?. Thus, a and a? can be considered the same activity
-    and we do not need to introduce a in the plan. Consequently, the
-    compatibilities associated with a are not ﬁred, because they have
-    been already triggered when a? was introduced in the plan.
+  \item[\textbf{Merging}]: A free activity is merged with a matching
+    activity already in the plan. An activity $a$ is said to match an
+    activity $a?$ iff $a$ and $a?$ unify \cite{russelnorvig} and the
+    temporal constraints involving $a$ are satisfied by $a?$. Thus,
+    $a$ and $a?$ can be considered the same activity without the need
+    to introduce $a$ in the plan. Consequently, the compatibilities
+    \kcomment{compatibilities have not been defined} associated with
+    $a$ are not ﬁred \kcomment{???}, because they have been already
+    triggered when $a?$ was introduced in the plan.
 
-  \item Activation: We introduce a new activity a in the current plan
-    associating it with the proper timeline, but without choosing a
-    speciﬁc time slot for it.The compatibilities associated with a are
-    applied and the subgoal activities resulting from those
-    compatibilities are introduced as free activities. This results in
-    both an ordering flaw, corresponding to the just activated
+  \item[\textbf{Activation}]: A new activity $a$ is introduced in the
+    current plan associating it with the correct timeline, without
+    choosing a specific time slot. The compatibilities \kcomment{as
+      above} associated with $a$ are applied and the subgoal
+    activities resulting from those compatibilities \kcomment{as
+      above} are introduced as free activities \kcomment{what is a
+      free activity?}. This results in both an ordering flaw
+    \kcomment{undefined}, corresponding to the just activated
     activity, and a number of open condition flaws, corresponding to
     the new subgoal activities.
 
-  \item Rejection: Some goals may be optional, if that is the case for
-    a particular order condition, its corresponding flaw can be
-    resolved by discarding the inactive token.
+  \item[\textbf{Rejection}]: Some goals may be optional; if so its
+    corresponding flaw can be resolved by discarding the
+    \texttt{INACTIVE} token.
 
-\end{enumerate}
+  \end{description}
 
-\item Threat: once a token has been placed in the partial plan it may
-  impact other tokens indirectly through possible overlapping
-  requirements on objects. Recall for example that a token may belong
-  to objects (e.g. Timelines) which require a total order over their
-  tokens. If any 2 tokens could possibly overlap (though not
-  necessarily), then they pose a threat to each other in terms of
+\item[\textbf{Threat}]: Once a token has been placed in the partial
+  plan it may impact other tokens indirectly through possible
+  overlapping requirements on objects. Recall for example that a token
+  may belong to objects (\eg timelines) which require a total order
+  over their tokens. If any two tokens could possibly overlap (though
+  not necessarily), then they pose a threat to each other in terms of
   achieving an extension of the current partial plan which is complete
   and consistent. Similarly, threats may arise where tokens share a
   common resource and their current state might yield extensions of
   the current partial plan which are inconsistent. Threats are
   resolved by imposing ordering constraints among tokens.
 
-\end{enumerate}
+\end{description}
 
 Open Conditions and Threats allow flaw detection and resolution at a
 higher-level of abstraction (i.e. in terms of objects and tokens) than
