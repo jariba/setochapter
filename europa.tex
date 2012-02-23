@@ -1,13 +1,13 @@
 \subsection{Architecture}
 \label{sec:europa:arch}
 
-\eu is implemented as a library that encapsulates all the elements
-described above and makes them easily accessible through modeling and
-Application Programming Interface (API) layers.  A user will typically
-use the modeling facilities to inject a problem domain description,
-and the API to extract and manipulate plans, and to obtain information
-about plan flaws and constraint violations at any stage of the
-planning process.
+\eu is implemented as a library that encapsulates all elements
+described above making them accessible via modeling and Application
+Programming Interface (API) layers.  A user will typically use the
+modeling facilities to inject a problem domain description and the
+API to extract and manipulate plans and to obtain information about
+plan flaws and constraint violations at any stage of the planning
+process.
 
 \begin{figure}
 \centering
@@ -17,59 +17,53 @@ planning process.
 \end{figure}
 
 Fig. \ref{fig:europa-architecture} shows the main architectural
-components in \eu and their relationships.
+components in \eu and their relationships. The \textbf{Constraint
+  Reasoning Engine} (\texttt{CRE}) manages domain types, variables and
+constraints that define relationships among them. It also provides an
+efficient arc consistency mechanism \cite{mackworth77}. The
+\texttt{CRE} is designed so that specialized reasoning algorithms for
+new constraints can be easily and efficiently plugged in. The
+\textbf{Plan Database} (\texttt{PDB}) manages object and token
+types. It also maintains the state of partial plans in terms of
+object, variable and token instances. This constitutes the data
+foundation on which end user applications and automated planners
+within \eu are built. The \textbf{Rules Engine} (\texttt{RE})
+modularly adds the semantics of domain rules that describe
+dependencies between tokens. The \textbf{Solver Module} provides the
+framework for flaw detection and resolution that is needed to
+implement search algorithms for planning. The \textbf{API Layer}
+provides access to services from all the different modules in a
+programmatic way so that \eu can be easily embedded into specialized
+applications.
 
-The \textbf{Constraint Reasoning Engine} (CRE) manages domain types,
-variables and constraints that define relationships among them. It
-also provides an efficient arc consistency mechanism
-\cite{mackworth77}. The CRE is designed so that specialized reasoning
-algorithms for new constraints can be easily and efficiently plugged
-in.
-
-The \textbf{Plan Database} (PDB) manages object and token types. It
-also maintains the state of partial plans in terms of object, variable
-and token instances. This constitutes the data foundation on which end
-user applications and automated planners are built.
-
-The \textbf{Rules Engine} (RE) modularly adds the semantics of domain
-rules that describe dependencies between tokens.
-
-The \textbf{Solver Module} provides the framework for flaw detection
-and resolution that is needed to implement search algorithms for
-planning.
-
-The \textbf {Language Modules}: Describing problem domains and problem
-instances in terms of objects, variables and domain rules in a
-programmatic way is cumbersome to the extent of being impractical,
-this motivated the creation of modeling languages that support those
-definitions in a much more natural and compact way. \texttt{NDDL} (New
-Domain Description Language [pronounced ``noodle'']) \cite{NDDL} is
-the main modeling language for \eu and will be described in detail in
-the Modeling section below. ANML is a language under development that
+Describing problem domains and problem instances in terms of objects,
+variables and domain rules in a programmatic way is cumbersome to the
+extent of being impractical; this motivated the creation of modeling
+languages that support those definitions in a much more natural and
+compact way. \texttt{NDDL} (New Domain Description Language
+[pronounced ``noodle'']) \cite{NDDL} is the main modeling language for
+\eu and will be described in detail in the Modeling section
+below. Another, \texttt{ANML} is a language under development that
 provides a more intuitive syntax \cite{smith08}.
   
-The \textbf{API Layer} provides access to services from all the
-different modules in a programmatic way so that \eu can be easily
-embedded into specialized applications.
-
- 
 In an effort to mimimize the amount of work that a user needs to
 perform to solve specific problems, \eu also bundles extension
 modules that have been found to be useful in many domains:
 
 \begin{enumerate}
 
-\item \textit{Temporal Network}: Extensions to the CRE module to
+\item \textit{Temporal Network}: Extensions to the \texttt{CRE} module to
   reason about temporal constraints
 
-\item \textit{Resources}: Extensions to the CRE, PDB and Solver
-  modules to provide out-of-the-box reasoning and search for metric
+\item \textit{Resources}: Extensions to the \texttt{CRE}, \texttt{PDB}
+  and Solver modules to provide reasoning and search for metric
   resources.
 
 \item \textit{Chronological Backtracking Solver}: A general purpose
-  built-in solver to provide the ability to plan out-of-the-box,
-  problems that require challenging search may require specialized
-  solvers to be built as explained in the Search section below.
+  built-in solver to provide the ability to plan out-of-the-box.
+  Problems that require challenging search may require specialized
+  solvers to be built as explained in Section \ref{sec:europa:search}.
+
 \end{enumerate}
 
 \subsection{Modeling in \eu}
@@ -80,28 +74,20 @@ be applied to different domains and problems, simply by providing
 different models and goals. Consequently the expressiveness of the
 language for models, goals and plans is of great importance. For \eue,
 \texttt{NDDL} allows the user to specify the different components of a
-problem domain in a concise way. The main characteristics that make
-\texttt{NDDL} a powerful tool for describing problem domains are:
-
-\begin{enumerate} 
-
-\item Object Oriented: \texttt{NDDL} supports classes and inheritance
-  in similar fashion to popular Object-Oriented languages like Java
-  and C++. It also supports polymorphism for some of the planning
-  components. Using object classes and instances is a time-tested
-  approach to naturally describe problem domains \cite{rumbaugh}.
-
-\item It offers declarative constructs to define constraints and
-  causality dependencies between actions and effects.
-
-\item It offers procedural constructs to populate \eu's plan database
-  with specific problem instances expressed in terms of objects,
-  variables, constraints, facts and goals.
-
-\end{enumerate}
-
-To understand how the most important elements of \texttt{NDDL} work,
-we show how the Shopping Agent problem could be modeled:
+problem domain in a precise and concise manner. Among the main
+features that make \texttt{NDDL} a powerful tool for describing
+problem domains are that it is object oriented. \texttt{NDDL} supports
+classes and inheritance in similar fashion to popular Object-Oriented
+languages like Java and C++. It also supports polymorphism for some of
+the planning components. Using object classes and instances is a
+time-tested approach to naturally describe problem domains
+\cite{rumbaugh}. It offers declarative constructs to define
+constraints and causality dependencies between actions and effects and
+finally it offers procedural constructs to populate \eus plan
+database with specific problem instances expressed in terms of
+objects, variables, constraints, facts and goals. To articulate
+important elements of \texttt{NDDL}, we show how the Shopping Agent
+problem could be modeled:
 
 \begin{verbatim}
 
@@ -172,12 +158,12 @@ class Agent {
 }
 \end{verbatim}
 
-In the model above we can see how the main elements or a problem
-domain can be mapped to \eu's representation:
+In the model above one can see the main elements of a problem domain
+can be mapped to \eus representation:
 
-\begin{enumerate}
+\begin{description}
 
-\item \textbf{Object Types}: \texttt{NDDL} supports an object-oriented
+\item[\textbf{Object Types}]: \texttt{NDDL} supports an object-oriented
   approach, where common data and behavior can be abstracted as a
   class. In this case, we have the \textit{Product} class represent
   the products that the Shopping Agent needs, \textit{Location}
@@ -188,38 +174,39 @@ domain can be mapped to \eu's representation:
   \textit{AgentLocation} class to keep track of where the agent is at
   any point in time. \texttt{NDDL} supports a single rooted class
   hierarchy so that state and behavior can be extended through
-  inheritance. We took advantage of that by making
-  \textit{AgentLocation} inherit from \eu's built-in \textit{Timeline}
+  inheritance. We take advantage of that feature by making
+  \textit{AgentLocation} inherit from \eus built-in \textit{Timeline}
   class which doesn't allow predicates to overlap in time for the same
-  object instance, in this way we can ensure that and agent can only
-  be at one place at a time.
+  object instance. This feature is used for instance, to ensure that
+  an agent can only be at one place at a time in our example.
 
-\item \textbf{Variable Types and Instances} : All object attributes
-  are represented as variables in this model, for instance, it uses
+\item[\textbf{Variable Types and Instances}]: All object attributes
+  are represented as variables in this model. For instance, it uses
   integer variables to represent the built-in temporal parameters for
   each token (activity duration, start and end times), string
   variables to represent \textit{Location} and \textit{Product} names,
   and object reference variables to represent the structural
   relationships between different objects (for instance, each Agent
-  has variable to keep track of its \textit{AgentLocation}).
+  maintains a variable to keep track of its \textit{AgentLocation}).
 
-\item \textbf{Predicate Types}: Some classes like \textit{Product},
-  \textit{Location} and \textit{ProductLocation} are completely static
-  and so don't have any predicate or action types associated with
-  them. The \textit{AgentLocation} class is purely used to keep track
-  of state and so it has \texttt{At} and \texttt{Going} predicate
-  types associated with it. The \textit{Agent} class keeps track of
-  the products it purchases through the \texttt{Own} predicate, having
-  a separate \textit{AgentBag} class with its own predicates would
-  have been an equally valid modeling choice.
+\item[\textbf{Predicate Types}]: Some classes like \textit{Product},
+  \textit{Location} and \textit{ProductLocation} are static and so
+  don't have any predicate or action types associated with them. The
+  \textit{AgentLocation} class is used to keep track of state and so
+  has \texttt{At} and \texttt{Going} predicate types associated with
+  it. The \textit{Agent} class keeps track of the products it
+  purchases through the \texttt{Own} predicate; having a separate
+  \textit{AgentBag} class with its own predicates would have been an
+  equally valid modeling choice.
 
-\item \textbf{Action Types}: The \textit{Agent} class is the only one
-  that has behavior associated with it, consequently, it defines
-  action types to represent when the agent is taking action to
+\item[\textbf{Action Types}]: In our example, \textit{Agent} is solely
+  the class that has behavior associated with it. Consequently, it
+  defines action types to represent when the agent is taking action to
   \texttt{Go} to a \textit{Location}, or to \texttt{Buy} a
-  \textit{Product}. We'll see how the actual behavior for those
-  actions is specified below.
-\end{enumerate}
+  \textit{Product}. % We'll see how the actual behavior for those
+  % actions is specified below.
+
+\end{description}
 
 \begin{verbatim}
 
@@ -257,40 +244,40 @@ Agent::Buy {
 \end{verbatim}
 
 Domain rules can be defined in \texttt{NDDL} in the context of a
-Predicate or an Action. In the example above we can see the main
+predicate or an action. In the example above we can see the main
 elements of a rule definition:
 
-\begin{enumerate}
+\begin{description}
 
-\item \textbf{Variables}: A Token Type (predicate or action) is part
-  of a class, therefore class attributes (see references to
-  \texttt{object.location} above), Token Type parameters (see
-  references to \texttt{[from, to]} in \texttt{Agent::Go}, or to
-  \texttt{[duration, product]} in \texttt{Agent::Buy} and locally
-  declared variables (see \texttt{possibleStores} in
-  \texttt{Agent::Buy}) can all be used in the definition of a Rule.
+\item[\textbf{Variables}]: A token type (predicate or action) is part
+  of a class, therefore class attributes (see \texttt{object.location}
+  above), token type parameters (see \texttt{[from, to]} in
+  \texttt{Agent::Go}, or \texttt{[duration, product]} in
+  \texttt{Agent::Buy}) and locally declared variables (see
+  \texttt{possibleStores} in \texttt{Agent::Buy}) can all be used in
+  the definition of a rule.
 
-\item \textbf{Constraints}: restrictions on the values that variables
-  can take inside a Rule are expressed through constraints, in the
-  example above only the \texttt{eq} constraint is used, but in
-  general, any constraint available in \eu's library can be used.
+\item[\textbf{Constraints}]: Restrictions on values that variables can
+  take within a rule are expressed through constraints. In the example
+  above the \texttt{eq} constraint is used; in general, any constraint
+  available in \eus library can be used.
 
-\item \textbf{Subgoals}: In \texttt{Agent::Go}, subgoals are used to
+\item[\textbf{Subgoals}]: In \texttt{Agent::Go}, subgoals are used to
   specify that the Shopping Agent's location must transition from
   origin to destination in a temporally consistent way. The
-  \texttt{[meets, equals, metby]} operators are used to specify
-  subgoals (Allen operators are explained in more detail below), along
-  with the temporal relationship each token representing a subgoal has
-  with the the token representing the \texttt{Agent::Go} action. Also,
+  \texttt{[meets, equals, metby]} operators (see Section
+  \ref{sec:europa:inference}) are used to specify subgoals, along with
+  the temporal relationship each token representing a subgoal has with
+  the the token representing the \texttt{Agent::Go} action. Also,
   \texttt{[condition, effect]} annotations can be used when defining a
-  subgoal inside an action, \eu doesn't immediately associate any
-  semantics with them, but they can be extremely useful for search
+  subgoal inside an action. Currently \eu does not associate semantics
+  with these annotation; but they can be extremely useful for search
   modules when creating plans.
 
-\end{enumerate}
+\end{description}
 
-Having that specification for the Shopping Agent domain, here is how a
-particular problem instance could be stated:
+With that specification for the Shopping Agent domain, a particular
+problem instance could be stated as follows:
 
 \begin{verbatim}
 
@@ -348,49 +335,39 @@ leq(atHomeForDinner.end, horizonEnd);
 \label{eu:model}
 \end{verbatim}
 
-A problem instance consists of:
+This problem instance consists of \textbf{Variables} and
+\textbf{Objects}, \textbf{Facts}, \textbf{Goals} and
+\textbf{Constraints}. In our example we define temporal variables that
+are used to specify the planning horizon (\texttt{horizonStart} and
+\texttt{horizonEnd}) and objects are used to specify locations,
+products, product-location associations and the Shopping Agent that we
+want to plan for. Facts are used to specify the current state of the
+world and do not need any support and are represented as tokens in
+\eus plan database. In this case we use facts to specify that the
+Shipping Agent is initially at home. Goals are also represented as
+tokens in \eus plan database. Different from facts, goals trigger
+inference in \eu which determines whether flaws (unresolved subgoals,
+overloaded resources, etc.) need to be resolved; if so, search modules
+can be invoked to resolve those flaws as part of the deliberation
+process. Finally, constraints are restrictions on and between actions
+and goals. In the example above, we use temporal constraints to
+specify when facts hold and when the goals should be
+accomplished. % As
+% always, all constraints in \eus library could be used.
 
-\begin{enumerate}
-
-\item \textbf{Variables} and \textbf{Objects}: In this case we defined
-  temporal variables that are used to specify the planning horizon
-  (see \texttt{horizonStart} and \texttt{horizonEnd}), and objects are
-  used to specify the locations, products, product-location
-  associations and the Shopping Agent that we want to plan for.
-
-\item \textbf{Facts}: These are used to specify the current state of
-  the world and don't need any support. Facts are represented as
-  tokens in \eu's Plan Database. In this case we use facts to specify
-  that the Shipping Agent is initially at home.
-
-\item \textbf{Goals}: Goals are represented as tokens in \eu's Plan
-  Database. Differently from Facts, Goals trigger inference in \eu
-  which determines whether flaws (unresolved subgoals, overloaded
-  resources, etc.) need to be resolved, if that is the case, search
-  modules can be invoked which will look for a plan to resolve those
-  flaws.
-
-\item \textbf{Constraints}: restrictions on and between actions and
-  goals are specified through constraints, in this case we use
-  temporal constraints to specify when the facts hold and when the
-  goals should be accomplished. As always, all the constraints in
-  \eu's library (built-in, or user defined), can be used to specify
-  these restrictions.
-\end{enumerate}
 
 \subsection{Automated Inference}
 \label{sec:europa:inference}
 
-In \eue, all the Variables and Constraints from a problem domain,
-domain descriptions are kept inside the Constraint Reasoning Engine
-(CRE).  The CRE provides a framework where any number of constraint
-types can collaborate to perform inference and prune variable domains
-using Bounds Propagation and Domain Reduction techniques. \eu uses a
-Propagator pattern, in which a Propagator object keeps track of a set
-of constraint instances of the same type and is responsible for
-ensuring that whenever any variable changes or constraints are
-introduced or dropped, all related variables are updated through
-inference.
+In \eue, all variables and constraints from a problem domain
+description are stored inside the \texttt{CRE}.  The \texttt{CRE}
+provides a framework where any number of constraint types can
+collaborate to perform inference and prune variable domains using
+Bounds Propagation and Domain Reduction techniques \kcomment{citation
+  needed}. \eu uses a Propagator pattern which keeps track of a set of
+constraint instances of the same type and is responsible for ensuring
+that whenever any variable is modified or constraints are introduced
+or dropped, all related variables are updated through inference.
 
 In a planning problem, variable or constraint changes can come
 directly from an end user (by introducing new activities or goals and
@@ -399,12 +376,10 @@ the start time of an activity, etc), or can come from an automated
 planner (by expanding subgoals, introducing precedence constraints to
 resolve mutual exclusion conflicts, etc). When these changes happen,
 each Propagator is only able to ensure consistency for the constraints
-that are associated with it.  To maintain global consistency, the CRE
-implements a variant of the \texttt{AC-3} algorithm \cite{mackworth77}
-where it asks Propagators to perform inference until the Constraint
-Network returns to an stable state.
-
-%\kcomment{add europa's AC-3 algorithm here}
+that are associated with it.  To maintain global consistency, the
+\texttt{CRE} implements a variant of the \texttt{AC-3} algorithm
+\cite{mackworth77} where it asks Propagators to perform inference
+until the Constraint Network returns to an stable state.
 
 \input{constraints-table}
 
@@ -419,7 +394,7 @@ types.
 
 Temporal and resource constraints are specially important to model
 real-life planning domains, so it is worth going into some more detail
-about how \eu's built-in support works for those constraint types.
+about how \eus built-in support works for those constraint types.
 
 \textit{Temporal Constraints:} \eu uses variables to explicitly
 represent timepoints for plan activities and states. Constraints among
@@ -445,6 +420,14 @@ source node to the target node.  The diagram below illustrates a
 simple STN with just 2 variables and a single constraint. It also
 shows the resulting DG.
 
+reflected by the use of the \texttt{Allen Algebra} \cite{allen84}
+temporal relations shown in Fig. \ref{fig:allen-algebra}. Interval
+arithmetic in the EUROPA$_2$ domain model using \texttt{Allen Algebra}
+allows encoding of temporal constraint relationships between tokens on
+concurrent timelines. See \cite{Jonsson00} for additional details
+including propagation algorithms and interval logic.
+
+
 \begin{figure}[!htb]
   \centering
   \subfloat[\small A Simple Temporal Network (STN)]{\label{fig:stn1}\includegraphics[width=0.4\columnwidth]{figs/stn-graph.pdf}}
@@ -461,7 +444,7 @@ path length less than 0. If such a cycle exists, the network is
 inconsistent. It was further shown that a single-source shortest path
 algorithm was sufficient to detect a negative cycle and provide
 sufficient propagation to yield a backtrack-free search. Thus we have
-an efficient and complete algorithm for propagating an STN. \eu's
+an efficient and complete algorithm for propagating an STN. \eus
 Propagator for temporal constraints is a straight implementation of
 this algorithm.
 
@@ -470,7 +453,7 @@ to deal with the fact that plans made up of actions that require
 resources to be performed typically have only a limited amount of
 those resources available (think of fuel, storage capacity, etc).  \eu
 provides built-in support for resources whose availability can be
-measured with real numbers, in terms of \eu's representation, resource
+measured with real numbers, in terms of \eus representation, resource
 object types and their related constraints are provided as follows:
 
 \begin{enumerate}
