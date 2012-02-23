@@ -399,22 +399,23 @@ automated planning. For example in Fig. \ref{fig:agent}, apart from
 other reactor (in blue) is a different instance of an \eu reactor
 differentiated only by their model and \eu solver configurations.
 
-It is important to note that in T-REX architecture the only critical
-task of a reactor is to sucessfully identify its state through
+It is important to note that, in T-REX architecture, the only critical
+task of a reactor is to successfully identify its state through
 synchronization as the execution frontier advances. Indeed, a reactor
 that fails to integrate its {\em external} state updates and/or
 identify its {\em internal} state at any tick express that it is not
 able anymore to explain the state of the world. In the agent point of
 view that means that any state information from this reactor is not to
-be trucsted anymore and will result on this reactor exclusion from the
-execution cycle. As the agent destroy the  faulty reactor is
-destraoyed the agent produced on all of its former {\em internal}
-timelines the special observation \texttt{Failed} to all the reactors
-which did declare these state variables as {\em external} informing
-them through this that this sepcific state varaiable is currently
+be trusted anymore and results on this reactor exclusion from the
+execution cycle and consequent destruction. As the agent destroy 
+the  faulty reactor is destroyed the agent produced on all of 
+its former {\em internal} timelines the special observation 
+\texttt{Failed} to all the reactors which did declare these state 
+variables as {\em external} informing
+them through this that this specific state variable is currently
 unavailable. On the other hand all goals exchanged between reactors
 are considered as rejectable by the reactor that manages them. As a
-result the falure to find a plwn for these goals, while to be avoided,
+result the failure to find a plan for these goals, while to be avoided,
 is not considered as a critical failure of the reactor and will only
 result on these goals being ignored until new goals are received.
 
@@ -425,11 +426,11 @@ in  such case this reactor is destroyed and both
 produced the \texttt{Failed} observation. Therefore, the
 \texttt{Survey controller} will received this observation on its {\em
   external} \texttt{Sampling\_policy} which indicates that this state
-varaiable is not managed anymore. At this point depending on this
-reactor implementationm we have two possible outcomes:
+variable is not managed anymore. At this point depending on this
+reactor implementation we have two possible outcomes:
 \begin{enumerate}
 \item \texttt{Survey  controller} model allows him to integrate this
-  \texttt{Failed} observation. For example it can integarte that from
+  \texttt{Failed} observation. For example it can integrate that from
   now there's now way to take water samples. It is still able to
   navigate as \texttt{Pilot} is still available which allow him to
   continue this aspect of its current plan.
@@ -439,7 +440,7 @@ reactor implementationm we have two possible outcomes:
   the \texttt{Failed} observation is produced on the \texttt{survey}
   timeline.
 \end{enumerate}
-Even on the worst case scenario of the later case, we
+Even on the worst case scenario presented on this second case, we
 note that a reactor failure only propagates up in the reactor graph. 
 In our example, even if all the reactors that depends on
 \texttt{Sampling} are entrained by its failure, we still keep the
@@ -493,7 +494,7 @@ target the synchronization problem by ensuring that the new {\em
   external} state updates are compatible with this plan. If so,
 synchronization propagates these events in the plan and can use it as
 an aid in resolving its {\em current state flaw}. It does so by using
-the plan information on the exepected {\em internal} state evolution
+the plan information on the expected {\em internal} state evolution
 near the execution frontier.
 
 If they are not compatible, then {\em synchronization} identifies a
@@ -779,7 +780,7 @@ outcome on the \texttt{Agent.location} timeline, is to be
 \texttt{At(SuperMarket)} in the directly foreseeable future. 
 
 In the real world the fact that the robot is \texttt{Going} to a
-certain location does not necessarly imply that it will succeed in
+certain location does not necessarily imply that it will succeed in
 ending up there. Due to an exogenous event, for example, the road to
 the \texttt{SuperMarket} could be closed, which could result in an
 alternate observation that the robot is \texttt{At(7th st. \& Main)}
@@ -1100,8 +1101,8 @@ deliberation steps. Consequently, most of the time synchronization is
 limited to very few nodes in the \eu search space often requiring no
 backtracking. Fig. \ref{fig:shop:exec} shows how the existing plan can
 support the synchronization process. The observation \texttt{Going}
-occuring at $\tau'$ is fully compatible with the token already present
-in our plan. By updating the plan and progating equality constraints,
+occurring at $\tau'$ is fully compatible with the token already present
+in our plan. By updating the plan and propagating equality constraints,
 the resolution of the {\em current state flaw} for the {\em Agent}
 timeline becomes obvious as a solution, as the token \texttt{Go} from
 the plan presents itself.
@@ -1113,9 +1114,9 @@ outcome of inserting all possible token types the timeline can accept.
 This is the reason this choice is evaluated last in our flaw
 resolution strategy.
 
-% In that sense, and thanks to the carefull choice on our
-% synchronization heurisitic we see that the plan produced during \rx
-% deliberation steps helps sthe synchronization process to be more
+% In that sense, and thanks to the careful choice on our
+% synchronization heuristic we see that the plan produced during \rx
+% deliberation steps helps the synchronization process to be more
 % efficient.
 
 % Should such a flaw be revealed 
@@ -1206,7 +1207,7 @@ latency.
 
 % As long as one can ensure that synchronization of all
 % reactors and deliberation steps can be done within a time that is
-% resonably small in comparison to the agent tick duration.
+% reasonably small in comparison to the agent tick duration.
 
 
 
