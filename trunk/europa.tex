@@ -529,6 +529,9 @@ ignore activities that may occur far in the future or in the past to
 be relevant for a particular plan, ensuring that the solver is making
 as few commitments as necessary and making planning tractable.
 
+\subsubsection{Flaw Resolution}
+\label{sec:europa:flaws}
+
 \eu provides a built-in solver that performs \emph{Plan Space
   Planning} \cite{ghallab04}; the initial state is considered a
 partial plan that needs to be refined toward a solution that achieves
@@ -618,22 +621,21 @@ detected are:
 
 \end{description}
 
-Open Conditions and Threats allow flaw detection and resolution at a
-higher-level of abstraction (i.e. in terms of objects and tokens) than
-that of simply binding variables as is common in Constraint
-Satisfaction Problems. This is advantageous when one applies
-heuristics for ordering choices since it provides a richer context in
-which to make decisions.  Furthermore, it aids in reducing the amount
-of work done by a solver so that only the necessary refinements are
-made, otherwise leaving the partial plan with maximum flexibility. For
-example, one can omit unbound variables which are time-points of
-tokens since threats will force a solver to impose restrictions on
-these variables based on the semantics of the objects to which their
-tokens apply. Thus the planning process may yield partially-ordered
-plans for which all possible extensions are provably valid.
+Open conditions and threats allow flaw detection and resolution at a
+higher-level of abstraction (\ie in terms of objects and tokens) than
+that of binding variables as is common in Constraint Satisfaction
+Problems. This is advantageous when a solver applies heuristics for
+ordering choices since it provides a richer context in which to make
+decisions.  Furthermore, it aids in reducing the amount of work done
+by a solver so that only the necessary refinements are made leaving a
+partial plan with sufficient flexibility. For example, one can bypass
+committing unbound timepoint variables since threats will force a
+solver to impose ordering restrictions on these variables.  Thus the
+planning process may yield partially-ordered plans for which all
+possible extensions are provably valid.
 
 The Plan Space Planning algorithm described above can be implemented
-in many different ways depending on the approach chosen for flaw and
+in multiple ways depending on the approach chosen for flaw and
 resolver selection and for backtracking. \eus built-in solver
 implements a chronological backtracking algorithm that is summarized
 in Algorithm \ref{alg:europa:solve}.
@@ -660,74 +662,82 @@ in Algorithm \ref{alg:europa:solve}.
 \label{alg:europa:solve}
 \end{algorithm}
 
+The algorithm takes as input a partial plan $p$ and returns true if a
+complete and consistent refinement of $p$ could be found (or if $p$ is
+initially complete and consistent) and false otherwise. Briefly the
+algorithm is described as:
 
-The algorithm takes as input a partial plan p and returns true if a
-complete and consistent refinement of p could be found (or if p is
-initially complete and consistent), and false otherwise.
+\begin{description}
 
-\begin{enumerate}
+\item[Line \textbf{\ref{li:propagate}}]: Propagate the constraints to
+  test for inconsistency. If inconsistent, then return false since no
+  refinements to $p$ can yield a consistent plan.
 
-\item Line \ref{li:propagate}: Propagate the constraints to test for
-  inconsistency. If found to be inconsistent, then we can return false
-  since this is a dead-end i.e. no refinements to p can yield a
-  consistent plan.
+\item[Line \textbf{\ref{li:selectflaw}}]: Choose a flaw from the set
+  of available flaws.
 
-\item Line \ref{li:selectflaw}: Choose a flaw from the set of
-  available flaws.
+\item[Line \textbf{\ref{li:noflaw}}]: If there are no flaws, then $p$
+  is complete and terminate with success.
 
-\item Line \ref{li:noflaw}: If there are no flaws, then p is complete
-  and we can terminate with success.
-
-\item Line \ref{li:decisionpt}: Otherwise we formulate a decision
-  point which is a branch in the search space. Each choice is a
-  particular refinement operation and the DecisionPoint collects all
+\item[Line \textbf{\ref{li:decisionpt}}]: Formulate a decision point
+  which is a branch in the search space. Each choice is a particular
+  refinement operation and the \texttt{DecisionPoint} collects all
   possible refinement operations for the given flaw.
 
-\item Line \ref{li:decisionloop}: We keep trying until the chosen flaw
-  is resolved, or until we run out of resolvers to try.
+\item[Line \textbf{\ref{li:decisionloop}}]: Keep trying until the
+  chosen flaw is resolved, or until there are no further resolvers to
+  try.
 
-\item Line \ref{li:decide}: A new partial plan is obtained by
-  application of a refinement operator. Note that the ordering over
+\item[Line \textbf{\ref{li:decide}}]: A new partial plan is obtained
+  by application of a refinement operator. Note that the ordering over
   refinement operators to select is a non-deterministic step.
 
-\item Line \ref{li:recurse}: Recursive call to solve the new planning
-  problem. If successful, then we are done.
+\item[Line \textbf{\ref{li:recurse}}]: Recursive call to solve the
+  new planning problem. If successful, then success.
 
-\item Line \ref{li:backtrack}: Otherwise, retract the last refinement
-  operation and move on to try the next one.
+\item[Line \textbf{\ref{li:backtrack}}]: Otherwise, retract the last
+  refinement operation and move on to try the next one.
 
-\item Line \ref{li:noplan}: If we arrive here, then we have exhausted
-  all options to resolve the flaw, including the case where no options
-  were available initially. Thus the problem cannot be solved.
+\item[Line \textbf{\ref{li:noplan}}]: Arriving here implies all
+  options to resolve the flaw have been exhausted, including the case
+  where no options were available initially. Thus the problem is
+  insoluble.
 
-\end{enumerate}
+\end{description}
 
-
-This algorithm provides for a sound and complete search, assuming that
-no flaws or available refinement operators are pruned unnecessarily.
-Dead-ends in the search are discovered through constraint propagation.
-Constraint propagation is a vehicle for evaluating the consistency of
-a partial plan and also for filtering infeasible values from
-consideration prior to commitment, allowing in some cases a strong
-look-ahead capability which is essential for tractable
-search. Consistency testing is initiated by the isConsistent
+Algorithm \ref{alg:europa:solve} provides for a sound and complete
+search, assuming that no flaws or available refinement operators are
+pruned unnecessarily.  Dead-ends in the search are discovered through
+constraint propagation, a vehicle for evaluating the consistency of a
+partial plan and also for filtering infeasible values from
+consideration prior to commitment. % This allows in some cases a strong
+% look-ahead capability which is essential for tractable
+% search.
+Consistency testing is initiated by the \texttt{isInconsistent}
 procedure. The algorithm permits a heuristically controlled search by
-applying orderings for chooseFlaw and makeDecisionPoint. It results in
-a chronologically-backtracking search.
+applying orderings for \texttt{chooseFlaw} and
+\texttt{makeDecisionPoint} resulting in a chronologically-backtracked
+search. Heuristics can be implemented by applying ordering/filtering
+policies for \texttt{chooseFlaw} and \texttt{makeDecisionPoint}, for
+instance, by dealing with earliest flaws first, or by making planning
+decisions (open condition flaws) before scheduling decision (threats).
 
-Heuristics can be implemented by applying ordering/filtering policies
-for \texttt{chooseFlaw} and \texttt{makeDecisionPoint}, for instance,
-by dealing with earliest flaws first, or by making planning decisions
-(open condition flaws) before scheduling ones (threats), etc.
-
-It should be emphasized that while this algorithm is commonly
-employed, it is only one of many that could be implemented. As a
-simple example, consider the following solver for the N-Queens
-problem, where there is an integer variable Vi to represent the queen
-in column i, so that for instance, V1=3 means that the variable on
-column 1 is placed on row 3.  non-attack constraints are posted as
-arithmetic constraints among the Vi variables to ensure that all the
-rows and diagonals contain only one queen.
+It should be emphasized that while this algorithm is commonly employed
+with \eu implementations, it is only one of many that could be
+implemented. As a simple example, consider the following solver for
+the $N$-Queens problem, where an integer variable V$_i$ represents the
+queen in column $i$; V$_1$ $= 3$ implies that the variable on column
+$1$ is placed on row $3$.  Non-attack constraints are posted as
+arithmetic constraints among the V$_i$ variables to ensure that all
+the rows and diagonals contain only one queen. \eus Constraint
+Reasoning Engine or \texttt{CRE} can then be used to compute the
+non-attack constraint violations, with \texttt{ce.getViolations()} a
+call on the API, to pick the queen that has he most violations.  By
+implementing \texttt{getQueenWithMaxViolation()} and looking ahead to
+see what moves are possible for a queen that would remove its
+violations with the implementing of \texttt{getMoves()}, this solver
+provides a viable planner implementation for a range of possible
+initial states.
 
 \begin{algorithm}[H]
   \KwIn{ConstraintEngine $ce$}
@@ -754,14 +764,6 @@ rows and diagonals contain only one queen.
   }
   \caption{$solveNQueens(ce, maxIter)$}
 \end{algorithm}
-
-\eus Constraint Reasoning Engine can be used to compute the non-attack
-constraint violations (\texttt{ce.getViolations()} is a straight call
-on the \eu API), to easily pick the queen that has he most violations
-by implementing \texttt{getQueenWithMaxViolation(ce)} and to look
-ahead and see what moves are possible for a queen that would remove
-its violations by implementing
-\texttt{getMoves(ce,queenToMove,curPos)}.
 
 In similar fashion, the constraint violation and flaw reporting
 mechanisms that \eu provides can be used as building blocks that
