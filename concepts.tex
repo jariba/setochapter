@@ -16,7 +16,7 @@ to date, in the mission-critical uplink process for the
 command/control of the Mars Exploration Rovers (\texttt{MER})
 mission. A vastly re-factored, higher performance open source version
 \cite{europapso} was named \eut and is the subject of this chapter and
-used by \rx.  Note however, in using the name \eu, we refer to the
+used by \rxe.  Note however, in using the name \eu, we refer to the
 \emph{fundamental ideas as well as the planning paradigm} even if
 there exists a specific implementation.
 
@@ -54,7 +54,7 @@ flexible partial plan.
 
 \begin{figure}[!htb]
 \centering
-\includegraphics[scale=0.35]{figs/flexible-timelines.pdf}
+\includegraphics[scale=0.3]{figs/flexible-timelines.pdf}
 \caption{\small Tokens with flexible temporal intervals and parametric
   constraints between tokens. This example shows the triggering of a
   water sampler based on a feature threshold while the vehicle
@@ -257,7 +257,7 @@ At the atomic level, the entities in the \eu plan representation are:
     restriction.  This is required to support \texttt{CAIP}'s approach
     to planning where goals and subgoals can be satisfied by either
     adding new intervals (tokens) to the plan, or by merging with
-    existing intervals. 
+    existing intervals.
     
   \end{enumerate}
 
@@ -302,31 +302,32 @@ At the atomic level, the entities in the \eu plan representation are:
   tokens.  Goals can be posted explicitly, for example, when a user
   asks the Shopping Agent to own a specific product by a specific
   time, or implicitly when subgoals are created as a result of domain
-  rules. For instance, when the Shopping Agent must get to a location where a product is
-  available before it is able to purchase it: in this case the
-  original goal of purchasing the product spawns a subgoal of being at
-  a specific location without which the purchase will not occur as
-  defined in the domain model.  Looking at how a simple Shopping
-  Agent goal would be addresed by \eu helps illustrate how Token
-  States support the planning process.  Let's assume the planner
-  starts with a partial plan that places the Shopping agent at home at
-  time $0$ with no products in possession. Let's also assume that goals are posted for
-  the Agent to own a drill by time 10 and to be home by time 20 as depicted in Fig. \ref{fig:europapr1}
+  rules. For instance, when the Shopping Agent must get to a location
+  where a product is available before it is able to purchase it: in
+  this case the original goal of purchasing the product spawns a
+  subgoal of being at a specific location without which the purchase
+  will not occur as defined in the domain model.  Looking at how a
+  simple Shopping Agent goal would be addresed by \eu helps illustrate
+  how Token States support the planning process.  Let's assume the
+  planner starts with a partial plan that places the Shopping agent at
+  home at time $0$ with no products in possession. Let's also assume
+  that goals are posted for the Agent to own a drill by time $10$ and
+  to be home by time $20$ as shown in Fig. \ref{fig:europapr1}
   
-\begin{figure} \centering
-  \includegraphics[scale=0.45]{figs/europa-pr-1.jpg}
-  \caption{\small Timelines representing initial state and goals for a Shopping Agent.}
-\label{fig:europapr1}
-\vskip+0.1cm
-\end{figure}
+  \begin{figure} \centering
+    \includegraphics[scale=0.4]{figs/europa-pr-1.pdf}
+    \caption{\small Timelines representing initial state and goals for a Shopping Agent.}
+    \label{fig:europapr1}
+  \end{figure}
 
-  Note that the tokens \texttt{Own(Drill)}  and \texttt{At(Home)} that represent the goals are
-  not immediately placed on the \texttt{AgentBag} or \texttt{AgentLocation} timelines since \eu
-  must first determine whether it can achieve those goal and how. When the
+  Note that the tokens \texttt{Own(Drill)} and \texttt{At(Home)} that
+  represent the goals are not immediately placed on the
+  \texttt{AgentBag} or \texttt{AgentLocation} timelines since \eu must
+  first determine whether it can achieve those goal and how. When the
   goals are posted and before any decisions are made, the
-  \texttt{Own(Drill)} and \texttt{At(Home)} tokens are created in an \texttt{INACTIVE}
-  state. \eu then considers the partial plan and evaluates two
-  possible alternatives:
+  \texttt{Own(Drill)} and \texttt{At(Home)} tokens are created in an
+  \texttt{INACTIVE} state. \eu then considers the partial plan and
+  evaluates two possible alternatives:
 
 \begin{enumerate}
 
@@ -346,61 +347,76 @@ When a token is merged, all restrictions imposed on the merged token
 are transferred to the active token upon which it is merged. Merging a
 token requires finding a target active token that is compatible. Two
 tokens are merge-compatible if they are instances of the same
-predicate and there are no empty intersections between corresponding token variables. 
-The effect of merging is illustrated in Fig. \ref{fig:europapr:merge}
+predicate and there are no empty intersections between corresponding
+token variables.  The effect of merging is illustrated in
+Fig. \ref{fig:europapr:merge}
 
-\begin{figure} \centering
-  \includegraphics[scale=0.45]{figs/europa-pr-merge.jpg}
-  \caption{\small Timeline states after satisfying goal to be home by time 20 by merging with initial state}
-\label{fig:europapr:merge}
-\vskip+0.1cm
+\begin{figure} 
+  \centering
+  \includegraphics[scale=0.4]{figs/europa-pr-merge.pdf}
+  \caption{\small State of timelines after satisfying a goal to be
+    home by time $20$ on merging with initial state.}
+  \label{fig:europapr:merge}
 \end{figure}
 
-The goal to be home by time 20 is satisfied by merging with the initial state that said that the Agent is home at time 0.
-The merge is possible because the tokens are of the same type \texttt{At}, and intersecting the domains for all of their variables
-doesn't yield an empty domain (which represents an inconsistency), in this case the token variables are the location, 
-which is \texttt{Home} in both cases, and the temporal variables (start, end, duration), which can be intersected without causing 
-an inconsistency. After the token representing the goal is merged onto the token representing the initial state, the resulting token
-represents not only the fact that the Agent must be \texttt{At(Home)} by time 0 but also \texttt{At(Home)} at time 20, this is reflected in 
-the new constraints on the token's start and end variables as depicted in Fig. \ref{fig:europaprmerge}.
+The goal to be home by time $20$ is satisfied by merging with the
+initial state that said that the Agent is home at time $0$.  The merge
+is possible because the tokens are of the same type \texttt{At}, and
+intersecting the domains for all of their variables doesn't yield an
+empty domain (which represents an inconsistency), in this case the
+token variables are the location, which is \texttt{Home} in both
+cases, and the temporal variables (start, end, duration), which can be
+intersected without causing an inconsistency. After the token
+representing the goal is merged onto the token representing the
+initial state, the resulting token represents not only the fact that
+the Agent must be \texttt{At(Home)} by time 0 but also
+\texttt{At(Home)} at time $20$, this is reflected in the new
+constraints on the token's start and end variables as depicted in
+Fig. \ref{fig:europapr:merge}.
 
-When a token is activated, all domain rules associated with its type are evaluated,
-which may lead to new subgoals being generated. In our example, there
-could be a domain rule stating that if a  Shopping Agent doesn't already own a product,
-then it must \texttt{Buy} it before it can \texttt{Own} it. In such a case,
-activating the \texttt{Own(Drill)} token will cause a new
-\texttt{Buy(Drill)} to be created in an \texttt{INACTIVE}
-state, which in turn could spawn its own subgoals, like being at the location where the product
-can be purchased before being able to buy it, and so on, until all domain rules are satisfied.
+When a token is activated, all domain rules associated with its type
+are evaluated, which may lead to new subgoals being generated. In our
+example, there could be a domain rule stating that if a Shopping Agent
+doesn't already own a product, then it must \texttt{Buy} it before it
+can \texttt{Own} it. In such a case, activating the
+\texttt{Own(Drill)} token will cause a new \texttt{Buy(Drill)} to be
+created in an \texttt{INACTIVE} state, which in turn could spawn its
+own subgoals, like being at the location where the product can be
+purchased before being able to buy it, and so on, until all domain
+rules are satisfied.
 
 \begin{figure} \centering
-  \includegraphics[scale=0.45]{figs/europa-pr-activate.jpg}
-  \caption{\small Timeline states after satisfying goal to own drill by time 10 by activating corresponding token}
+  \includegraphics[scale=0.4]{figs/europa-pr-activate.pdf}
+  \caption{\small State of timelines after satisfying a goal to own a
+    drill by time $10$ by activating corresponding token.}
 \label{fig:europapr:activate}
-\vskip+0.1cm
 \end{figure}
 
-It is easy to see in Fig. \ref{fig:europapr:activate} that the decision to merge the goal to be \texttt{At(Home)} by time 20 
-with the initial state was not a good one since the Agent will have to get away from \texttt{Home} to be able to 
-buy the drill which is inconsistent with the constraints that resulted after the merge. As a result that decision will have 
-to be retracted at some point and the alternative to activate or merge with a different token will have to be considered.
+As Fig. \ref{fig:europapr:activate} shows the decision to merge the
+goal to be \texttt{At(Home)} by time $20$ with the initial state was
+not appropriate since the Agent will have to get away from
+\texttt{Home} to be able to buy the drill which is inconsistent with
+the constraints that resulted after the merge. As a result that
+decision will have to be retracted at some point and the alternative
+to activate or merge with a different token will have to be
+considered.
 
-If, after looking at all possibilities, neither activating nor merging work, a token may be
-\texttt{REJECTED}. This is possible only for goals posted by the end
-user and specified as optional. Subgoals generated as a result of
-token activation cannot be rejected. If a subgoal cannot be satisfied
-through activation or merging then it will cause the original
-activation decision that spawned it to be retracted.
+If, after looking at all possibilities, neither activating nor merging
+work, a token may be \texttt{REJECTED}. This is possible only for
+goals posted by the end user and specified as optional. Subgoals
+generated as a result of token activation cannot be rejected. If a
+subgoal cannot be satisfied through activation or merging then it will
+cause the original activation decision that spawned it to be
+retracted.
 
-As can be seen from the above example, during the search for a plan, a token's state can go from
-\texttt{INACTIVE} to \texttt{ACTIVE, MERGED} or \texttt{REJECTED}, as
-shown in Fig. \ref{fig:europapr:states}.
+As can be seen from the above example, during the search for a plan, a
+token's state can go from \texttt{INACTIVE} to \texttt{ACTIVE, MERGED}
+or \texttt{REJECTED}, as shown in Fig. \ref{fig:europapr:states}.
 
 \begin{figure} \centering
   \includegraphics[scale=0.45]{figs/europa-pr-states.jpg}
   \caption{\small Possible transitions for a Token State}
 \label{fig:europapr:states}
-\vskip+0.1cm
 \end{figure}
 
 
@@ -425,24 +441,24 @@ shown in Fig. \ref{fig:europapr:states}.
   Shopping Agent precede and succeed tokens of the predicate
   \texttt{Go} that represents traveling.
 
-  \begin{figure} \centering
-  \includegraphics[scale=0.45]{figs/europa-pr-rules.jpg}
-  \caption{\small Master and Slave tokens generated as a result of a Domain Rule}
-\label{fig:europapr:rules}
-\vskip+0.1cm
-\end{figure}
+  \begin{figure} 
+    \centering
+    \includegraphics[scale=0.4]{figs/europa-pr-rules.pdf}
+    \caption{\small Master and Slave tokens generated as a result of a domain rule.}
+    \label{fig:europapr:rules}
+  \end{figure}
 
-  Fig. \ref{fig:europapr:rules} illustrates the entities and
-  relations involved in specifying such a rule on a \texttt{Go}
-  action. The token on which the rule applies  (\texttt{Go}) is referred to
- as the \emph{master}. Each \texttt{At} and \texttt{Going} token required
-  by the master is referred to as a \emph{slave}. 
-  Application of a rule on a token can thus cause slave
-  tokens, variables and constraints to be introduced.  The capability
-  of a domain rule to cause a slave token to be created is a key
-  vehicle through which planning occurs. Semantically, a rule
-  imposes a requirement for supporting (slave) tokens to be in the
-  plan in order for the master token to be valid.
+  Fig. \ref{fig:europapr:rules} illustrates the entities and relations
+  involved in specifying such a rule on a \texttt{Go} action. The
+  token on which the rule applies (\texttt{Go}) is referred to as the
+  \emph{master}. Each \texttt{At} and \texttt{Going} token required by
+  the master is referred to as a \emph{slave}.  Application of a rule
+  on a token can thus cause slave tokens, variables and constraints to
+  be introduced.  The capability of a domain rule to cause a slave
+  token to be created is a key vehicle through which planning
+  occurs. Semantically, a rule imposes a requirement for supporting
+  (slave) tokens to be in the plan in order for the master token to be
+  valid.
 
 \end{description}
 
