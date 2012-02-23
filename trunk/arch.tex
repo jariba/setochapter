@@ -50,10 +50,10 @@ and beyond \texttt{IDEA} are in the following ways:
 
 \item \emph{Coupling} a tighter integration between the planning
   process and world evolution to ensure that planning occurs
-  \emph{during continuous} state update. By doing so, the planner is
+  \emph{during continuous} state update in the {\em same} polan
+  database used for planning. By doing so, the planner is
   better informed in its deliberation despite a larger latency than
-  the changing world.
-
+  the changing world. 
 \end{itemize}
 
 Systematic partitioned inference is a major contribution of
@@ -399,6 +399,59 @@ automated planning. For example in Fig. \ref{fig:agent}, apart from
 other reactor (in blue) is a different instance of an \eu reactor
 differentiated only by their model and \eu solver configurations.
 
+It is important to note that in T-REX architecture the only critical
+task of a reactor is to sucessfully identify its state through
+synchronization as the execution frontier advances. Indeed, a reactor
+that fails to integrate its {\em external} state updates and/or
+identify its {\em internal} state at any tick express that it is not
+able anymore to explain the state of the world. In the agent point of
+view that means that any state information from this reactor is not to
+be trucsted anymore and will result on this reactor exclusion from the
+execution cycle. As the agent destroy the  faulty reactor is
+destraoyed the agent produced on all of its former {\em internal}
+timelines the special observation \texttt{Failed} to all the reactors
+which did declare these state variables as {\em external} informing
+them through this that this sepcific state varaiable is currently
+unavailable. On the other hand all goals exchanged between reactors
+are considered as rejectable by the reactor that manages them. As a
+result the falure to find a plwn for these goals, while to be avoided,
+is not considered as a critical failure of the reactor and will only
+result on these goals being ignored until new goals are received.
+
+Take for example our AUV agent from Fig. \ref{fig:agent},
+and assume that the \texttt{Sampling} reactor failed to synchronize;
+in  such case this reactor is destroyed and both
+\texttt{Sampling\_policy} and \texttt{Relevant\_data} state variables
+produced the \texttt{Failed} observation. Therefore, the
+\texttt{Survey controller} will received this observation on its {\em
+  external} \texttt{Sampling\_policy} which indicates that this state
+varaiable is not managed anymore. At this point depending on this
+reactor implementationm we have two possible outcomes:
+\begin{enumerate}
+\item \texttt{Survey  controller} model allows him to integrate this
+  \texttt{Failed} observation. For example it can integarte that from
+  now there's now way to take water samples. It is still able to
+  navigate as \texttt{Pilot} is still available which allow him to
+  continue this aspect of its current plan.
+\item \texttt{Survey controller} models is not able to handle this
+  unexpected failure resulting in turn on its failure to
+  synchronize. This result on this reactor being also destroyed and
+  the \texttt{Failed} observation is produced on the \texttt{survey}
+  timeline.
+\end{enumerate}
+Even on the worst case scenario of the later case, we
+note that a reactor failure only propagates up in the reactor graph. 
+In our example, even if all the reactors that depends on
+\texttt{Sampling} are entrained by its failure, we still keep the
+three reactors \texttt{Vehicle}, \texttt{Pilot} and \texttt{Ship
+  operation} allowing to  maintain the vehicle navigation control
+(\texttt{Pilot}) along with high level safety operation 
+(\texttt{Ship operation}). It illustrates how \rx can handle graceful
+system degradation despite the failure of one or more reactors. It
+also emphasize that it is critical to ensure that the low level
+reactors are properly designed in order to be as robust as 
+possible. 
+
 \subsection{The  Deliberative Reactor}
 \label{sec:arch:europa}
 
@@ -642,7 +695,14 @@ The synchronization process in turn can be described as:
 \begin{enumerate}
 
 \item Integrate the external state as provided by the owner of each
-  external timeline into the plan database.
+  external timeline into the plan database. 
+  \begin{itemize}
+  \item New observations are integrated by creating the
+    corresponding token as a fact in the plan database
+  \item If no observations have been received at this tick the last
+    observation token restrict its \texttt{end} domaine to the
+    interval $[\tau+1, +\infty)$
+  \end{itemize}
 
 \item Propagate this information in the plan database using model
   $\mathcal{M}$ of this reactor.
@@ -931,8 +991,13 @@ two effects:
 \subsubsection{Interleaving Synchronization and Execution}
 \label{sec:arch:intertwine}
 
-A key aspect of the \rx framework is interleaved plan execution. As
-noted above, it is synchronization which drives planning, so the
+A key aspect of the \rx framework is interleaved plan and
+execution. Both {\em synchronization} -- keeping track of execution --
+and {\em deliberation} -- dealing with reactor planning -- of one
+reactor are sharing the same {\em single} plan database which 
+they modify alternatively as the \rx agent schedule their execution.
+
+As noted above, it is synchronization which drives planning, so the
 co-mingling between these two processes is critical to maintaining
 state within a robot especially when it is immersed in a dynamic
 environment. Further, it is important that \rx maintain
