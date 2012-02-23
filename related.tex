@@ -126,7 +126,7 @@ contrast in providing a distinct set of advantages:
 
 \end{enumerate}
 
-There are costs associated with such inference based control which are 
+There are costs associated with such inference based control which are
 not inconsequential. Foremost among them is the steep learning curve
 that comes with the design of the domain model. With limited support
 tools necessary for knowledge capture and design of the constraints
@@ -136,7 +136,10 @@ problem solving. More importantly it is often necessary for the
 modeler to be exposed to the internal representation of the planner
 and how it performs search. The level of expertise is often well above
 what would be expected of a typical well-rounded Computer Science
-graduate student.
+graduate student. Yet in our experience, the cost of model design in
+such systems, is well balanced against the cost of re-engineering new
+mission scripts for new deployment in more ``classical'' script-based
+controllers.
 
 However this is mild criticism given the end benefits and the
 scientific and engineering goals associated with adaptive and
@@ -144,11 +147,6 @@ persistent observation for marine robots whether for civil or military
 applications. Given the general problem-solving nature of such
 deliberative systems, there is also a substantial overall benefit for
 the field of robotics. 
-\fcomment{Though it woulfd  be usefull to emphasize this ...}
-The cost of modeling put aduring the intial design, for example,
-should be balanced against the cost of redesigning
-a new mission script eate every new deployment in more ``classical''
-script-based controllers. 
 
 \subsection{Evolution of AI-based Robotic Planning: A Necessary Digression}
 
@@ -177,10 +175,9 @@ rationale), notable examples of which include \texttt{IPEM}
 \cite{AmbrosIngerson88}, \texttt{ROGUE} \cite{Haigh98}, the LAAS
 Architecture \cite{alami:1998p820}, the Remote Agent Experiment
 \texttt{RAX} \cite{mus98} and the Autonomous Spacecraft Experiment
-\texttt{ASE} \cite{chien99} (see \cite{Knight01} for a survey). Early
-efforts were cognizant of if absent with, dealing with time and
-resources for such experiments.\fcomment{This sentence does not make
-  sence to me}
+\texttt{ASE} \cite{chien99} (see \cite{Knight01} for a survey). % Early
+% efforts were cognizant of if absent with, dealing with time and
+% resources for such experiments.
 
 Representationally, the first paper on managing time systematically
 within AI Planning frameworks was \cite{dean87}; subsequent efforts by
@@ -375,17 +372,15 @@ controller, relying instead on a possibly exponential planning
 algorithm. Efficient synchronization of state in a partitioned
 structure is fundamental to making the approach effective in practice.
 
-Our system, \texttt{T-REX}, the focus of this chapter, is an agent
-control structure formally defined as a composition of coordinated
-control loops where sensing, planning and acting are resulting from 
-concurrent deliberating tasks within a formal framework. \fcomment{Got
-  rid of sense-plan-act reference here. \rx plan/sense while sensing/planning.}
-\texttt{T-REX} was designed after carefully
-evaluating lessons learned from \texttt{IDEA} and owes substantially
-to the notion of partitioned problem solving from that effort. However
-this partitioning is systematic and methodologically principled where
-we manage the information flow within the partitioned structure to
-ensure consistency in order to direct the flow of goals and
+Our system, \rx, the focus of this chapter, is an agent control
+structure formally defined as a composition of coordinated control
+loops where sensing, planning and acting are resulting from concurrent
+deliberating tasks within a formal framework.  \rx was designed after
+carefully evaluating lessons learned from \texttt{IDEA} to which it
+owes substantially the notion of partitioned problem solving. However
+partitioning in \rx is systematic and methodologically principled
+where we manage the information flow within the partitioned structure
+to ensure consistency in order to direct the flow of goals and
 observations in a timely manner. The resulting control structure
 improves scalability since many details of each controller can be
 encapsulated within a single control loop.  Furthermore, partitioning
@@ -394,15 +389,14 @@ enable graceful system degradation, making this an effective
 \emph{divide-and-conquer} approach to the overall control problem.
 
 A recent variation of the key idea of such controller composition
-derived from \texttt{T-REX} is \texttt{ROAR} \cite{degroote11} where
-lower-level functional modules that control specific sensors are
-organized within a graph hierarchy. One reason they cite such a
-structure is essential is in dealing robustly to failure; an
-off-nominal condition will allow rapid graph traversal to identify
-alternative ways in which sensing tasks can be executed and therefore
-aiding in responsiveness. However, it is unclear whether to date this
-system actually deliberates and whether it is actually instantiated on
-a real platform for control.
+derived from \rx is \texttt{ROAR} \cite{degroote11} where lower-level
+functional modules that control specific sensors are organized within
+a graph hierarchy. One reason they cite such a structure is essential
+is in dealing robustly to failure; an off-nominal condition will allow
+rapid graph traversal to identify alternative ways in which sensing
+tasks can be executed and therefore aiding in responsiveness. However,
+it is unclear whether to date this system actually deliberates and
+whether it is actually instantiated on a real platform for control.
 
 % ``The whole partition must be accordingly reorganized: this kind of
 % construction does not scale well over a large variety of missions,
