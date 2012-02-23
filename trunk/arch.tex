@@ -57,7 +57,7 @@ and beyond \texttt{IDEA} are in the following ways:
 \end{itemize}
 
 Systematic partitioned inference is a major contribution of
-\rx. However that is not the focus of this chapter with details
+\rxe. However that is not the focus of this chapter with details
 covered in \cite{py10, rajan12}. Coupled interaction between planning
 and the world on the other hand, has a significant implication on how
 planning can be integrated in such frameworks. In this chapter we show
@@ -402,11 +402,11 @@ differentiated only by their model and \eu solver configurations.
 \subsection{The  Deliberative Reactor}
 \label{sec:arch:europa}
 
-Within \rx, an instance of an \eu reactor comes with the sole purpose
+Within \rxe, an instance of an \eu reactor comes with the sole purpose
 to deliberate. A typical design of such a reactor takes its cues from
 \texttt{IDEA} \cite{mus02, mus06} where both planning and execution
 are based on a single unified model within a rich representation that
-provides support for temporal inference. In \rx, the execution cycle
+provides support for temporal inference. In \rxe, the execution cycle
 consists of two deliberation processes which are implemented as two
 separate \eu solvers modifying the \emph{same} plan database.
 
@@ -483,7 +483,7 @@ plan. In the eventuality that such repair is not feasible they require
 that their robot comes to a stop until (re-)planning is complete.  
 
 This assumption is problematic for situated agents in general and as
-Fig. \ref{fig:tick-exec} shows, for \rx. Synchronization that tracks
+Fig. \ref{fig:tick-exec} shows, for \rxe. Synchronization that tracks
 state evolution can occur several times during reactor
 deliberation. By making synchronization and deliberation share the
 same plan we provide a solution that relaxes this static world
@@ -505,7 +505,7 @@ targeting the change at the execution frontier.
 \end{quote}}
 
 This suggests a deliberate non overlap between {\em reactive planner}
-and {\em deliberative planners} horizons. In \rx, and more
+and {\em deliberative planners} horizons. In \rxe, and more
 specifically in our \eu reactor the planning horizon of {\em
   synchronization} -- limited to the current tick -- is a subset of
 the planning horizon of the deliberation steps -- starting at the
