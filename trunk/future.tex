@@ -141,19 +141,17 @@ ensure that this kind of dynamic alteration of the graph can be done
 wothout breaking our current assumptions both at \rx level and \eu
 level.
 
-More specifically to \eu level we would like to improve \rx
+At the \eu level we would like to improve \rx
 integration of \eu ability to deliberate about resources. More
-specifically we need to ba able to update resource level as 
-modeled by \eu based on \rx observation.  As of today the 
-support of resource is limited inside the \eu solver and there's no
-direct way for \rx to update them dynamically based on recent
-observations. This result on a potential discrepeancy between measured
-given by, for example, the battery as modeled in \eu and the current
-battery level as read in a \rx timeline. Finding an automated way to
-link these two constructs would allow the plan to dynamically readapt
-when these two values differs -- for example if the vehicle looses a
-battery bank during a mission.
-
+specifically we need to be able to update resource level as 
+modeled by \eu based on \rx observation.  
+Keeping the link between these two constructs automatically updated 
+would allow the plan to dynamically adapt when these two values differ -- 
+for example if the vehicle looses a battery bank during a mission.
+Work is being done on \eu to provide enhanced modeling
+capabilities and more powerful domain-independent search, these
+would make it easier for \rx users to create domain models and to 
+perform more ambitious deliberation.
 
 
 % multi-vehicle control
