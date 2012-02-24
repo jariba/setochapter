@@ -365,11 +365,10 @@ accomplished. % As
 
 In \eu, problem domains use \texttt{Allen Algebra} \cite{allen84}
 temporal relations shown in Fig. \ref{fig:allen-algebra} which allow
-encoding of temporal constraint relationships between tokens on
-concurrent timelines. \kcomment{This para could do with a little
+encoding of temporal constraint relationships between tokens. 
+%\kcomment{This para could do with a little
   embellishment especially since it is the only material that actually
-  talks about the kinds of constraints and their origin.}
-
+  talks about the kinds of constraints and their origin.JB: I don't really know what else to say given the table above.}
 
 \subsection{Automated Inference}
 \label{sec:europa:inference}
@@ -378,10 +377,10 @@ In \eue, all variables and constraints from a problem domain
 description are stored inside the \texttt{CRE}.  The \texttt{CRE}
 provides a framework where any number of constraint types can
 collaborate to perform inference and prune variable domains using
-Bounds Propagation and Domain Reduction techniques \kcomment{citation
-  needed}. \eu uses a Propagator pattern which keeps track of a set of
+Bounds Propagation and Domain Reduction techniques \cite{marriott98}. 
+\eu uses a Propagator pattern which keeps track of a set of
 constraint instances of the same type and is responsible for ensuring
-variables are inferentially updated with change (modifications or
+variables are inferentially updated upon change (domain modifications or
 constraint addition/deletion).
 
 % that whenever any variable is modified or constraints are introduced
@@ -586,24 +585,21 @@ detected are:
     activity $a?$ iff $a$ and $a?$ unify \cite{russelnorvig} and the
     temporal constraints involving $a$ are satisfied by $a?$. Thus,
     $a$ and $a?$ can be considered the same activity without the need
-    to introduce $a$ in the plan. Consequently, the compatibilities
-    \kcomment{compatibilities have not been defined} associated with
-    $a$ are not Þred \kcomment{???}, because they have been already
+    to introduce $a$ in the plan. Consequently, the domain rules associated with
+    $a$ are not introduced into the planning process, because they have been already
     triggered when $a?$ was introduced in the plan.
 
   \item[\textbf{Activation}]: A new activity $a$ is introduced in the
     current plan associating it with the correct timeline, without
-    choosing a specific time slot. The compatibilities \kcomment{as
-      above} associated with $a$ are applied and the subgoal
-    activities resulting from those compatibilities \kcomment{as
-      above} are introduced as free activities \kcomment{what is a
-      free activity?}. This results in both an ordering flaw
-    \kcomment{undefined}, corresponding to the just activated
-    activity, and a number of open condition flaws, corresponding to
+    choosing a specific time slot (if its timing causes a problem 
+    it'll trigger a Threat flaw, explained below). 
+    The domain rules associated with $a$ are applied and the subgoal
+    activities resulting from those domain rules are introduced as inactive tokens. 
+    This results in a number of open condition flaws, corresponding to
     the new subgoal activities.
 
   \item[\textbf{Rejection}]: Some goals may be optional; if so its
-    corresponding flaw can be resolved by discarding the
+    corresponding flaw may be resolved by discarding the
     \texttt{INACTIVE} token.
 
   \end{description}
