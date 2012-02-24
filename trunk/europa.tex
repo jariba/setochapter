@@ -454,17 +454,18 @@ provides built-in support for resource computation. In \eus
 representation resource object types come in three forms with related
 constraints. \textbf{Reservoir} resources can have both
 \texttt{consume(resource,time,quantity)} and
-\texttt{produce(resource,time,quantity)} constraints. Production and
-consumption is instantaneous. \textbf{Reusable} resources have
-\texttt{uses(resource,start,duration,quantity)} constraints that use a
-quantity of the resource for a specific duration, which are then
-released. \textbf {Unary} resources are reusable with capacity$ = 1$,
-which allows \eu to perform run time savings in comparison to the
-generic reusable class. Configuration options are offered such that in
-addition to the usual constraint violations when a resource is
-completely depleted, plan flaws can be generated whenever a resource
-level is outside a specific upper or lower bound, or when
-instantaneous production or consumption exceeds a specific threshold.
+\texttt{produce(resource,time,quantity)} constraints; production and
+consumption is instantaneous. \textbf{Reusable} resources on the other
+hand, have constraints that use a quantity of the resource for a
+specific duration (\texttt{uses(resource,start,duration,quantity)}),
+which are then subsequently released. \textbf {Unary} resources are
+reusable with capacity$ = 1$, which allows \eu to perform run time
+savings in comparison to the generic reusable class. Configuration
+options are offered such that in addition to the usual constraint
+violations when a resource is completely depleted, plan flaws can be
+generated whenever a resource level is outside a specific upper or
+lower bound, or when instantaneous production or consumption exceeds a
+specific threshold.
 
 Since \eu supports a flexible temporal representation, where time is
 represented by intervals, instead of single values, determining
