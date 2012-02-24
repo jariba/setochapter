@@ -313,11 +313,19 @@ At the atomic level, the entities in the \eu plan representation are:
   that goals are posted for the Agent to own a drill by time $10$ and
   to be home by time $20$ as shown in Fig. \ref{fig:europapr1}
   
-  \begin{figure} \centering
-    \includegraphics[scale=0.4]{figs/europa-pr-1.pdf}
-    \caption{\small Timelines representing initial state and goals for a Shopping Agent.}
-    \label{fig:europapr1}
+  \begin{figure}[t]
+    \centering \subfloat[\small Timelines representing initial state
+    and goals for a Shopping
+    Agent.]{\label{fig:europapr1}\includegraphics[scale=0.35]{figs/europa-pr-1.pdf}}\qquad
+    \subfloat[\small State of timelines after satisfying a goal to be
+    home by time $20$ on merging with initial
+    state.]{\label{fig:europapr:merge}\includegraphics[scale=0.35]{figs/europa-pr-merge.pdf}}\qquad
+    \subfloat[\small State of timelines after satisfying a goal to own
+    a drill by time $10$ by activating corresponding
+    token.]{\label{fig:europapr:activate}\includegraphics[scale=0.35]{figs/europa-pr-activate.pdf}}
+    \caption{\small Evolution of a timeline from the Shopping Agent example}
   \end{figure}
+
 
   Note that the tokens \texttt{Own(Drill)} and \texttt{At(Home)} that
   represent the goals are not immediately placed on the
@@ -350,13 +358,13 @@ predicate and there are no empty intersections between corresponding
 token variables.  The effect of merging is illustrated in
 Fig. \ref{fig:europapr:merge}
 
-\begin{figure} 
-  \centering
-  \includegraphics[scale=0.4]{figs/europa-pr-merge.pdf}
-  \caption{\small State of timelines after satisfying a goal to be
-    home by time $20$ on merging with initial state.}
-  \label{fig:europapr:merge}
-\end{figure}
+% \begin{figure} 
+%   \centering
+%   \includegraphics[scale=0.4]{figs/europa-pr-merge.pdf}
+%   \caption{\small State of timelines after satisfying a goal to be
+%     home by time $20$ on merging with initial state.}
+%   \label{fig:europapr:merge}
+% \end{figure}
 
 The goal to be home by time $20$ is satisfied by merging with the
 initial state that said that the Agent is home at time $0$.  The merge
@@ -384,12 +392,12 @@ own subgoals, like being at the location where the product can be
 purchased before being able to buy it, and so on, until all domain
 rules are satisfied.
 
-\begin{figure} \centering
-  \includegraphics[scale=0.4]{figs/europa-pr-activate.pdf}
-  \caption{\small State of timelines after satisfying a goal to own a
-    drill by time $10$ by activating corresponding token.}
-\label{fig:europapr:activate}
-\end{figure}
+% \begin{figure} \centering
+%   \includegraphics[scale=0.4]{figs/europa-pr-activate.pdf}
+%   \caption{\small State of timelines after satisfying a goal to own a
+%     drill by time $10$ by activating corresponding token.}
+% \label{fig:europapr:activate}
+% \end{figure}
 
 As Fig. \ref{fig:europapr:activate} shows the decision to merge the
 goal to be \texttt{At(Home)} by time $20$ with the initial state was

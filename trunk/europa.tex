@@ -163,7 +163,7 @@ can be mapped to \eus representation:
 
 \begin{description}
 
-\item[\textbf{Object Types}]: \texttt{NDDL} supports an object-oriented
+\item[\textbf{Object Types}:] \texttt{NDDL} supports an object-oriented
   approach, where common data and behavior can be abstracted as a
   class. In this case, we have the \textit{Product} class represent
   the products that the Shopping Agent needs, \textit{Location}
@@ -180,7 +180,7 @@ can be mapped to \eus representation:
   object instance. This feature is used for instance, to ensure that
   an agent can only be at one place at a time in our example.
 
-\item[\textbf{Variable Types and Instances}]: All object attributes
+\item[\textbf{Variable Types and Instances}:] All object attributes
   are represented as variables in this model. For instance, it uses
   integer variables to represent the built-in temporal parameters for
   each token (activity duration, start and end times), string
@@ -189,7 +189,7 @@ can be mapped to \eus representation:
   relationships between different objects (for instance, each Agent
   maintains a variable to keep track of its \textit{AgentLocation}).
 
-\item[\textbf{Predicate Types}]: Some classes like \textit{Product},
+\item[\textbf{Predicate Types}:] Some classes like \textit{Product},
   \textit{Location} and \textit{ProductLocation} are static and so
   don't have any predicate or action types associated with them. The
   \textit{AgentLocation} class is used to keep track of state and so
@@ -199,7 +199,7 @@ can be mapped to \eus representation:
   \textit{AgentBag} class with its own predicates would have been an
   equally valid modeling choice.
 
-\item[\textbf{Action Types}]: In our example, \textit{Agent} is solely
+\item[\textbf{Action Types}:] In our example, \textit{Agent} is solely
   the class that has behavior associated with it. Consequently, it
   defines action types to represent when the agent is taking action to
   \texttt{Go} to a \textit{Location}, or to \texttt{Buy} a
@@ -249,7 +249,7 @@ elements of a rule definition:
 
 \begin{description}
 
-\item[\textbf{Variables}]: A token type (predicate or action) is part
+\item[\textbf{Variables}:] A token type (predicate or action) is part
   of a class, therefore class attributes (see \texttt{object.location}
   above), token type parameters (see \texttt{[from, to]} in
   \texttt{Agent::Go}, or \texttt{[duration, product]} in
@@ -257,12 +257,12 @@ elements of a rule definition:
   \texttt{possibleStores} in \texttt{Agent::Buy}) can all be used in
   the definition of a rule.
 
-\item[\textbf{Constraints}]: Restrictions on values that variables can
+\item[\textbf{Constraints}:] Restrictions on values that variables can
   take within a rule are expressed through constraints. In the example
   above the \texttt{eq} constraint is used; in general, any constraint
   available in \eus library can be used.
 
-\item[\textbf{Subgoals}]: In \texttt{Agent::Go}, subgoals are used to
+\item[\textbf{Subgoals}:] In \texttt{Agent::Go}, subgoals are used to
   specify that the Shopping Agent's location must transition from
   origin to destination in a temporally consistent way. The
   \texttt{[meets, equals, metby]} operators (see Section
@@ -359,16 +359,18 @@ accomplished. % As
 \centering
 \includegraphics[scale=0.3]{figs/Allen-algebra.pdf}
 \caption{\small Temporal relations defined within the planner are
-  based on \texttt{Allen Algebra} relations shown above.}
+  based on \texttt{Allen Algebra} \cite{allen84} relations shown
+  above.}
 \label{fig:allen-algebra}
 \end{figure}
 
 In \eu, problem domains use \texttt{Allen Algebra} \cite{allen84}
 temporal relations shown in Fig. \ref{fig:allen-algebra} which allow
-encoding of temporal constraint relationships between tokens. 
-%\kcomment{This para could do with a little
-  embellishment especially since it is the only material that actually
-  talks about the kinds of constraints and their origin.JB: I don't really know what else to say given the table above.}
+encoding of temporal constraint relationships between tokens.
+\kcomment{This para could do with a little embellishment especially
+  since it is the only material that actually talks about the kinds of
+  constraints and their origin.JB: I don't really know what else to
+  say given the table above.}
 
 \subsection{Automated Inference}
 \label{sec:europa:inference}
@@ -567,11 +569,11 @@ detected are:
 
 \begin{description}
 
-\item[\textbf{Unbound Variable}]: a variable in the partial plan whose
+\item[\textbf{Unbound Variable}:] a variable in the partial plan whose
   domain is not a singleton. Unbound Variables are resolved by value
   selection from their domain.
 
-\item[\textbf{Open Condition}]: an open condition is an
+\item[\textbf{Open Condition}:] an open condition is an
   \texttt{INACTIVE} token. \texttt{INACTIVE} tokens can be generated
   by explicitly posted goals, or when a token is activated, rules may
   activate the creation of \texttt{INACTIVE} slave tokens as described
@@ -580,31 +582,33 @@ detected are:
 
   \begin{description}
 
-  \item[\textbf{Merging}]: A free activity is merged with a matching
-    activity already in the plan. An activity $a$ is said to match an
-    activity $a?$ iff $a$ and $a?$ unify \cite{russelnorvig} and the
-    temporal constraints involving $a$ are satisfied by $a?$. Thus,
-    $a$ and $a?$ can be considered the same activity without the need
-    to introduce $a$ in the plan. Consequently, the domain rules associated with
-    $a$ are not introduced into the planning process, because they have been already
-    triggered when $a?$ was introduced in the plan.
+  \item[\textbf{Merging}:] A free activity \kcomment{this could be
+      defined, since no def. for 'free' is provided} is merged with a
+    matching activity already in the plan. An activity $a$ is said to
+    match an activity $a?$ iff $a$ and $a?$ unify \cite{russelnorvig}
+    and the temporal constraints involving $a$ are satisfied by
+    $a?$. Thus, $a$ and $a?$ can be considered the same activity
+    without the need to introduce $a$ in the plan. Consequently, the
+    domain rules associated with $a$ are not introduced into the
+    planning process, since they are already triggered when $a?$ was
+    introduced in the plan.
 
-  \item[\textbf{Activation}]: A new activity $a$ is introduced in the
-    current plan associating it with the correct timeline, without
-    choosing a specific time slot (if its timing causes a problem 
-    it'll trigger a Threat flaw, explained below). 
-    The domain rules associated with $a$ are applied and the subgoal
-    activities resulting from those domain rules are introduced as inactive tokens. 
-    This results in a number of open condition flaws, corresponding to
-    the new subgoal activities.
+  \item[\textbf{Activation}:] A new activity $a$ is introduced in the
+    current plan associating it with the appropriate timeline, without
+    choosing a specific time slot; if its timing causes a problem a
+    Threat flaw will be triggered (see below).  The domain rules
+    associated with $a$ are applied and the subgoal activities
+    resulting from those domain rules are introduced as inactive
+    tokens.  This results in a number of open condition flaws,
+    corresponding to the new subgoal activities.
 
-  \item[\textbf{Rejection}]: Some goals may be optional; if so its
+  \item[\textbf{Rejection}:] Some goals may be optional; if so its
     corresponding flaw may be resolved by discarding the
     \texttt{INACTIVE} token.
 
   \end{description}
 
-\item[\textbf{Threat}]: Once a token has been placed in the partial
+\item[\textbf{Threat}:] Once a token has been placed in the partial
   plan it may impact other tokens indirectly through possible
   overlapping requirements on objects. Recall for example that a token
   may belong to objects (\eg timelines) which require a total order
@@ -666,36 +670,36 @@ algorithm is described as:
 
 \begin{description}
 
-\item[Line \textbf{\ref{li:propagate}}]: Propagate the constraints to
+\item[Line \textbf{\ref{li:propagate}}:] Propagate the constraints to
   test for inconsistency. If inconsistent, then return false since no
   refinements to $p$ can yield a consistent plan.
 
-\item[Line \textbf{\ref{li:selectflaw}}]: Choose a flaw from the set
+\item[Line \textbf{\ref{li:selectflaw}}:] Choose a flaw from the set
   of available flaws.
 
-\item[Line \textbf{\ref{li:noflaw}}]: If there are no flaws, then $p$
+\item[Line \textbf{\ref{li:noflaw}}:] If there are no flaws, then $p$
   is complete and terminate with success.
 
-\item[Line \textbf{\ref{li:decisionpt}}]: Formulate a decision point
+\item[Line \textbf{\ref{li:decisionpt}}:] Formulate a decision point
   which is a branch in the search space. Each choice is a particular
   refinement operation and the \texttt{DecisionPoint} collects all
   possible refinement operations for the given flaw.
 
-\item[Line \textbf{\ref{li:decisionloop}}]: Keep trying until the
+\item[Line \textbf{\ref{li:decisionloop}}:] Keep trying until the
   chosen flaw is resolved, or until there are no further resolvers to
   try.
 
-\item[Line \textbf{\ref{li:decide}}]: A new partial plan is obtained
+\item[Line \textbf{\ref{li:decide}}:] A new partial plan is obtained
   by application of a refinement operator. Note that the ordering over
   refinement operators to select is a non-deterministic step.
 
-\item[Line \textbf{\ref{li:recurse}}]: Recursive call to solve the
+\item[Line \textbf{\ref{li:recurse}}:] Recursive call to solve the
   new planning problem. If successful, then success.
 
-\item[Line \textbf{\ref{li:backtrack}}]: Otherwise, retract the last
+\item[Line \textbf{\ref{li:backtrack}}:] Otherwise, retract the last
   refinement operation and move on to try the next one.
 
-\item[Line \textbf{\ref{li:noplan}}]: Arriving here implies all
+\item[Line \textbf{\ref{li:noplan}}:] Arriving here implies all
   options to resolve the flaw have been exhausted, including the case
   where no options were available initially. Thus the problem is
   insoluble.
