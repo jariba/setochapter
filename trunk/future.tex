@@ -109,7 +109,50 @@ addition we will build software that will learn to incorporate
 incoming data streams to provide an existence proof of a feature of
 interest. 
 
+Many aspect remain to be fully explored in how to improve \rx and its
+integration with \eu. We present here  few of these that we consider
+as important in order to improve \rx abilities and reduce the
+engineering required to circonvey them.
 
+One of them is related to the dispatchability of
+the {\em external} part of the plan \cite{mus98a}. While we were able
+to limit its impact so far by adding extra controls inside the \eu
+model we know that it can be impoved. For example by analyzing the
+plan structure we dshould be able to distinguish part of the plan that
+contribute to a  reactor goal -- which often needs to be dispatched
+as early as possible -- to other tokens describing the world evolution
+for which it can be preferrable to dispatch as late as needed. Being
+able to distinguish these two kinds of tokens should largely improve
+the quality of the overal agent behavior while avoiding to add extra
+complexity on every reactor models. 
+
+At the architecture level we would like to take full benefits of the
+reactor graph structure maintained by the agent and how to take full
+benefits. One aspect, we need to improve further is the ability to
+alter this graph dynamically by creating new reactors or new timeline
+connections. Offering such abilty would allow to provide better
+reovery mechanism after one reactor has failed to sunchronize by the 
+agent. For example, one alternate reactor could take ownership of the
+timelines left invalid by the destruction of the faulty reactor. This
+would allow to dimplement in atrasnparent way components
+redudancy. Still, even though our implementation already allow such
+mechanism we do not provide yet this at \rx API level as we need to
+ensure that this kind of dynamic alteration of the graph can be done
+wothout breaking our current assumptions both at \rx level and \eu
+level.
+
+More specifically to \eu level we would like to improve \rx
+integration of \eu ability to deliberate about resources. More
+specifically we need to ba able to update resource level as 
+modeled by \eu based on \rx observation.  As of today the 
+support of resource is limited inside the \eu solver and there's no
+direct way for \rx to update them dynamically based on recent
+observations. This result on a potential discrepeancy between measured
+given by, for example, the battery as modeled in \eu and the current
+battery level as read in a \rx timeline. Finding an automated way to
+link these two constructs would allow the plan to dynamically readapt
+when these two values differs -- for example if the vehicle looses a
+battery bank during a mission.
 
 
 
@@ -122,3 +165,8 @@ interest.
 
 
 
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: "setobook"
+%%% End: 
