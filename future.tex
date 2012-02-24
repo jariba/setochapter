@@ -92,67 +92,67 @@ biogeochemical variables in the coastal ocean, our work on INLs
 shown that scaling to different problems remains problematic. This is
 a prime motivation to move towards more semi-supervised methods such
 as \cite{kumar11,sergio12}. With the advent of the \od however,
-another direction our research is taking us is in Recommender systems
-\cite{Adomavicius05} as noted in Section \ref{sec:results}. We are
-working to design and deploy software infrastructure that will learn
-from user tagged data. To do so, we will use tagging techniques
-similar to what users of commercial image sharing sites like Flickr
-and Picassa do, to learn the context of the data (including remote
-sensing). In addition, the \od will integrate statistical Machine
-Learning techniques with incoming asynchronous data stream obtained by
-sensors and platforms. Identification models will be based on existing
-training sets for INLs and plumes; models for other features of
-scientific interests driven by \can requirements will be built in
-addition. Existing AUV archives for instance provide sufficient data
-for a learning base for a range of features of interest to \can; in
-addition we will build software that will learn to incorporate
-incoming data streams to provide an existence proof of a feature of
-interest. 
+another direction our research is taking us is in \texttt{Recommender
+  Systems} \cite{Adomavicius05} as noted in Section
+\ref{sec:results}. We are working to design and deploy software
+infrastructure that will learn from user tagged data. To do so, we
+will use tagging techniques similar to what users of commercial image
+sharing sites like Flickr and Picassa do, to learn the context of the
+data (including remote sensing). In addition, the \od will integrate
+statistical Machine Learning techniques with incoming asynchronous
+data stream obtained by sensors and platforms. Identification models
+will be based on existing training sets for INLs and plumes; models
+for other features of scientific interests driven by \can requirements
+will be built in addition. Existing AUV archives for instance provide
+sufficient data for a learning base for a range of features of
+interest to \can; in addition we will build software that will learn
+to incorporate incoming data streams to provide an existence proof of
+a feature of interest.
 
-Many aspect remain to be fully explored in how to improve \rx and its
-integration with \eu. We present here  few of these that we consider
-as important in order to improve \rx abilities and reduce the
-engineering required to circonvey them.
+A number of issues remain to be explored improving \rx and \eu
+integration particularly in the context of engineering models for
+execution.
 
-One of them is related to the dispatchability of
-the {\em external} part of the plan \cite{mus98a}. While we were able
-to limit its impact so far by adding extra controls inside the \eu
-model we know that it can be impoved. For example by analyzing the
-plan structure we dshould be able to distinguish part of the plan that
-contribute to a  reactor goal -- which often needs to be dispatched
-as early as possible -- to other tokens describing the world evolution
-for which it can be preferrable to dispatch as late as needed. Being
-able to distinguish these two kinds of tokens should largely improve
-the quality of the overal agent behavior while avoiding to add extra
-complexity on every reactor models. 
+Dispatchability of the {\em external} temporally flexible partial
+plans continues to be an open research problem. Substantial progress
+has been made \cite{vidal97,mus98a,tsam98,morris00} by analyzing the
+plan structure of static offline temporal plans. However in the
+context of embedded plan execution, balancing model design while
+dealing with execution uncertainty requires further research. For
+instance it should be possible to distinguish part of the plan that
+contributes to a reactor goal, which often needs to be dispatched as
+early as possible with other tokens describing world evolution with a
+preference to dispatch as late as possible. Making this distinction
+would improve the quality of agent behavior while avoiding extra model
+complexity.
 
-At the architecture level we would like to take full benefits of the
-reactor graph structure maintained by the agent and how to take full
-benefits. One aspect, we need to improve further is the ability to
-alter this graph dynamically by creating new reactors or new timeline
-connections. Offering such abilty would allow to provide better
-reovery mechanism after one reactor has failed to sunchronize by the 
-agent. For example, one alternate reactor could take ownership of the
-timelines left invalid by the destruction of the faulty reactor. This
-would allow to dimplement in atrasnparent way components
-redudancy. Still, even though our implementation already allow such
-mechanism we do not provide yet this at \rx API level as we need to
-ensure that this kind of dynamic alteration of the graph can be done
-wothout breaking our current assumptions both at \rx level and \eu
-level.
+More abstractly at the architectural level, the ability to dynamically
+manipulate the reactor graph would be of importance while creating new
+reactors or modifying timelines. Doing so would provide more robust
+failure recovery mechanisms especially after a reactor has failed to
+synchronize. For example, an alternate reactor could take ownership of
+timelines left invalid by the destruction of another failed reactor
+ensuring a transparent implementation of component redundancy. While
+the current design broadly provides for such a capability, the \rx API
+has yet to implement it while ensuring other design elements within
+\rx and \eu are not compromised.
 
-At the \eu level we would like to improve \rx
-integration of \eu ability to deliberate about resources. More
-specifically we need to be able to update resource level as 
-modeled by \eu based on \rx observation.  
-Keeping the link between these two constructs automatically updated 
-would allow the plan to dynamically adapt when these two values differ -- 
-for example if the vehicle looses a battery bank during a mission.
-Work is being done on \eu to provide enhanced modeling
-capabilities and more powerful domain-independent search, these
-would make it easier for \rx users to create domain models and to 
-perform more ambitious deliberation.
+Finally and importantly, integration of reasoning about resources
+within \rx and tying it to existing \eu capabilities needs to be
+demonstrated. Specifically \rx needs to be able to update resource
+levels as incoming observations.  Doing so would ensure plan
+adaptation occurs dynamically when planned and observed resource
+values diverge -- for instance if the vehicle looses a bank of
+batteries during the course of a mission.  Enhanced modeling
+capabilities and augmented domain-independent search within \eu would
+make it easier for \rx users to create such domain models and to
+perform more proactive deliberation.
 
+Along with all these potential extensions, we are also very cognizant
+that the learning curve associated with \rx and \eu for a general user
+in the marine robotics community needs to be tackled. At present, the
+complex system that underlies \rx and its underlying framework, even
+if well documented, can be intimidating for a naive first time user.
 
 % multi-vehicle control
 % sampling
