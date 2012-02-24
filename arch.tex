@@ -426,7 +426,8 @@ Take for example our AUV agent from Fig. \ref{fig:agent},
 and assume that the \texttt{Sampling} reactor failed to synchronize;
 in  such case this reactor is destroyed and both
 \texttt{Sampling\_policy} and \texttt{Relevant\_data} state variables
-produced the \texttt{Failed} observation. Therefore, the
+produced the \texttt{Failed} observation as illustrated in in
+Fig. \ref{fig:fail0}. Therefore, the
 \texttt{Survey controller} will received this observation on its {\em
   external} \texttt{Sampling\_policy} which indicates that this state
 variable is not managed anymore. At this point depending on this
@@ -436,13 +437,32 @@ reactor implementation we have two possible outcomes:
   \texttt{Failed} observation. For example it can identify that, from
   now on, there's no way to take water samples. It still can 
   navigate as \texttt{Pilot} is available which allow him to continue
-  this aspect of its current plan.
+  this aspect of its current plan. In such case the agent structure
+  remains as in Fig. \ref{fig:fail0} with no further impact.
 \item \texttt{Survey controller} models is not able to handle this
   unexpected failure resulting in turn on its failure to
   synchronize. This result on this reactor being also destroyed and
   the \texttt{Failed} observation is produced on the \texttt{survey}
-  timeline.
+  timeline (Fig. \ref{fig:fail1}).
 \end{enumerate}
+\begin{figure}[!htb]
+  \centering
+  \subfloat[\small When \texttt{Sampling} reactor fails to
+  synchronize its removed from the graph and all its {\em internal}
+  timelines produces the \texttt{Failed} observation]{\includegraphics[width=0.4\columnwidth]{figs/AUV-fail0.pdf}
+  \label{fig:fail0}
+  }
+  \qquad
+  \subfloat[\small In the worst case this \texttt{Failed} may imply
+  other reactors hat depends on \texttt{Sampling} to  fail to
+  synchronize implying a bottom-up destruction of faulty reactors.]{
+    \includegraphics[width=0.4\columnwidth]{figs/AUV-fail1}
+    \label{fig:fail1}
+  }
+  \caption{Impact of the \texttt{Sampling} reactor failure in the AUV
+    agent from Fig. \ref{fig:agent}}
+\end{figure}
+
 Even on the worst case scenario presented on this second case, we
 note that a reactor failure only propagates up in the reactor graph. 
 In our example, even if all the reactors that depends on
