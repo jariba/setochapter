@@ -26,8 +26,8 @@ new constraints can be easily and efficiently plugged in. The
 \textbf{Plan Database} (\texttt{PDB}) manages object and token
 types. It also maintains the state of partial plans in terms of
 object, variable and token instances. This constitutes the data
-foundation on which end user applications and automated planners
-within \eu are built. The \textbf{Rules Engine} (\texttt{RE})
+foundation on which end user applications and automated problem solvers
+ are built. The \textbf{Rules Engine} (\texttt{RE})
 modularly adds the semantics of domain rules that describe
 dependencies between tokens. The \textbf{Solver Module} provides the
 framework for flaw detection and resolution that is needed to
@@ -85,7 +85,7 @@ time-tested approach to naturally describe problem domains
 constraints and causality dependencies between actions and effects and
 finally it offers procedural constructs to populate \eus \texttt{PDB}
 with specific problem instances expressed in terms of objects,
-variables, constraints, facts and goals. To articulate important
+variables, constraints, facts and goals. To articulate the most important
 elements of \texttt{NDDL}, we show how the Shopping Agent problem
 could be modeled:
 
@@ -158,7 +158,7 @@ class Agent {
 }
 \end{verbatim}
 
-In the model above one can see the main elements of a problem domain
+In the model above one can see how the main elements of a problem domain
 can be mapped to \eus representation:
 
 \begin{description}
@@ -183,7 +183,7 @@ can be mapped to \eus representation:
 \item[\textbf{Variable Types and Instances}:] All object attributes
   are represented as variables in this model. For instance, it uses
   integer variables to represent the built-in temporal parameters for
-  each token (activity duration, start and end times), string
+  each token (duration, start and end times), string
   variables to represent \textit{Location} and \textit{Product} names,
   and object reference variables to represent the structural
   relationships between different objects (for instance, each Agent
@@ -203,9 +203,8 @@ can be mapped to \eus representation:
   the class that has behavior associated with it. Consequently, it
   defines action types to represent when the agent is taking action to
   \texttt{Go} to a \textit{Location}, or to \texttt{Buy} a
-  \textit{Product}. % We'll see how the actual behavior for those
-  % actions is specified below.
-
+  \textit{Product}. 
+  
 \end{description}
 
 \begin{verbatim}
@@ -270,8 +269,8 @@ elements of a rule definition:
   the temporal relationship each token representing a subgoal has with
   the the token representing the \texttt{Agent::Go} action. Also,
   \texttt{[condition, effect]} annotations can be used when defining a
-  subgoal inside an action. Currently \eu does not associate semantics
-  with these annotation; but they can be extremely useful for search
+  subgoal inside an action. \eu does not intrinsicaly associate semantics
+  with these annotations; but they can be extremely useful for search
   modules when creating plans.
 
 \end{description}
@@ -332,7 +331,6 @@ int horizonEnd = 100;
 leq(horizonStart, atHomeForBreakfast.start);
 leq(atHomeForDinner.end, horizonEnd);
 
-\label{eu:model}
 \end{verbatim}
 
 This problem instance consists of \textbf{Variables} and
@@ -342,18 +340,20 @@ are used to specify the planning horizon (\texttt{horizonStart} and
 \texttt{horizonEnd}) and objects are used to specify locations,
 products, product-location associations and the Shopping Agent that we
 want to plan for. Facts are used to specify the current state of the
-world and do not need any support and are represented as tokens in the
+world, do not need any support and are represented as tokens in the
 \texttt{PDB}. In this case we use facts to specify that the Shipping
 Agent is initially at home. Goals are also represented as tokens in
 the \texttt{PDB}. Different from facts, goals trigger inference in \eu
 which determines whether flaws (unresolved subgoals, overloaded
 resources, etc.) need to be resolved; if so, search modules can be
 invoked to resolve those flaws as part of the deliberation
-process. Finally, constraints are restrictions on and between actions
+process. Finally, constraints are restrictions on and between facts 
 and goals. In the example above, we use temporal constraints to
 specify when facts hold and when the goals should be
-accomplished. % As
-% always, all constraints in \eus library could be used.
+accomplished. In the model above, \texttt{before} and \texttt{after} 
+are \texttt{Allen Algebra} \cite{allen84} operators, which \eu supports to specify
+temporal relations between tokens (specifically between their start and end timepoints)
+as summarized in Fig. \ref{fig:allen-algebra} 
 
 \begin{figure}[!htb]
 \centering
@@ -364,13 +364,6 @@ accomplished. % As
 \label{fig:allen-algebra}
 \end{figure}
 
-In \eu, problem domains use \texttt{Allen Algebra} \cite{allen84}
-temporal relations shown in Fig. \ref{fig:allen-algebra} which allow
-encoding of temporal constraint relationships between tokens.
-\kcomment{This para could do with a little embellishment especially
-  since it is the only material that actually talks about the kinds of
-  constraints and their origin.JB: I don't really know what else to
-  say given the table above.}
 
 \subsection{Automated Inference}
 \label{sec:europa:inference}
@@ -382,22 +375,19 @@ collaborate to perform inference and prune variable domains using
 Bounds Propagation and Domain Reduction techniques \cite{marriott98}. 
 \eu uses a Propagator pattern which keeps track of a set of
 constraint instances of the same type and is responsible for ensuring
-variables are inferentially updated upon change (domain modifications or
-constraint addition/deletion).
-
-% that whenever any variable is modified or constraints are introduced
-% or dropped, all related variables are updated through inference.
+variables are updated through inference whenever a relevant change occurs
+ (variable domain modifications or constraint addition/deletion).
 
 In a planning problem, variable or constraint changes can come
 directly from an end user (by introducing new activities or goals and
 relating them to the rest of the plan through constraints, by changing
-the start time of an activity, etc), or from an automated planner (by
+the start or end time of an activity, etc), or from an automated planner (by
 expanding subgoals, introducing precedence constraints to resolve
 mutual exclusion conflicts, etc). When these changes occur, each
 propagator is only able to ensure consistency for the constraints that
 are associated with it.  To maintain global consistency, the
 \texttt{CRE} implements a variant of the \texttt{AC-3} algorithm
-\cite{mackworth77} where propagators are triggered to infer to ensure
+\cite{mackworth77} where propagators are invoked repeatedly until
 the constraint network returns to a quiescent state.
 
 \subsubsection{Constraint Formulation}
@@ -409,17 +399,16 @@ built-in constraint library with a range of arithmetic, temporal, set
 and resource constraint types so that a large number of problem
 domains can be modeled without having to introduce new constraint
 types. Tables \ref{tab:calconst}, \ref{tab:setconst},
-\ref{tab:objhierarchy} and \ref{tab:misc} show various constraint
-types.
+\ref{tab:objhierarchy} and \ref{tab:misc} show the main constraint
+types included in \eus Constraint Library.
 
 \input{constraints-table}
 
 Temporal and resource constraints are especially important to model
-real-world planning domains. % so it is worth going into some more
-% detail about how \eus built-in support works for those constraint
-% types.
+real-world planning domains. 
+
 \eu uses variables to explicitly represent timepoints for plan
-activities and states. Constraints among timepoints provide a natural
+actions and states. Constraints among timepoints provide a natural
 way to express domain axioms. For example, in order to state that
 activity $A$ must occur before activity $B$ we can say that the end
 timepoint of $A$ is $leq$ the start timepoint of $B$.
@@ -460,7 +449,7 @@ consumption is instantaneous. \textbf{Reusable} resources on the other
 hand, have constraints that use a quantity of the resource for a
 specific duration (\texttt{uses(resource,start,duration,quantity)}),
 which are then subsequently released. \textbf {Unary} resources are
-reusable with capacity$ = 1$, which allows \eu to perform run time
+reusables with capacity$ = 1$, which allows \eu to perform run time
 savings in comparison to the generic reusable class. Configuration
 options are offered such that in addition to the usual constraint
 violations when a resource is completely depleted, plan flaws can be
@@ -476,7 +465,7 @@ computing a profile of the resource and checking against some limits.
 With temporal flexibility, a number of resource profiles could be
 possible depending on precisely when each production/consumption event
 occurs out of a range of possible values that are in the domain of the
-variables that represent the temporal extant for the event.
+variables that represent the temporal extent for the event.
 \cite{Muscettola04,Muscettola06} proposed an algorithm where the
 variables that represent the time for production/consumption events
 are placed in a temporal network, similar to the network used by the
@@ -502,13 +491,13 @@ brittleness in the face of changing activity durations or start
 times. They can also be useful when searching for plans; however they
 are relatively expensive to compute. Therefore their ability to prune
 the search space must be weighted against the ability to search faster
-\cite{6007772}.
+\cite{6007772}, \comment{cite "Stable Grounded Inference in Flexible Resource Scheduling" by Morris, Bresina, Barreiro}.
 
 
 \subsection{Search in \eu}
 \label{sec:europa:search}
 
-Given the above, an automated problem solver can be created using, a
+Given the above, an automated problem solver can be created using a
 \emph{domain model} that describes the variable, object, predicate and
 action types that are relevant for the problem, a \emph{problem
   instance} or initial state that consists of variable and object
@@ -522,15 +511,14 @@ Since temporal intervals may extend indefinitely in both positive and
 negative directions, for problems with a temporal dimension it is also
 common to specify a \emph{planning horizon} when invoking a solver;
 any decisions that fall completely outside of the horizon can be
-ignored. This is particularly useful for recurrent activities;
+ignored. This is useful to ignore activities that may occur far in the future 
+or in the past to be relevant for a particular plan, ensuring that the solver is making
+as few commitments as necessary and reducing the complexity of plan generation.
+The \emph{planning horizon} is also useful when dealing with recurrent activities;
 consider for instance a model where a medical checkup has to occur
 every $3$ months. The user can model a recurring activity and then use
 the horizon to ensure that a finite number of medical checkup
-activities are generated as part of a plan. This is also useful to
-ignore activities that may occur far in the future or in the past to
-be relevant for a particular plan, ensuring that the solver is making
-as few commitments as necessary and making planning tractable.
-
+activities are generated as part of a plan. 
 \subsubsection{Flaw Resolution}
 \label{sec:europa:flaws}
 
@@ -558,9 +546,6 @@ any time are:
 
 \end{enumerate}
 	
-% This Plan Space Planning algorithm is translated into \eus
-% representation as follows:
-
 The initial partial plan is the state of \eus Plan Database after the
 initial state has been instantiated. This results in a set of
 variable, object and token instances. Inference then takes place to
@@ -576,29 +561,28 @@ detected are:
 \item[\textbf{Open Condition}:] an open condition is an
   \texttt{INACTIVE} token. \texttt{INACTIVE} tokens can be generated
   by explicitly posted goals, or when a token is activated, rules may
-  activate the creation of \texttt{INACTIVE} slave tokens as described
+  cause the creation of \texttt{INACTIVE} slave tokens as described
   in Section \ref{sec:europa:pr}. Open Conditions can be resolved in
   three ways:
 
   \begin{description}
 
-  \item[\textbf{Merging}:] A free activity \kcomment{this could be
-      defined, since no def. for 'free' is provided} is merged with a
-    matching activity already in the plan. An activity $a$ is said to
-    match an activity $a?$ iff $a$ and $a?$ unify \cite{russelnorvig}
+  \item[\textbf{Merging}:] An \texttt{INACTIVE} token is merged with a
+    matching \texttt{ACTIVE} token already in the plan. A token $a$ is said to
+    match another token $a?$ iff $a$ and $a?$ unify \cite{russelnorvig}
     and the temporal constraints involving $a$ are satisfied by
-    $a?$. Thus, $a$ and $a?$ can be considered the same activity
+    $a?$. Thus, $a$ and $a?$ can be considered the same token
     without the need to introduce $a$ in the plan. Consequently, the
     domain rules associated with $a$ are not introduced into the
     planning process, since they are already triggered when $a?$ was
     introduced in the plan.
 
-  \item[\textbf{Activation}:] A new activity $a$ is introduced in the
+  \item[\textbf{Activation}:] A token $a$ is introduced in the
     current plan associating it with the appropriate timeline, without
     choosing a specific time slot; if its timing causes a problem a
     Threat flaw will be triggered (see below).  The domain rules
     associated with $a$ are applied and the subgoal activities
-    resulting from those domain rules are introduced as inactive
+    resulting from those domain rules are introduced as \texttt{INACTIVE}
     tokens.  This results in a number of open condition flaws,
     corresponding to the new subgoal activities.
 
@@ -711,11 +695,10 @@ search, assuming that no flaws or available refinement operators are
 pruned unnecessarily.  Dead-ends in the search are discovered through
 constraint propagation, a vehicle for evaluating the consistency of a
 partial plan and also for filtering infeasible values from
-consideration prior to commitment. % This allows in some cases a strong
-% look-ahead capability which is essential for tractable
-% search.
-Consistency testing is initiated by the \texttt{isInconsistent}
-procedure. The algorithm permits a heuristically controlled search by
+consideration prior to commitment. Consistency testing is initiated by the \texttt{isInconsistent}
+procedure. 
+
+The algorithm permits a heuristically controlled search by
 applying orderings for \texttt{chooseFlaw} and
 \texttt{makeDecisionPoint} resulting in a chronologically-backtracked
 search. Heuristics can be implemented by applying ordering/filtering
@@ -724,21 +707,13 @@ instance, by dealing with earliest flaws first, or by making planning
 decisions (open condition flaws) before scheduling decision (threats).
 
 It should be emphasized that while this algorithm is commonly employed
-with \eu implementations, it is only one of many that could be
+by applications that embed  \eu, it is only one of many that could be
 implemented. As a simple example, consider the following solver for
 the $N$-Queens problem, where an integer variable V$_i$ represents the
 queen in column $i$; V$_1$ $= 3$ implies that the variable on column
 $1$ is placed on row $3$.  Non-attack constraints are posted as
 arithmetic constraints among the V$_i$ variables to ensure that all
-the rows and diagonals contain only one queen. \eus Constraint
-Reasoning Engine or \texttt{CRE} can then be used to compute the
-non-attack constraint violations, with \texttt{ce.getViolations()} a
-call on the API, to pick the queen that has he most violations.  By
-implementing \texttt{getQueenWithMaxViolation()} and looking ahead to
-see what moves are possible for a queen that would remove its
-violations with the implementing of \texttt{getMoves()}, this solver
-provides a viable planner implementation for a range of possible
-initial states.
+the rows and diagonals contain only one queen. 
 
 \begin{algorithm}[H]
   \KwIn{ConstraintEngine $ce$}
@@ -765,6 +740,13 @@ initial states.
   }
   \caption{$solveNQueens(ce, maxIter)$}
 \end{algorithm}
+
+\eus Constraint Reasoning Engine or \texttt{CRE} can be used to compute the
+non-attack constraint violations, with \texttt{ce.getViolations()} a
+call on the \eu API. The \texttt{CRE} can also be used to pick the queen 
+that has he most violations in \texttt{getQueenWithMaxViolation()}, and to
+look ahead and see what moves are possible for a queen that would remove its
+violations in \texttt{getMoves()}. 
 
 In similar fashion, the constraint violation and flaw reporting
 mechanisms that \eu provides can be used as building blocks that
