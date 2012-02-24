@@ -4913,7 +4913,7 @@
 	<key>MasterSheets</key>
 	<array/>
 	<key>ModificationDate</key>
-	<string>2012-02-17 16:49:34 -0800</string>
+	<string>2012-02-24 10:09:27 -0800</string>
 	<key>Modifier</key>
 	<string>Kanna</string>
 	<key>NotesVisible</key>
@@ -5994,6 +5994,8 @@
 						<dict>
 							<key>CornerRadius</key>
 							<real>2</real>
+							<key>Draws</key>
+							<string>NO</string>
 							<key>Width</key>
 							<real>0.5</real>
 						</dict>
@@ -6022,7 +6024,7 @@
 					<integer>99</integer>
 					<key>Points</key>
 					<array>
-						<string>{237.757, 60.5925}</string>
+						<string>{237.989, 60.5}</string>
 						<string>{186.5, 81}</string>
 					</array>
 					<key>Style</key>
@@ -6070,6 +6072,8 @@
 						<dict>
 							<key>CornerRadius</key>
 							<real>2</real>
+							<key>Draws</key>
+							<string>NO</string>
 							<key>Width</key>
 							<real>0.5</real>
 						</dict>
@@ -6103,7 +6107,7 @@
 					<integer>97</integer>
 					<key>Points</key>
 					<array>
-						<string>{162.736, 261.305}</string>
+						<string>{162.58, 261.5}</string>
 						<string>{177.014, 243.391}</string>
 					</array>
 					<key>Style</key>
@@ -14229,11 +14233,11 @@ Engine}</string>
 	<key>WindowInfo</key>
 	<dict>
 		<key>CurrentSheet</key>
-		<integer>4</integer>
+		<integer>1</integer>
 		<key>ExpandedCanvases</key>
 		<array/>
 		<key>Frame</key>
-		<string>{{370, -20}, {1187, 1000}}</string>
+		<string>{{370, 0}, {1187, 1000}}</string>
 		<key>ListView</key>
 		<true/>
 		<key>OutlineWidth</key>
@@ -14247,9 +14251,9 @@ Engine}</string>
 		<key>SidebarWidth</key>
 		<integer>120</integer>
 		<key>VisibleRegion</key>
-		<string>{{-238, -56}, {1052, 846}}</string>
+		<string>{{0, 0}, {519, 415.5}}</string>
 		<key>Zoom</key>
-		<real>1</real>
+		<real>2</real>
 		<key>ZoomValues</key>
 		<array>
 			<array>

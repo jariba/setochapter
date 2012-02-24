@@ -44,16 +44,39 @@ execution events by embedding and customizing \eu.
 \label{sec:planningfound}
 
 {\scriptsize
-  \begin{quote}
-[Planning] \emph{is an abstract, explicit deliberation process that chooses and
-organizes actions by anticipating their expected outcomes. This
-deliberation aims at achieving as best as possible some prestated
-objectives. Automated planning is an area of Artificial Intelligence
-(AI) that studies this deliberation process computationally.} -- from
-\textbf{Automated Planning Theory and Practice} by Ghallab, Nau and
-Traverso \cite{ghallab04} 
+  \begin{quote} [Planning] \emph{is an abstract, explicit deliberation
+      process that chooses and organizes actions by anticipating their
+      expected outcomes. This deliberation aims at achieving as best
+      as possible some prestated objectives. Automated planning is an
+      area of Artificial Intelligence (AI) that studies this
+      deliberation process computationally.} -- from \textbf{Automated
+      Planning Theory and Practice} by Ghallab, Nau and Traverso
+    \cite{ghallab04}
 \end{quote}
 }
+
+Planning as an activity is ingrained in human decision-making
+\cite{berthoz} and its generalization into a computational framework
+demonstrating machine intelligence long targeted by pioneers in
+computer science \cite{computersthought}. Early work in this context
+focused on logical theorem proving by computer \cite{green69} which
+has formed the basis of much of the discipline of AI Planning. The
+emphasis in these early attempts was to logically derive the existence
+proof of a trajectory of actions for a hypothetical robot (moving
+blocks, chess pieces, furniture etc) to achieve a specific goal given
+specific initial conditions. Two important properties of
+\emph{Soundness}\footnote{A planning algorithm is sound if invoked on
+  a problem $P$ returns a plan which is a solution for $P$.} and
+\emph{Completeness}\footnote{A planning algorithm is complete if
+  invoked on a solvable problem $P$ is guaranteed to return a
+  solution.} along with derived results for algorithmic complexity
+\cite{corman} were a defining cornerstone for understanding how
+different computational paradigms could actually be tractable first in
+simulation and subsequently in actual robotic platforms. In this
+chapter our emphasis is to focus on embedded AI Planning and the
+execution of plans on an embedded robotic marine robotic
+platform. While the platform is domain specific, the techniques we
+highlight are general purpose as noted in Section \ref{sec:intro}.
 
 \begin{figure}[b]
 \centering
@@ -143,12 +166,13 @@ project is finished as early as possible. Fig. \ref{fig:rcpsp-1} shows
 an example of a a solution provided by \eu for an \texttt{RCPSP}
 instance with 10 activities, 5 resources and 30 temporal constraints.
 
-\begin{figure}
+\begin{figure}[t]
 \centering
-\includegraphics[scale=0.25]{figs/Example-UBO0.jpg}
-\caption{\small A \eu solution to an \texttt{RCPSP} \cite{Bruckera99}
-  problem.}
-\label{fig:rcpsp-1}
+\subfloat[\small A \eu solution to an \texttt{RCPSP} \cite{Bruckera99}
+  problem.]{\label{fig:rcpsp-1}\includegraphics[scale=0.2]{figs/Example-UBO0.jpg}}\qquad
+\subfloat[\small A \eu solution to a shopping agent problem domain where
+  the agent needs to buy Bananas, Milk and a Drill.]{\label{fig:shopping-1}\includegraphics[scale=0.25]{figs/Example-Shopping0.jpg}}
+\caption{\small \eu based solutions to scheduling and planning problems.}
 \end{figure}
 
 
@@ -163,14 +187,6 @@ actions that need to be performed to find and acquire the required
 items, as well as when to perform each of those actions.
 Fig. \ref{fig:shopping-1} shows a solution produced by \eu for such a
 problem instance.
-
-\begin{figure}
-\centering
-\includegraphics[scale=0.3]{figs/Example-Shopping0.jpg}
-\caption{\small A \eu solution to a shopping agent problem domain where
-  the agent needs to buy Bananas, Milk and a Drill.}
-\label{fig:shopping-1}
-\end{figure}
 
 As the examples above show, a Planning problem (actions to achieve a
 goal) may embed a Scheduling problem (what resources are necessary to

@@ -226,7 +226,7 @@ from its current set of objectives.
     control loops (rounded boxes) which are connected through state
     variables provided by one reactor ({\color{blue}blue} solid line)
     with multiple possible clients ({\color{green}green} dashed
-    lines)]{\includegraphics[scale=0.45]{figs/AUV-agent.pdf}
+    lines).]{\includegraphics[scale=0.45]{figs/AUV-agent.pdf}
   \label{fig:agent}
   }
   \qquad
@@ -400,82 +400,85 @@ automated planning. For example in Fig. \ref{fig:agent}, apart from
 other reactor (in blue) is a different instance of an \eu reactor
 differentiated only by their model and \eu solver configurations.
 
-\subsubsection{Reactors failure handling in \rx}
+\subsubsection{Handling Failure in \rx}
 \label{sec:rx-reactor-failure}
-It is important to note that, in T-REX architecture, the only critical
-task of a reactor is to successfully identify its state through
-synchronization as the execution frontier advances. Indeed, a reactor
-that fails to integrate its {\em external} state updates and/or
-identify its {\em internal} state at any tick express that it is not
-able anymore to explain the state of the world. In the agent point of
-view that means that any state information from this reactor is not to
-be trusted anymore and results on this reactor exclusion from the
-execution cycle and consequent destruction. As the agent destroy 
-the  faulty reactor is destroyed the agent produced on all of 
-its former {\em internal} timelines the special observation 
-\texttt{Failed} to all the reactors which did declare these state 
-variables as {\em external} informing
-them through this that this specific state variable is currently
-unavailable. On the other hand all goals exchanged between reactors
-are considered as rejectable by the reactor that manages them. As a
-result the failure to find a plan for these goals, while to be avoided,
-is not considered as a critical failure of the reactor and will only
-result on these goals being ignored until new goals are received.
 
-Take for example our AUV agent from Fig. \ref{fig:agent},
-and assume that the \texttt{Sampling} reactor failed to synchronize;
-in  such case this reactor is destroyed and both
-\texttt{Sampling\_policy} and \texttt{Relevant\_data} state variables
-produced the \texttt{Failed} observation as illustrated in in
-Fig. \ref{fig:fail0}. Therefore, the
-\texttt{Survey controller} will received this observation on its {\em
-  external} \texttt{Sampling\_policy} which indicates that this state
-variable is not managed anymore. At this point depending on this
-reactor implementation we have two possible outcomes:
+The critical task of a \rx reactor is to successfully identify its
+state through synchronization as the execution frontier advances. When
+a reactor fails to integrate its {\em external} state update and/or
+identify its {\em internal} state at any tick, it implies that it is
+unable to explain the state of the world.  This in turn implies that
+any state information from this reactor is suspect, resulting in the
+exclusion of this reactor from the execution cycle and consequent
+destruction. As the agent destroys the faulty reactor, a special
+observation, \texttt{Failed}, is produced on all {\em internal}
+timelines. Reactors which declare these very state variables as {\em
+  external}, are informed of the failure of this timeline.  All goals
+exchanged between reactors are considered \emph{rejectable} by the
+reactor that manages them. As a result in such a situation, the
+failure to find a plan for these goals, is \emph{not} considered a
+critical failure of the reactor. It will only result on these goals
+being ignored until newer goals are received.
+
+Take for example our AUV agent from Fig. \ref{fig:agent}, and assume
+that the \texttt{Sampling} reactor failed to synchronize. In such a
+case this reactor is destroyed and both \texttt{Sampling\_policy} and
+\texttt{Relevant\_data} timelines generate the \texttt{Failed}
+observation as illustrated in Fig. \ref{fig:fail0}.  The
+\texttt{Survey controller} will receive this \texttt{Failed}
+observation on its {\em external} \texttt{Sampling\_policy} timeline
+which indicates that this state variable is no longer managed by its
+owner reactor. This leads to two potential outcomes based on how the
+reactor is implemented:
+
 \begin{enumerate}
-\item \texttt{Survey  controller} model allows him to integrate this
-  \texttt{Failed} observation. For example it can identify that, from
-  now on, there's no way to take water samples. It still can 
-  navigate as \texttt{Pilot} is available which allow him to continue
-  this aspect of its current plan. In such case the agent structure
-  remains as in Fig. \ref{fig:fail0} with no further impact.
-\item \texttt{Survey controller} models is not able to handle this
-  unexpected failure resulting in turn on its failure to
-  synchronize. This result on this reactor being also destroyed and
-  the \texttt{Failed} observation is produced on the \texttt{survey}
-  timeline (Fig. \ref{fig:fail1}).
+
+\item The \texttt{Survey controller} model allows it to integrate the
+  \texttt{Failed} observation. For example it can identify that,
+  subsequent use of the water sampler is no longer possible.  The \rx
+  agent can continue to navigate since \texttt{Pilot} is still
+  available. In such a case the agent structure remains as in
+  Fig. \ref{fig:fail0} with no consequent impact.
+
+\item The \texttt{Survey controller} model is unable to handle this
+  unexpected failure resulting in its failure to synchronize. This
+  results in the \texttt{Survey controller} also failing, with
+  subsequent destruction and flagging via the \texttt{Failed}
+  observation on its \texttt{survey} timeline as shown in
+  Fig. \ref{fig:fail1}.
+
 \end{enumerate}
-\begin{figure}[!htb]
+
+\begin{figure}[b]
   \centering
-  \subfloat[\small When \texttt{Sampling} reactor fails to
-  synchronize its removed from the graph and all its {\em internal}
-  timelines produces the \texttt{Failed} observation]{\includegraphics[width=0.4\columnwidth]{figs/AUV-fail0.pdf}
-  \label{fig:fail0}
-  }
+  \subfloat[\small When the \texttt{Sampling} reactor fails to
+  synchronize, it is removed from the reactor dependency graph along
+  with all its {\em internal} timelines while generating a \texttt{Failed} observation]{\includegraphics[width=0.35\columnwidth]{figs/AUV-fail0.pdf}
+  \label{fig:fail0}}
   \qquad
-  \subfloat[\small In the worst case this \texttt{Failed} may imply
-  other reactors hat depends on \texttt{Sampling} to  fail to
-  synchronize implying a bottom-up destruction of faulty reactors.]{
-    \includegraphics[width=0.4\columnwidth]{figs/AUV-fail1}
-    \label{fig:fail1}
-  }
-  \caption{Impact of the \texttt{Sampling} reactor failure in the AUV
-    agent from Fig. \ref{fig:agent}}
+  \subfloat[\small In the worst case this \texttt{Failed} observation may imply
+  other reactors that depend on the \texttt{Sampling} reactor might fail to
+  synchronize leading to a bottom-up destruction of ``faulty'' reactors.]{
+    \includegraphics[width=0.35\columnwidth]{figs/AUV-fail1}\label{fig:fail1}}
+  \caption{\small Impact of the \texttt{Sampling} reactor failure in
+    the AUV agent shown in Fig. \ref{fig:agent}}
 \end{figure}
 
-Even on the worst case scenario presented on this second case, we
-note that a reactor failure only propagates up in the reactor graph. 
-In our example, even if all the reactors that depends on
-\texttt{Sampling} are entrained by its failure, we still keep the
-three reactors \texttt{Vehicle}, \texttt{Pilot} and \texttt{Ship
-  operation} allowing to  maintain the vehicle navigation control
-(\texttt{Pilot}) along with high level safety operation 
-(\texttt{Ship operation}). It illustrates how \rx can handle graceful
-system degradation despite the failure of one or more reactors. It
-also emphasize that it is critical to ensure that the low level
-reactors are properly designed in order to be as robust as 
-possible. 
+Even in the worst of the two cases presented above, we note that a
+reactor failure only propagates \emph{up} in the reactor dependency
+graph.  In our example, even if all the reactors that depend on
+\texttt{Sampling} are entrained by its failure, \rx continues to keep
+the reactors \texttt{Vehicle}, \texttt{Pilot} and \texttt{Ship
+  operation} intact.  This ensures maintenance of vehicle control via
+the \texttt{Pilot}, in addition to an abstract commanding mode for
+safe operation via the \texttt{Ship operation} reactor, illustrating
+how \rx can handle system degradation despite the failure of one or
+more reactors, and doing so gracefully. 
 
+Consequently, by ensuring that lower level reactors closest to the
+platform hardware are robustly designed, the \rx framework ensures
+that system designers can focus their attention on critical components
+while factoring in deliberative control of their platforms.
 
 \subsection{The  Deliberative Reactor}
 \label{sec:arch:europa}
@@ -492,11 +495,11 @@ separate \eu solvers modifying the \emph{same} plan database.
 
 \item The \emph{synchronization solver} is a specialized \eu solver
   that integrates new information in the plan. This signifies the
-  evolution of \emph{external} state variables and ensures that the
-  reactor propagates these to identify current reactor state as well
-  as to inform other reactors of any state change on its
-  \emph{internal} timelines. This solver is summoned at the beginning
-  of every single tick.
+  evolution of \emph{external} timelines and ensures that the reactor
+  propagates these to identify current reactor state as well as to
+  inform other reactors of any state change on its \emph{internal}
+  timelines. This solver is summoned at the beginning of every single
+  tick.
 
 \item The \emph{deliberation solver} manages the deliberation process
   of the reactor. It does so either to produce a new plan, to alter
@@ -1063,7 +1066,7 @@ namely the tokens \texttt{Going(home, superMarket)} and
 \texttt{At(SuperMarket)} -- are installed as goals for the reactor
 managing this state variable internally.
 
-\begin{figure}[!htb]
+\begin{figure}[!b]
   \centering
   \subfloat[\small A plan produced before
   synchronization.]{\label{fig:shop:exec0}\includegraphics[width=0.7\columnwidth]{figs/shoping_exec_t0}} \\
@@ -1179,7 +1182,7 @@ that all {\em external} goals it requested for the future are no
 longer valid, allowing timeline owners to divest maintaining such
 goals.
 
-\begin{figure}[!htbp]
+\begin{figure}[!b]
   \centering
   \subfloat[Conflicting Observation]{\label{fig:shop:relax1}\includegraphics[width=0.7\columnwidth]{figs/shoping_exec_relax-1}}\\
   \subfloat[Relaxed Partial Plan]{\label{fig:shop:relax2}\includegraphics[width=0.7\columnwidth]{figs/shoping_exec_relax-2}}

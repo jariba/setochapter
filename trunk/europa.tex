@@ -9,7 +9,7 @@ API to extract and manipulate plans and to obtain information about
 plan flaws and constraint violations at any stage of the planning
 process.
 
-\begin{figure}
+\begin{figure}[b]
 \centering
 \includegraphics[scale=0.4]{figs/EUROPA-Architecture.pdf}
 \caption{\small The \eu software architecture.}
@@ -347,17 +347,19 @@ the \texttt{PDB}. Different from facts, goals trigger inference in \eu
 which determines whether flaws (unresolved subgoals, overloaded
 resources, etc.) need to be resolved; if so, search modules can be
 invoked to resolve those flaws as part of the deliberation
-process. Finally, constraints are restrictions on and between facts 
+process. Finally, constraints are restrictions on and between facts
 and goals. In the example above, we use temporal constraints to
-specify when facts hold and when the goals should be
-accomplished. In the model above, \texttt{before} and \texttt{after} 
-are \texttt{Allen Algebra} \cite{allen84} operators, which \eu supports to specify
-temporal relations between tokens (specifically between their start and end timepoints)
-as summarized in Fig. \ref{fig:allen-algebra} 
+specify when facts hold and when the goals should be accomplished. In
+the model above, \texttt{before} and \texttt{after} are \texttt{Allen
+  Algebra} \cite{allen84} operators, which \eu supports to specify
+temporal relations between tokens (specifically between their start
+and end timepoints). The algebra is particularly effective in dealing
+with interval arithmetic; its elements are summarized in
+Fig. \ref{fig:allen-algebra}
 
-\begin{figure}[!htb]
+\begin{figure}[!t]
 \centering
-\includegraphics[scale=0.3]{figs/Allen-algebra.pdf}
+\includegraphics[scale=0.4]{figs/Allen-algebra.pdf}
 \caption{\small Temporal relations defined within the planner are
   based on \texttt{Allen Algebra} \cite{allen84} relations shown
   above.}
@@ -491,7 +493,7 @@ brittleness in the face of changing activity durations or start
 times. They can also be useful when searching for plans; however they
 are relatively expensive to compute. Therefore their ability to prune
 the search space must be weighted against the ability to search faster
-\cite{6007772}, \comment{cite "Stable Grounded Inference in Flexible Resource Scheduling" by Morris, Bresina, Barreiro}.
+\cite{6007772, morris11}.
 
 
 \subsection{Search in \eu}
@@ -511,14 +513,16 @@ Since temporal intervals may extend indefinitely in both positive and
 negative directions, for problems with a temporal dimension it is also
 common to specify a \emph{planning horizon} when invoking a solver;
 any decisions that fall completely outside of the horizon can be
-ignored. This is useful to ignore activities that may occur far in the future 
-or in the past to be relevant for a particular plan, ensuring that the solver is making
-as few commitments as necessary and reducing the complexity of plan generation.
-The \emph{planning horizon} is also useful when dealing with recurrent activities;
-consider for instance a model where a medical checkup has to occur
-every $3$ months. The user can model a recurring activity and then use
-the horizon to ensure that a finite number of medical checkup
-activities are generated as part of a plan. 
+ignored. This is useful to ignore activities that may occur far in the
+future or in the past to be relevant for a particular plan, ensuring
+that the solver is making as few commitments as necessary and reducing
+the complexity of plan generation.  The \emph{planning horizon} is
+also useful when dealing with recurrent activities; consider for
+instance a model where a medical checkup has to occur every $3$
+months. The user can model a recurring activity and then use the
+horizon to ensure that a finite number of medical checkup activities
+are generated as part of a plan.
+
 \subsubsection{Flaw Resolution}
 \label{sec:europa:flaws}
 
@@ -695,8 +699,8 @@ search, assuming that no flaws or available refinement operators are
 pruned unnecessarily.  Dead-ends in the search are discovered through
 constraint propagation, a vehicle for evaluating the consistency of a
 partial plan and also for filtering infeasible values from
-consideration prior to commitment. Consistency testing is initiated by the \texttt{isInconsistent}
-procedure. 
+consideration prior to commitment. Consistency testing is initiated by
+the \texttt{isInconsistent} procedure.
 
 The algorithm permits a heuristically controlled search by
 applying orderings for \texttt{chooseFlaw} and
@@ -734,7 +738,7 @@ the rows and diagonals contain only one queen.
       \lIf{$! moved$}{
         $forceMove(queenToMove, curPos, moves.first())$ \;
       }
-      $checkSolution()$ \tcp*{See if we have a new best solution}
+      $checkSolution()$ \tcp*{Evaluate if a new best solution}
       $curIter$\texttt{++} \;
     }
   }

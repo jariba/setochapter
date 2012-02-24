@@ -323,7 +323,7 @@ At the atomic level, the entities in the \eu plan representation are:
     \subfloat[\small State of timelines after satisfying a goal to own
     a drill by time $10$ by activating corresponding
     token.]{\label{fig:europapr:activate}\includegraphics[scale=0.35]{figs/europa-pr-activate.pdf}}
-    \caption{\small Evolution of a timeline from the Shopping Agent example}
+    \caption{\small Evolution of a timeline from the Shopping Agent example.}
   \end{figure}
 
 
@@ -356,30 +356,20 @@ token requires finding a target active token that is compatible. Two
 tokens are merge-compatible if they are instances of the same
 predicate and there are no empty intersections between corresponding
 token variables.  The effect of merging is illustrated in
-Fig. \ref{fig:europapr:merge}
-
-% \begin{figure} 
-%   \centering
-%   \includegraphics[scale=0.4]{figs/europa-pr-merge.pdf}
-%   \caption{\small State of timelines after satisfying a goal to be
-%     home by time $20$ on merging with initial state.}
-%   \label{fig:europapr:merge}
-% \end{figure}
-
-The goal to be home by time $20$ is satisfied by merging with the
-initial state that said that the Agent is home at time $0$.  The merge
-is possible because the tokens are of the same type \texttt{At}, and
-intersecting the domains for all of their variables doesn't yield an
-empty domain (which represents an inconsistency), in this case the
-token variables are the location, which is \texttt{Home} in both
-cases, and the temporal variables (start, end, duration), which can be
-intersected without causing an inconsistency. After the token
-representing the goal is merged onto the token representing the
-initial state, the resulting token represents not only the fact that
-the Agent must be \texttt{At(Home)} by time 0 but also
-\texttt{At(Home)} at time $20$, this is reflected in the new
-constraints on the token's start and end variables as depicted in
-Fig. \ref{fig:europapr:merge}.
+Fig. \ref{fig:europapr:merge}. The goal to be home by time $20$ is
+satisfied by merging with the initial state that said that the Agent
+is home at time $0$.  The merge is possible because the tokens are of
+the same type \texttt{At}, and intersecting the domains for all of
+their variables doesn't yield an empty domain (which represents an
+inconsistency), in this case the token variables are the location,
+which is \texttt{Home} in both cases, and the temporal variables
+(start, end, duration), which can be intersected without causing an
+inconsistency. After the token representing the goal is merged onto
+the token representing the initial state, the resulting token
+represents not only the fact that the Agent must be \texttt{At(Home)}
+by time 0 but also \texttt{At(Home)} at time $20$, this is reflected
+in the new constraints on the token's start and end variables as
+depicted in Fig. \ref{fig:europapr:merge}.
 
 When a token is activated, all domain rules associated with its type
 are evaluated, which may lead to new subgoals being generated. In our
@@ -390,23 +380,14 @@ can \texttt{Own} it. In such a case, activating the
 created in an \texttt{INACTIVE} state, which in turn could spawn its
 own subgoals, like being at the location where the product can be
 purchased before being able to buy it, and so on, until all domain
-rules are satisfied.
-
-% \begin{figure} \centering
-%   \includegraphics[scale=0.4]{figs/europa-pr-activate.pdf}
-%   \caption{\small State of timelines after satisfying a goal to own a
-%     drill by time $10$ by activating corresponding token.}
-% \label{fig:europapr:activate}
-% \end{figure}
-
-As Fig. \ref{fig:europapr:activate} shows the decision to merge the
-goal to be \texttt{At(Home)} by time $20$ with the initial state was
-not appropriate since the Agent will have to get away from
-\texttt{Home} to be able to buy the drill which is inconsistent with
-the constraints that resulted after the merge. As a result that
-decision will have to be retracted at some point and the alternative
-to activate or merge with a different token will have to be
-considered.
+rules are satisfied. As Fig. \ref{fig:europapr:activate} shows the
+decision to merge the goal to be \texttt{At(Home)} by time $20$ with
+the initial state was not appropriate since the Agent will have to get
+away from \texttt{Home} to be able to buy the drill which is
+inconsistent with the constraints that resulted after the merge. As a
+result that decision will have to be retracted at some point and the
+alternative to activate or merge with a different token will have to
+be considered.
 
 If, after looking at all possibilities, neither activating nor merging
 work, a token may be \texttt{REJECTED}. This is possible only for
@@ -422,7 +403,7 @@ or \texttt{REJECTED}, as shown in Fig. \ref{fig:europapr:states}.
 
 \begin{figure} \centering
   \includegraphics[scale=0.45]{figs/europa-pr-states.jpg}
-  \caption{\small Possible transitions for a Token State}
+  \caption{\small Possible transitions for a token state.}
 \label{fig:europapr:states}
 \end{figure}
 
@@ -458,7 +439,7 @@ or \texttt{REJECTED}, as shown in Fig. \ref{fig:europapr:states}.
   a requirement for supporting (slave) tokens to be in the plan in
   order for the master token to be valid.
 
-  \begin{figure} 
+  \begin{figure}[t]
     \centering
     \includegraphics[scale=0.4]{figs/europa-pr-rules.pdf}
     \caption{\small Master and Slave tokens generated as a result of a domain rule.}
