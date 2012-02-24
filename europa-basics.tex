@@ -102,9 +102,10 @@ must be placed on an  $N \times N$ chessboard so no queens attack the other. % F
 % \label{fig:nqueens-1}
 % \vskip+0.1cm
 % \end{figure}
-If we define $N$x$N$ variables Q$_{rc}$, $r \in [1,N]$, $c \in [1,N]$,
-Q$_{rc} = 1$ if cell $r,c$ in the chessboard is occupied by a Queen,
-$0$ otherwise. Then the following constraints need to be satisfied:
+If we define $N \times N$ variables Q$_{rc}$, $r \in [1,N]$, $c \in
+[1,N]$, Q$_{rc} = 1$ if cell $r,c$ in the chessboard is occupied by a
+Queen, $0$ otherwise. Then the following constraints need to be
+satisfied:
 
 \begin{eqnarray*}
  Sum(Q_{rc}) & = & \left\{
@@ -214,12 +215,12 @@ consists of two operations:
 A set of constraints and variables that describe a problem domain are
 typically represented as a \emph{Constraint Network}, where the
 variables are nodes and constraints are arcs between the variables. A
-pair of variables $x \& y$ is said to be \emph{arc consistent} if for
-every value in $x$'s domain, there is a value in $y$'s domain that is
-consistent with all the constraints that connect $x$ and $y$.  A naive
-approach to ensuring arc consistency consists of cycling through all
-the variable pairs and performing constraint propagation until there
-are no variable domain changes. The \texttt{AC-3} algorithm
+pair of variables $x$ and $y$ is said to be \emph{arc consistent} if
+for every value in $x$'s domain, there is a value in $y$'s domain that
+is consistent with all the constraints that connect $x$ and $y$.  A
+naive approach to ensuring arc consistency consists of cycling through
+all the variable pairs and performing constraint propagation until
+there are no variable domain changes. The \texttt{AC-3} algorithm
 \cite{mackworth77}, a popular implementation, improves over the naive
 approach by ignoring constraints whose variables were not affected
 since the last iteration. Fig. \ref{fig:constraintnet} shows a set of

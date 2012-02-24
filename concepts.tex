@@ -439,7 +439,17 @@ or \texttt{REJECTED}, as shown in Fig. \ref{fig:europapr:states}.
   relationship among tokens. It specifies a requirement that tokens of
   the predicate \texttt{At} that represent the location state for the
   Shopping Agent precede and succeed tokens of the predicate
-  \texttt{Go} that represents traveling.
+  \texttt{Go} that represents traveling. Fig. \ref{fig:europapr:rules}
+  illustrates the entities and relations involved in specifying such a
+  rule on a \texttt{Go} action. The token on which the rule applies
+  (\texttt{Go}) is referred to as the \emph{master}. Each \texttt{At}
+  and \texttt{Going} token required by the master is referred to as a
+  \emph{slave}.  Application of a rule on a token can thus cause slave
+  tokens, variables and constraints to be introduced.  The capability
+  of a domain rule to cause a slave token to be created is a key
+  vehicle through which planning occurs. Semantically, a rule imposes
+  a requirement for supporting (slave) tokens to be in the plan in
+  order for the master token to be valid.
 
   \begin{figure} 
     \centering
@@ -447,18 +457,6 @@ or \texttt{REJECTED}, as shown in Fig. \ref{fig:europapr:states}.
     \caption{\small Master and Slave tokens generated as a result of a domain rule.}
     \label{fig:europapr:rules}
   \end{figure}
-
-  Fig. \ref{fig:europapr:rules} illustrates the entities and relations
-  involved in specifying such a rule on a \texttt{Go} action. The
-  token on which the rule applies (\texttt{Go}) is referred to as the
-  \emph{master}. Each \texttt{At} and \texttt{Going} token required by
-  the master is referred to as a \emph{slave}.  Application of a rule
-  on a token can thus cause slave tokens, variables and constraints to
-  be introduced.  The capability of a domain rule to cause a slave
-  token to be created is a key vehicle through which planning
-  occurs. Semantically, a rule imposes a requirement for supporting
-  (slave) tokens to be in the plan in order for the master token to be
-  valid.
 
 \end{description}
 
