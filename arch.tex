@@ -369,36 +369,6 @@ eventually become goals for the lowest level reactor which -- instead
 of deliberating -- may just transform this goal into a command for
 execution in hardware.
 
-\begin{figure}[!htbp]
-  \centering
-  \vskip-1pc
-  \includegraphics[width=0.55\columnwidth]{figs/tick-cycle}
-  \caption{\small \rx reactor execution cycle: {\em Deliberation} is
-    interrupted by {\em synchronization} at the beginning of every
-    {\em tick} allowing integration of state information.}
-  \label{fig:tick-exec}
-  \vskip-0.8pc
-\end{figure}
-
-The manner in which the agent interleaves planning \texttt{step}s and
-synchronization for a single reactor is illustrated in
-Fig.~\ref{fig:tick-exec}. Synchronization occurs at every tick while
-interrupting planning; this allows a reactor to identify its current
-state that can propagate through the reactor hierarchy in order to
-ensure a consistent view of the state of the world between all the
-reactors.
-% This view of a reactor has two parallel tasks allowing for long
-% planning deliberation while ensuring that the state evolution
-% propagates through the agent as time advance.
-These intertwined tasks together provide two natural information flows
-(bottom-up for state estimation and top-down for plan projection) that
-we expect to see in a control loop. As they are both inference-based
-processes it is natural to implement a reactor based on generic
-automated planning. For example in Fig. \ref{fig:agent}, apart from
-\textsf{Shore comm.} and \textsf{Vehicle} acting as interfaces, every
-other reactor (in blue) is a different instance of an \eu reactor
-differentiated only by their model and \eu solver configurations.
-
 It is important to note that, in T-REX architecture, the only critical
 task of a reactor is to successfully identify its state through
 synchronization as the execution frontier advances. Indeed, a reactor
@@ -452,6 +422,37 @@ system degradation despite the failure of one or more reactors. It
 also emphasize that it is critical to ensure that the low level
 reactors are properly designed in order to be as robust as 
 possible. 
+
+\begin{figure}[!htbp]
+  \centering
+  \vskip-1pc
+  \includegraphics[width=0.55\columnwidth]{figs/tick-cycle}
+  \caption{\small \rx reactor execution cycle: {\em Deliberation} is
+    interrupted by {\em synchronization} at the beginning of every
+    {\em tick} allowing integration of state information.}
+  \label{fig:tick-exec}
+  \vskip-0.8pc
+\end{figure}
+
+The manner in which the agent interleaves planning \texttt{step}s and
+synchronization for a single reactor is illustrated in
+Fig.~\ref{fig:tick-exec}. Synchronization occurs at every tick while
+interrupting planning; this allows a reactor to identify its current
+state that can propagate through the reactor hierarchy in order to
+ensure a consistent view of the state of the world between all the
+reactors.
+% This view of a reactor has two parallel tasks allowing for long
+% planning deliberation while ensuring that the state evolution
+% propagates through the agent as time advance.
+These intertwined tasks together provide two natural information flows
+(bottom-up for state estimation and top-down for plan projection) that
+we expect to see in a control loop. As they are both inference-based
+processes it is natural to implement a reactor based on generic
+automated planning. For example in Fig. \ref{fig:agent}, apart from
+\textsf{Shore comm.} and \textsf{Vehicle} acting as interfaces, every
+other reactor (in blue) is a different instance of an \eu reactor
+differentiated only by their model and \eu solver configurations.
+
 
 \subsection{The  Deliberative Reactor}
 \label{sec:arch:europa}
