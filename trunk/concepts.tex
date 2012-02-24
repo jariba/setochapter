@@ -279,20 +279,19 @@ At the atomic level, the entities in the \eu plan representation are:
   by exactly one token for every given timepoint in the plan. Any
   instances of a class derived from \eus built-in timeline class will
   induce ordering requirements among its tokens to ensure no temporal
-  overlap may occur among them \cite{mus94}.  \kcomment{add a figure}
+  overlap may occur among them \cite{mus94}. Fig. \ref{fig:europapr1} below and several others
+  after that illustrate how timelines are used to represent state in a plan.
 
 \item \textit{Resources}: Metric resources, e.g. the energy of a
   battery or the capacity of a cargo hold, are objects with an
   explicit quantitative state in time and with a circumscribed range
   of changes that can occur to impact that state i.e. produce,
-  consume, use, change.  Resources are a common requirement for \eu
+  consume, use, change.  Resources are such a common requirement for \eu
   users that built-in object types (with their corresponding token
   types to denote production, consumption, etc) are provided.
   Instances of classes derived from a resource will induce ordering
   requirements on their tokens in order to ensure that the level of
-  the resource remains within specified limits.  \kcomment{This
-    definitely needs a visual example and some text esp. since it
-    impacts plan structure via scheduling}
+  the resource remains within specified limits.
 
 \end{enumerate}
 
