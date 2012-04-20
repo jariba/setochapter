@@ -56,24 +56,25 @@ Fault Diagnosis, Isolation and Recovery (FDIR) algorithms as
 demonstrated in the \texttt{RAX} experiment
 \cite{williams96,mus98,williams97} and more recently on an AUV by
 Dearden and others \cite{wang09,ernits10,dearden11}. The second
-challenge has to implementing a policy within the \rx framework that
-explicitly deals with recovery since controller failure can be
-distributed across reactors. Since reactors are hierarchical in their
-relationship to one another, their well defined dependencies allow
-them to be removed from an agent systematically. Reactors more
-abstract in scope can be removed before those which are less abstract
-(and closer to the hardware). In the event a Navigation reactor, for
-example, has a fault, it can be removed safely with lower level
-functionalities (such as those in the executive). When the Navigator
-is removed, it will recursively remove more abstract reactors (such as
-a Mission Manager) that depend on it. Such a safety feature then
-allows the system designers to ensure that early on they can invest
-more in ensuring that reactors lower in the hierarchy are robust and
-potentially formally verified. It also means that there is a safe and
-sure way to take control of the vehicle at any level within the
-reactors hierarchy; as long as low level reactors are still active one
-will always been able to send goals/commands to them and execute what
-are traditionally known as runout sequences (or clean up scripts).
+challenge has to \kcomment{do with} implementing a policy within the
+\rx framework that explicitly deals with recovery since controller
+failure can be distributed across reactors. Since reactors are
+hierarchical in their relationship to one another, their well defined
+dependencies allow them to be removed from an agent
+systematically. Reactors more abstract in scope can be removed before
+those which are less abstract (and closer to the hardware). In the
+event a Navigation reactor, for example, has a fault, it can be
+removed safely with lower level functionalities (such as those in the
+executive). When the Navigator is removed, it will recursively remove
+more abstract reactors (such as a Mission Manager) that depend on
+it. Such a safety feature then allows the system designers to ensure
+that early on they can invest more in ensuring that reactors lower in
+the hierarchy are robust and potentially formally verified. It also
+means that there is a safe and sure way to take control of the vehicle
+at any level within the reactors hierarchy; as long as low level
+reactors are still active one will always been able to send
+goals/commands to them and execute what are traditionally known as
+runout sequences (or clean up scripts).
 
 Feature recognition for Sampling is a general research thrust; however
 it has specific relevance in the context of \rx and AUV control. As
@@ -91,7 +92,7 @@ biogeochemical variables in the coastal ocean, our work on INLs
 \cite{mcgann08d,ryan10} and reliance on a oceanographic expert has
 shown that scaling to different problems remains problematic. This is
 a prime motivation to move towards more semi-supervised methods such
-as \cite{kumar11,sergio12}. With the advent of the \od however,
+as \cite{kumar11}. With the advent of the \od however,
 another direction our research is taking us is in \texttt{Recommender
   Systems} \cite{Adomavicius05} as noted in Section
 \ref{sec:results}. We are working to design and deploy software
