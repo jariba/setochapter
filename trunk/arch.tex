@@ -124,8 +124,8 @@ propagate down following the same mechanism.
 In such a process, one challenge is to avoid being overwhelmed by
 goals that may threaten the ability of a reactor to process and
 integrate in its evolving partial plan. For that reason, each reactor
-specifies the following two parameters that applied towards the scope
-of the agent lifetime:
+specifies the following two parameters that \kcomment{are} applied
+towards the scope of the agent lifetime:
 
 \begin{itemize}
 
@@ -311,7 +311,7 @@ goals is directly derived from \eu timelines and tokens.  While such a
 rich representation allows exchange of state information in a formal
 yet flexible manner, its translation into planning frameworks that
 have an explicit representation of time (such as but not limited to
-\eu) is often trivial.
+\eue) is often trivial.
 
 \subsection{The Execution Cycle}
 \label{sec:arch:exec}
@@ -356,9 +356,9 @@ complete and valid. How the reactor identifies that its plan is
 complete and valid is its responsibility and depends on the way each
 reactor resolves its plan at each {\em step}. The general idea is that
 the reactor is able to find a valid strategy in order to satisfy as
-many of its {\em internal} goals as possible. For \eu, this means that
-the solver is unable to identify any further flaws to be resolved in
-the plan.
+many of its {\em internal} goals as possible. For \eue, this means
+that the solver is unable to identify any further flaws to be resolved
+in the plan.
 
 When such plan is identified, its {\em external} timeline(s) are then
 dispatched to the corresponding reactors which own these times and
@@ -417,8 +417,8 @@ timelines. Reactors which declare these very state variables as {\em
 exchanged between reactors are considered \emph{rejectable} by the
 reactor that manages them. As a result in such a situation, the
 failure to find a plan for these goals, is \emph{not} considered a
-critical failure of the reactor. It will only result on these goals
-being ignored until newer goals are received.
+critical failure of the reactor. It will only result \kcomment{in}
+these goals being ignored until newer goals are received.
 
 Take for example our AUV agent from Fig. \ref{fig:agent}, and assume
 that the \texttt{Sampling} reactor failed to synchronize. In such a
@@ -585,15 +585,15 @@ targeting the change at the execution frontier.
   reactive execution and does not affect the reactivity of the agent. 
 \end{quote}}
 
-This suggests a deliberate non overlap between {\em reactive planner}
-and {\em deliberative planners} horizons. In \rxe, and more
-specifically in our \eu reactor the planning horizon of {\em
+This suggests a deliberate non overlap between \kcomment{the} {\em
+  reactive planner} and {\em deliberative planners} horizons. In \rxe,
+and more specifically in our \eu reactor the planning horizon of {\em
   synchronization} -- limited to the current tick -- is a subset of
 the planning horizon of the deliberation steps -- starting at the
 current tick and with an extent based on latency $\lambda$ and
 look-ahead $\pi$ of the reactor. In this manner we avoid creating a
 conflict between the deliberation and synchronization by controlling
-the scheduling of these two process by the \rx agent.
+the scheduling of these two process\kcomment{es} by the \rx agent.
 
 In the following sections we show how synchronization and deliberation
 are implemented independently to show how their interaction through
@@ -631,7 +631,7 @@ Agent::Buy {
 }
 \end{verbatim}
 
-If \texttt{object.location} is {\em external} and \texttt{Agent} is an
+If \texttt{object.location\kcomment{.At}} is {\em external} and \texttt{Agent} is an
 {\em internal} timeline, a robot may encounter the situation where it
 is at the location where it can buy one (possibly among others)
 product. This results in a decision-making problem related to the
@@ -824,10 +824,10 @@ meant to be confronted by execution is problematic. It might be valid
 if one can guarantee that an outcome is predisposed to occur (for
 example the reactor managing the \texttt{Agent.location} timeline
 guarantees that the outcome of the \texttt{Going} will {\em always}
-result on ending at the traget location). However, given the very
-nature of the planning problem and the ability to search outcomes and
-to replan, the model should be written so that a future projection can
-be manipulated. 
+result on ending at the \kcomment{target} location). However, given
+the very nature of the planning problem and the ability to search
+outcomes and to replan, the model should be written so that a future
+projection can be manipulated.
 
 One could therefore alter this part of the model to give the reactor
 more flexibility as follows:
@@ -865,7 +865,7 @@ As the example above shows, synchronization involves a deliberation
 process. The risk is such that the search for a solution is not a
 simple sequence of decisions where the resolution can be easily
 identified by the solver as any other option would lead immediately to
-n plan inconsistency. Since such a process is required by the \rx at
+plan inconsistency. Since such a process is required by the \rx at
 \emph{every} tick for \emph{every} reactor the model needs to be
 designed carefully.
 
@@ -884,8 +884,9 @@ notifying any reactor that depends on its {\em internal} state
 variables; it does so by posting the special observation
 \textsf{Failed}. This special state is a special predicate which is
 acceptable for all the {\em internal} and {\em external} timelines of
-a \eu reactor.  By so doing we allow for graceful degradation where
-other reactors can readapt their plans on receipt of this observation.
+\kcomment{an} \eu reactor.  By so doing we allow for graceful
+degradation where other reactors can readapt their plans on receipt of
+this observation.
 
 Finally, at the engine level careful choices were made in both the
 focus of the search -- limited only to tokens that can potentially
@@ -963,7 +964,7 @@ alterations of the flaws directly related to {\em synchronization}:
 \item The last observation has proved that the current plan is invalid
   requiring the {\em synchronization} solver to relax the existing
   plan to identify its current {\em external} state. (This case is
-  developed further on the next section).
+  developed further \kcomment{in} the next section).
 
 \end{enumerate}
 
@@ -995,7 +996,7 @@ as tokens can be excluded dynamically from deliberation as their
 insertion in the plan and scheduling with other generated tokens can
 alter their temporal scope to be outside of the planning window.  This
 allows the planner to focus on its planning horizon and report
-decision on flaws that are beyond this scope. As, time advances, these
+decision on flaws that are beyond this scope. As time advances, these
 potential future flaws will eventually be part of the planning window
 of the reactor and will be then resolved along with potentially new
 goals.  This in turn, results in an apparent \emph{continuous
