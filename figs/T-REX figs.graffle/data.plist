@@ -4913,7 +4913,7 @@
 	<key>MasterSheets</key>
 	<array/>
 	<key>ModificationDate</key>
-	<string>2012-02-24 10:09:27 -0800</string>
+	<string>2012-04-23 15:46:27 -0700</string>
 	<key>Modifier</key>
 	<string>Kanna</string>
 	<key>NotesVisible</key>
@@ -10543,6 +10543,7 @@ Database}</string>
 \pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\qc\pardirnatural
 
 \f0\fs24 \cf0 Constraint\
+Reasoning\
 Engine}</string>
 					</dict>
 				</dict>
@@ -14233,11 +14234,11 @@ Engine}</string>
 	<key>WindowInfo</key>
 	<dict>
 		<key>CurrentSheet</key>
-		<integer>1</integer>
+		<integer>3</integer>
 		<key>ExpandedCanvases</key>
 		<array/>
 		<key>Frame</key>
-		<string>{{370, 0}, {1187, 1000}}</string>
+		<string>{{396, -44}, {1187, 1000}}</string>
 		<key>ListView</key>
 		<true/>
 		<key>OutlineWidth</key>
@@ -14251,9 +14252,9 @@ Engine}</string>
 		<key>SidebarWidth</key>
 		<integer>120</integer>
 		<key>VisibleRegion</key>
-		<string>{{0, 0}, {519, 415.5}}</string>
+		<string>{{0, 0}, {1052, 846}}</string>
 		<key>Zoom</key>
-		<real>2</real>
+		<real>1</real>
 		<key>ZoomValues</key>
 		<array>
 			<array>
