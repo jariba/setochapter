@@ -25,6 +25,12 @@ methods often employ, namely using pre-scripted methods. With the
 installation of \rx onboard the Dorado with its capability sense the
 environment and to appropriately synthesize plans and replan on the
 fly, more imaginative methods of sample acquisition were targeted.
+\kcomment{The Dorado uses two onboard computers: a main vehicle computer which
+is a 244 Mhz PC/104 stack running the QNX real-time operating system,
+and a 367 MHz EPIC EPX-GX500 AMD Geode stack running Linux and \rxe. A
+socket-based communication protocol allows the exchange of goals and
+state updates between \rx and the lower level functional layer.}
+
 
 Our early work focused on observing and sampling within Intermediate
 Nephaloid Layers (INLs) \footnote{INLs are fluid sheets of suspended
@@ -409,11 +415,11 @@ data returned by experiment partners.
 \subfloat[]{\label{fig:odss-mtg}\includegraphics[width=0.3\textwidth]{figs/october-canon-meeting.png}}
 \subfloat[]{\label{fig:odss-virtual}\includegraphics[width=0.33\textwidth]{figs/virtual-drifter-tool.png}}
 \subfloat[]{\label{fig:odss-ipad}\includegraphics[width=0.3\textwidth]{figs/photo-ipad-2.jpg}}
-\caption{\small \ref{fig:odss-mtg} shows a 2010 \can meeting with the
-  \od in use. \ref{fig:odss-virtual} shows a drifter tracking tool
-  used during \can planning; it used a physical model of advected
+\caption{\small Fig. \ref{fig:odss-mtg} shows a 2010 \can meeting with
+  the \od in use. Fig. \ref{fig:odss-virtual} shows a drifter tracking
+  tool used during \can planning; it used a physical model of advected
   surface currents from \texttt{CeNCOOS} \cite{cencoos} to plan AUV
-  deployments. \ref{fig:odss-ipad} shows \od use on an iPad.}
+  deployments. Fig. \ref{fig:odss-ipad} shows \od use on an iPad.}
 \label{fig:odss2}
 \end{figure*}
 

@@ -2,10 +2,10 @@
 \label{sec:concepts}
 
 \rx is an adaptive, artificial intelligence based controller and
-provides general framework for building reasoning systems for
-real-world autonomous vehicles. At MBARI \rx is used for AUV control;
-another instantiation of the system is being used for control of a
-terrestrial personal robot \cite{pr2, Meeussen:2010dn}. The
+provides \kcomment{a} general framework for building reasoning systems
+for real-world autonomous vehicles. At MBARI \rx is used for AUV
+control; another instantiation of the system is being used for control
+of a terrestrial personal robot \cite{pr2, Meeussen:2010dn}. The
 development of \rx has been targeted at surveying a number of
 oceanographic features which are dynamic and spatio-temporally
 unpredictable. Typically this requires our AUVs to balance the goals
@@ -74,7 +74,7 @@ specific initial conditions. Two important properties of
 different computational paradigms could actually be tractable first in
 simulation and subsequently in actual robotic platforms. In this
 chapter our emphasis is to focus on embedded AI Planning and the
-execution of plans on an embedded robotic marine robotic
+execution of plans on an embedded \kcomment{marine robotic}
 platform. While the platform is domain specific, the techniques we
 highlight are general purpose as noted in Section \ref{sec:intro}.
 
@@ -169,9 +169,9 @@ instance with 10 activities, 5 resources and 30 temporal constraints.
 \begin{figure}[t]
 \centering
 \subfloat[\small A \eu solution to an \texttt{RCPSP} \cite{Bruckera99}
-  problem.]{\label{fig:rcpsp-1}\includegraphics[scale=0.2]{figs/Example-UBO0.jpg}}\qquad
+  problem.]{\label{fig:rcpsp-1}\includegraphics[scale=0.25]{figs/Example-UBO0.jpg}}\qquad
 \subfloat[\small A \eu solution to a shopping agent problem domain where
-  the agent needs to buy Bananas, Milk and a Drill.]{\label{fig:shopping-1}\includegraphics[scale=0.25]{figs/Example-Shopping0.jpg}}
+  the agent needs to buy Bananas, Milk and a Drill.]{\label{fig:shopping-1}\includegraphics[scale=0.3]{figs/Example-Shopping0.jpg}}
 \caption{\small \eu based solutions to scheduling and planning problems.}
 \end{figure}
 
@@ -349,10 +349,12 @@ problems are specified in terms of:
 
 \end{description}
 
-To generate plans, the \texttt{CAIP} framework uses a plan-space search
-approach \cite{ghallab04}, where a partial plan is evolved until all
-open goals are achieved, and all inconsistencies are removed. The
-specific search algorithm used by \eu will be covered in detail below.
+To generate plans, the \texttt{CAIP} framework uses a plan-space
+search approach \cite{ghallab04}, where a \emph{partial plan} is
+evolved until all open goals are achieved and all inconsistencies are
+removed. \kcomment{A partial plan is a subsequence of a plan which can
+  be refined into a plan structure.} The specific search algorithm
+used by \eu will be covered in \kcomment{further} detail below.
 
 
 %%% Local Variables: 

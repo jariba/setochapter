@@ -32,7 +32,7 @@ behaviors are tweaked to generate some measure of responsiveness to
 the surrounding environment \cite{yanwu08} to generate interesting
 observations for oceanographers, yet technically naive in terms of
 scalability and systematicity. \cite{Benjamin2006} is clear about the
-extant of adaptation in stating:
+\kcomment{extent} of adaptation in stating:
 
 {\footnotesize
   \begin{quote}
@@ -305,11 +305,11 @@ important aspect targeted by \texttt{ASE} given the disparate models
 between the planner and the rule-based executive. With such a system,
 real-time updates from the environment cannot be accommodated since
 the planner is a monolithic computational environment. The rate of
-updates from the science drivers is roughly in the order of an earth
-orbit on the EO-1 vehicle. As a result, the ASE is only an incremental
-update on RAX and is not suitable for domains where complex automated
-reasoning and asynchronous environmental observations need to be
-factored in deliberation.
+updates from the science drivers is roughly \kcomment{on} the order of
+an earth orbit on the EO-1 vehicle. As a result, the ASE is only an
+incremental update on RAX and is not suitable for domains where
+complex automated reasoning and asynchronous environmental
+observations need to be factored in deliberation.
 
 \texttt{TCA} \cite{simmons94} is another framework for robot control
 and has similar motivations to \texttt{RAX} and
@@ -325,9 +325,9 @@ while partial orders are possible, it does deal with execution time
 uncertainty. Third, while \texttt{TCA} shares the notion of using
 domain expertise of different planners, it does so thru a centralized
 message passing mechanism. While this allows disparate code-bases to
-talk to each other thru IPC (a inter-process communication or message
-passing mechanism), failure in the centralized controller is
-tantamount to a system crash.
+talk to each other \kcomment{through} IPC (\kcomment{an} inter-process
+communication or message passing mechanism), failure in the
+centralized controller is tantamount to a system crash.
 
 The \texttt{ReSSAC} project at ONERA \cite{teichteil07} has similar
 motivations in controlling aerial UAV platforms for autonomous Search

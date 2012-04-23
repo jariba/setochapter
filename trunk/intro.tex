@@ -55,21 +55,25 @@ we demonstrate that earlier control paradigms (primarily driven by
 targeted observation and sampling as well as a more nuanced and
 balanced consideration of mission objectives, environmental conditions
 and available resources. Planning (or deliberation or projection in
-action space) is important to balance current needs of a robot with
-future desires or goals taking into account time and available
-resources in-situ on the robot. Planning without time or action
-planning in and of itself is not adequate; dealing with time ensures
-that the balance between now and the future is handled
-systematically. Yet, plans have to be tied to robotic action and in
-the real-world which is not static. Further, plans project future
-state which is not only likely to change, but is based on substantial
-uncertainty\footnote{It is important to remember that these principles
-  are broad much as Dwight Eisenhower is reputed to have said
-  ``\emph{In preparing for battle I have always found that plans are
-    useless, but planning is indispensable}'' and ``\emph{Failing to
-    plan is planning to fail}''}. Use of environmental cues is often
-hampered by poor predicitve skill of ocean models and little to no
-availability of a priori synoptic views of the survey area
+action space \kcomment{and used interchangeably in this chapter}) is
+important to balance current needs of a robot with future desires or
+goals taking into account time and available resources in-situ on the
+robot. Planning without time or action planning in and of itself is
+not adequate; dealing with time ensures that the balance between now
+and the future is handled systematically. Yet, plans have to be tied
+to robotic action and in the real-world which is not static. Further,
+plans project future state which is not only likely to change, but is
+based on substantial uncertainty\footnote{It is important to remember
+  that these principles are broad much as Dwight Eisenhower is reputed
+  to have said ``\emph{In preparing for battle I have always found
+    that plans are useless, but planning is indispensable}'' and
+  ``\emph{Failing to plan is planning to fail}''}. Use of
+environmental cues is often hampered by poor \kcomment{predictive}
+skill \cite{anderson2009} of ocean models and little to no
+availability of a priori synoptic views of the survey
+area. \kcomment{Planning therefore provides a ``buffer'' against the
+  stochastic environment.}
+
 
 AUV control architectures have primarily been driven by reactive
 Subsumption-based approaches \cite{brooks86}. They have been adequate
@@ -138,7 +142,7 @@ from this rich legacy included the following:
 \end{itemize}
 
 We have developed, tested and deployed the Teleo-Reactive EXecutive
-(\rx) an on-board adaptive control system that integrates AI based
+(\rxe) an on-board adaptive control system that integrates AI based
 planning and state estimation in a hybrid
 executive\cite{mcgann08a,mcgann08b,py10}.  State estimation allows the
 system to keep track of world evolution as time advances based on a
@@ -148,20 +152,21 @@ based on the state identified during state estimation.  It further
 enables goal-directed commanding within the context of projected
 mission state and allows for replanning for off-nominal situations and
 opportunistic science events. The framework in addition to being used
-on an AUV, is general enough be used for controlling a personal robot
-\cite{pr2,Meeussen:2010dn,mcgann2009} and is deployed on a European
-planetary rover testbed \cite{goac11}. While it is possible to
-integrate probabilistic estimation on top of this framework
-\cite{mcgann08d}, such representation is not explicitly handled by the
-framework and is out of scope of this chapter.  Deliberation and
-reaction are integrated systematically over different temporal and
-functional scopes within a single agent and a single model that covers
-the needs of high-level mission management, low-level navigation,
-instrument control, and detection of unstructured and poorly
-understood phenomena. \rx is deployed on MBARI's \emph{Dorado} AUV
-shown in Fig. \ref{fig:auv-fig}, which to the best of our knowledge is
-the only operational marine platform anywhere being used for routine
-scientific surveys with onboard plan synthesis.
+on an AUV, is general enough \kcomment{to} be used for controlling a
+personal robot \cite{pr2,Meeussen:2010dn,mcgann2009} and is deployed
+on a European planetary rover testbed \cite{goac11}. While it is
+possible to integrate probabilistic estimation on top of this
+framework \cite{mcgann08d}, such representation is not explicitly
+handled by the framework and is out of scope of this chapter.
+Deliberation and reaction are integrated systematically over different
+temporal and functional scopes within a single agent and a single
+model that covers the needs of high-level mission management,
+low-level navigation, instrument control, and detection of
+unstructured and poorly understood phenomena. \rx is deployed on
+MBARI's \emph{Dorado} AUV shown in Fig. \ref{fig:auv-fig}, which to
+the best of our knowledge is the only operational marine platform
+anywhere being used for routine scientific surveys with onboard plan
+synthesis.
 
 \begin{figure}[t]
   \centering \vskip-5pt

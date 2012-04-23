@@ -29,10 +29,11 @@ results in duplication of effort and a diffusion of knowledge leading
 to significant design and integration issues \cite{DS1report}.
 \texttt{IDEA} mitigated most of these issues by tightly integrating
 planning and execution in a single representational and computational
-framework with a unified declarative model. Our approach with \rx
-builds on this design methodology albeit in a substantially systematic
-manner. The \rx architecture contributes to agent architectures over
-and beyond \texttt{IDEA} are in the following ways:
+framework with \kcomment{an} unified declarative model. Our approach
+with \rx builds on this design methodology albeit in a substantially
+systematic manner. The \rx architecture contributes to agent
+architectures over and beyond \texttt{IDEA} in the following
+\kcomment{significant} ways:
 
 \begin{itemize}
 
@@ -41,19 +42,20 @@ and beyond \texttt{IDEA} are in the following ways:
   scope both functionally (one for example focusing on the conversion
   of high level waypoints into low-level commands) and temporally as
   each reactor declares its planning look-ahead $\pi$ and expected
-  latency $\lambda$ before being able to produce plan to the agent
-  depending on where it is located in a reactor dependency graph such
-  as shown in Fig. \ref{fig:agent}. A reactor closer to the hardware
-  in the hierarchy, is expected to deliberate less and be highly
-  responsive to observations from the world. This implies lower values
-  of $\pi$ and $\lambda$ (see Section \ref{sec:arch:trex} below).
+  latency $\lambda$ before being able to produce \kcomment{a} plan to
+  the agent depending on where it is located in a reactor dependency
+  graph such as shown in Fig. \ref{fig:agent}. A reactor closer to the
+  hardware in the hierarchy, is expected to deliberate less and be
+  highly responsive to observations from the world. This implies lower
+  values of $\pi$ and $\lambda$ (see Section \ref{sec:arch:trex}
+  below).
 
 \item \emph{Coupling} a tighter integration between the planning
   process and world evolution to ensure that planning occurs
-  \emph{during continuous} state update in the {\em same} polan
-  database used for planning. By doing so, the planner is
-  better informed in its deliberation despite a larger latency than
-  the changing world. 
+  \emph{during continuous} state update in the {\em same}
+  \kcomment{plan} database used for planning. By doing so, the planner
+  is better informed in its deliberation despite a larger latency than
+  the changing world.
 \end{itemize}
 
 Systematic partitioned inference is a major contribution of
@@ -461,7 +463,7 @@ reactor is implemented:
   synchronize leading to a bottom-up destruction of ``faulty'' reactors.]{
     \includegraphics[width=0.35\columnwidth]{figs/AUV-fail1}\label{fig:fail1}}
   \caption{\small Impact of the \texttt{Sampling} reactor failure in
-    the AUV agent shown in Fig. \ref{fig:agent}}
+    the AUV agent \kcomment{from} Fig. \ref{fig:agent}}
 \end{figure}
 
 Even in the worst of the two cases presented above, we note that a
@@ -760,10 +762,9 @@ The synchronization process in turn can be described as:
 %   subsection further in depth}
 %%%%
 
-Steps $2$ \& $3$ above are handled by the \eu solver from algorithm
+Steps $2$ \& $3$ above are handled by the \eu solver from Algorithm
 \ref{alg:europa:solve} which ensures that the {\em current state
-  flaws} are selected last so as to follow the sequence given
-above. 
+  flaws} are selected last so as to follow the sequence given above.
 
 As {\em synchronization} focuses on the execution frontier it also
 filters out all flaws that are outside of the current tick's scope.
