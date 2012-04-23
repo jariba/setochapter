@@ -54,7 +54,7 @@ flexible partial plan.
 
 \begin{figure}[!htb]
 \centering
-\includegraphics[scale=0.3]{figs/flexible-timelines.pdf}
+\includegraphics[scale=0.35]{figs/flexible-timelines.pdf}
 \caption{\small Tokens with flexible temporal intervals and parametric
   constraints between tokens. This example shows the triggering of a
   water sampler based on a feature threshold while the vehicle
@@ -219,18 +219,20 @@ At the atomic level, the entities in the \eu plan representation are:
   the beginning to the end of the planning horizon. However, in
   practice, the temporal extent of interest must be defined with
   timepoints \cite{Dean88} to represent its start and end.  In such
-  representation, one writes \texttt{At($a$,$s$,$e$,$l$)} to indicate
-  that agent $a$ is at location $l$ from time $s$ to time $e$. In
-  fact, this pattern of using such predicates to describe both state
-  and behavior of objects is prevalent enough that \eu the token
-  representation. Token have built in variables to indicate the object
-  to which the statement principally applies as well as the timepoints
-  over which it holds. A token is an instance of a predicate that
-  represents an object's state or behavior and is defined over a
-  temporal extent. In \eu, all predicate instances are tokens. Also,
-  in the same way that objects are described generically by classes,
-  in \eu tokens can be described generically by token types. Every
-  token has five built-in variables:
+  \kcomment{a} representation, one writes \texttt{At($a$,$s$,$e$,$l$)}
+  to indicate that agent $a$ is at location $l$ from time $s$ to time
+  $e$. In fact, this pattern of \kcomment{usage} to describe both
+  state and behavior of objects is prevalent enough that \eu
+  \kcomment{encapsulates into} the token
+  representation. \kcomment{Tokens} have built in variables to
+  indicate the object to which \kcomment{it primarily} applies as well
+  as the timepoints over which it holds. A token, therefore, is an
+  instance of a predicate that represents an object's state or
+  behavior and is defined over a temporal extent. In \eu, all
+  predicate instances are tokens. \kcomment{In} the same way that
+  objects are described generically by classes, in \eu tokens can be
+  described generically by token types. Every token has five built-in
+  variables:
 
   \begin{enumerate}
 
@@ -279,8 +281,9 @@ At the atomic level, the entities in the \eu plan representation are:
   by exactly one token for every given timepoint in the plan. Any
   instances of a class derived from \eus built-in timeline class will
   induce ordering requirements among its tokens to ensure no temporal
-  overlap may occur among them \cite{mus94}. Fig. \ref{fig:europapr1} below and several others
-  after that illustrate how timelines are used to represent state in a plan.
+  overlap may occur among them \cite{mus94}. Fig. \ref{fig:europapr1}
+  below and several others after that illustrate how timelines are
+  used to represent state in a plan.
 
 \item \textit{Resources}: Metric resources, e.g. the energy of a
   battery or the capacity of a cargo hold, are objects with an
@@ -314,15 +317,14 @@ At the atomic level, the entities in the \eu plan representation are:
   to be home by time $20$ as shown in Fig. \ref{fig:europapr1}
   
   \begin{figure}[t]
-    \centering \subfloat[\small Timelines representing initial state
-    and goals for a Shopping
-    Agent.]{\label{fig:europapr1}\includegraphics[scale=0.35]{figs/europa-pr-1.pdf}}\qquad
+    \centering 
+    \subfloat[\small Timelines representing initial state
+    and goals for a Shopping Agent.]{\label{fig:europapr1}\includegraphics[scale=0.4]{figs/europa-pr-1.pdf}}\qquad
     \subfloat[\small State of timelines after satisfying a goal to be
-    home by time $20$ on merging with initial
-    state.]{\label{fig:europapr:merge}\includegraphics[scale=0.35]{figs/europa-pr-merge.pdf}}\qquad
+    home by time $20$ on merging with initial state.]{\label{fig:europapr:merge}\includegraphics[scale=0.4]{figs/europa-pr-merge.pdf}}\qquad
     \subfloat[\small State of timelines after satisfying a goal to own
     a drill by time $10$ by activating corresponding
-    token.]{\label{fig:europapr:activate}\includegraphics[scale=0.35]{figs/europa-pr-activate.pdf}}
+    token.]{\label{fig:europapr:activate}\includegraphics[scale=0.4]{figs/europa-pr-activate.pdf}} 
     \caption{\small Evolution of a timeline from the Shopping Agent example.}
   \end{figure}
 
@@ -330,10 +332,10 @@ At the atomic level, the entities in the \eu plan representation are:
   Note that the tokens \texttt{Own(Drill)} and \texttt{At(Home)} that
   represent the goals are not immediately placed on the
   \texttt{AgentBag} or \texttt{AgentLocation} timelines since \eu must
-  first determine whether it can achieve those goal and how. When the
-  goals are posted and before any decisions are made, the
-  \texttt{Own(Drill)} and \texttt{At(Home)} tokens are created in an
-  \texttt{INACTIVE} state. \eu then considers the partial plan and
+  first determine whether it can achieve those \kcomment{goals} and
+  how. When the goals are posted and before any decisions are made,
+  the \texttt{Own(Drill)} and \texttt{At(Home)} tokens are created in
+  an \texttt{INACTIVE} state. \eu then considers the partial plan and
   evaluates two possible alternatives:
 
 \begin{enumerate}
