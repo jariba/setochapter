@@ -85,33 +85,34 @@ sequences must necessarily be designed considering worst case
 scenarios.
 
 \eu uses a \emph{state variable} representation
-\cite{mus94,jonsson00,mcgann09} to describe the evolution of state
-over time. The instantiated history of such state variable evolution
-over a temporal horizon we call \emph{timelines} and which represent a
-single thread in the execution of a concurrent system. At any given
-time each thread can execute a single procedure.  Thus each timeline
-consists of a sequence of procedures which encapsulate and describe
-state evolution; we call these instantiated atomic entities
-\emph{tokens}.  A token therefore describes a procedure invocation,
-the state variables on which it can occur, the parameter values of the
-procedure, and the time values defining the interval. We allow
-encapsulation of uncertainty within these tokens with a range of start
-and end times and parameters, all of which are encoded as variables. A
-constraint solver in turn manipulates these variables defined in a \eu
-domain model. For example, consider a scientific need to take water
-samples 100 meters from an environmental hotspot while an AUV is
-performing a Yo-Yo sawtooth pattern\footnote{\kcomment{Variability in
-    the water column is along the vertical dimension. Since the Dorado
-    platform can only move forward, the Yo-Yo pattern is the most
-    efficient mechanism for studying water column properties.}}  in
-the water-column. Two samples are needed if the feature's signal is
-above a threshold; one otherwise. The token that is capturing the
-sensory threshold has a parametric constraints to the token which
-fires the requisite water sampler. In addition, the start time of the
-water sampling procedure is highly dependant on the variability of
-sub-sea currents and actual speed of the vehicle. Therefore a number
-of values are possible for the start times and duration of the
-sampling all of which are valid combinations for desired outcomes.
+\cite{mus94,jonsson00,py10} to describe the evolution of state over
+time. The instantiated history of such state variable evolution over a
+temporal horizon we call \kcomment{as a} \emph{timeline} and
+\kcomment{one which represents} a single thread in the execution of a
+concurrent system. At any given time each thread can execute a single
+procedure.  Thus each timeline consists of a sequence of procedures
+which encapsulate and describe state evolution; we call these
+instantiated atomic entities \emph{tokens}.  A token therefore
+describes a procedure invocation, the state variables on which it can
+occur, the parameter values of the procedure, and the time values
+defining the interval. We allow encapsulation of uncertainty within
+these tokens with a range of start and end times and parameters, all
+of which are encoded as variables. A constraint solver in turn
+manipulates these variables defined in a \eu domain model. For
+example, consider a scientific need to take water samples 100 meters
+from an environmental hotspot while an AUV is performing a Yo-Yo
+sawtooth pattern\footnote{\kcomment{Variability in the water column is
+    along the vertical dimension. Since the Dorado platform can only
+    move forward, the Yo-Yo pattern is the most efficient mechanism
+    for studying water column properties.}}  in the water-column. Two
+samples are needed if the feature's signal is above a threshold; one
+otherwise. The token that is capturing the sensory threshold has a
+parametric constraints to the token which fires the requisite water
+sampler. In addition, the start time of the water sampling procedure
+is highly dependant on the variability of sub-sea currents and actual
+speed of the vehicle. Therefore a number of values are possible for
+the start times and duration of the sampling all of which are valid
+combinations for desired outcomes.
 
 \subsection{\eu Plan Representation}
 \label{sec:europa:pr}
@@ -179,25 +180,23 @@ At the atomic level, the entities in the \eu plan representation are:
   domain.
 
 \item[\textbf{Objects}] The items we wish to describe and refer to in
-  a domain are considered objects. As in the case with object-oriented
-  analysis and design, one can seek out the nouns in any domain
-  description to find likely objects. In the Shopping Agent example,
-  we might consider the Agent, Products and Locations all to be
-  objects. Objects have state and behavior, for example, a Shopping
-  Agent can have, its location, a bag that contains the products it
-  has already purchased (the bag can in turn be another object) and
-  behavior as in going to a location to look for a product, perform a
-  purchase, return home, etc.
-
-  Objects that have similar state and behavior can be described
+  a domain are considered objects. % As in the case with object-oriented
+  % analysis and design, one can seek out the nouns in any domain
+  % description to find likely objects. ---- this seemed confusing
+  In the Shopping Agent example, we might consider the Agent, Products
+  and Locations all to be objects. Objects have state and behavior.
+  For example, a Shopping Agent can have its location, a bag that
+  contains the products it has already purchased (the bag can in turn
+  be another object) and behavior, as in going to a location to look
+  for a product, perform a purchase, return home, etc. all as objects.
+  Those that have similar state and behavior can be described
   generically in terms of object types or classes. \eu allows the
   definition of classes similar to object-oriented programming
   languages, where a class can have attributes (represented by
-  variables), and classes can be arranged in a single-parent hierarchy
-  through inheritance.  However, one key aspect in \eu that is not
-  found in object-oriented programming: to describe state and behavior
-  for the purposes of planning we need to build on the formalism of
-  first order logic.
+  variables) and classes can be arranged in a single-parent hierarchy
+  through inheritance.  \kcomment{What is different however, is that
+    to describe state and behavior for planning one needs} to build on
+  the formalism of first order logic.
 
 \item[\textbf{Tokens}] In first order logic, a predicate defines a
   relation between objects and properties \cite{gen87}.  In \eu, we
@@ -437,16 +436,17 @@ or \texttt{REJECTED}, as shown in Fig. \ref{fig:europapr:states}.
   rule on a \texttt{Go} action. The token on which the rule applies
   (\texttt{Go}) is referred to as the \emph{master}. Each \texttt{At}
   and \texttt{Going} token required by the master is referred to as a
-  \emph{slave}.  Application of a rule on a token can thus cause slave
-  tokens, variables and constraints to be introduced.  The capability
-  of a domain rule to cause a slave token to be created is a key
-  vehicle through which planning occurs. Semantically, a rule imposes
-  a requirement for supporting (slave) tokens to be in the plan in
-  order for the master token to be valid.
+  \emph{slave}.  Application of a rule on a token \kcomment{(\ie a
+    master)} can thus cause slave tokens, variables and constraints to
+  be introduced.  The capability of a domain rule to cause a slave
+  token to be created is a key vehicle through which planning
+  occurs. Semantically, a rule imposes a requirement for supporting
+  slave tokens to be in the plan in order for the master token to be
+  valid.
 
   \begin{figure}[t]
     \centering
-    \includegraphics[scale=0.4]{figs/europa-pr-rules.pdf}
+    \includegraphics[scale=0.45]{figs/europa-pr-rules.pdf}
     \caption{\small Master and Slave tokens generated as a result of a domain rule.}
     \label{fig:europapr:rules}
   \end{figure}
