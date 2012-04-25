@@ -296,7 +296,10 @@ forms as illustrated in Fig. \ref{fig:trex:flow}:
   compute their {\em internal} state variable values for this same
   tick. By doing so we propagate a consistent view of that state of
   the world throughout all the reactors as time
-  advances. 
+  advances. \kcomment{Observations can therefore be both sensor
+    measurements as well state passed up from other reactors. The
+    strict rules of timeline ownership enable a clear policy for
+    conflict resolution: observations dominate expectations.}
 
 \item {\em Goal request on future state}: This information propagates
   \emph{down} in the reactor dependency graph. In order to satisfy own

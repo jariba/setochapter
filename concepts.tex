@@ -54,7 +54,7 @@ flexible partial plan.
 
 \begin{figure}[!htb]
 \centering
-\includegraphics[scale=0.35]{figs/flexible-timelines.pdf}
+\includegraphics[scale=0.4]{figs/flexible-timelines.pdf}
 \caption{\small Tokens with flexible temporal intervals and parametric
   constraints between tokens. This example shows the triggering of a
   water sampler based on a feature threshold while the vehicle
@@ -100,15 +100,18 @@ and end times and parameters, all of which are encoded as variables. A
 constraint solver in turn manipulates these variables defined in a \eu
 domain model. For example, consider a scientific need to take water
 samples 100 meters from an environmental hotspot while an AUV is
-performing a Yo-Yo sawtooth pattern in the water-column. Two samples
-are needed if the feature's signal is above a threshold; one
-otherwise. The token that is capturing the sensory threshold has a
-parametric constraints to the token which fires the requisite water
-sampler. In addition, the start time of the water sampling procedure
-is highly dependant on the variability of sub-sea currents and actual
-speed of the vehicle. Therefore a number of values are possible for
-the start times and duration of the sampling all of which are valid
-combinations for desired outcomes.
+performing a Yo-Yo sawtooth pattern\footnote{\kcomment{Variability in
+    the water column is along the vertical dimension. Since the Dorado
+    platform can only move forward, the Yo-Yo pattern is the most
+    efficient mechanism for studying water column properties.}}  in
+the water-column. Two samples are needed if the feature's signal is
+above a threshold; one otherwise. The token that is capturing the
+sensory threshold has a parametric constraints to the token which
+fires the requisite water sampler. In addition, the start time of the
+water sampling procedure is highly dependant on the variability of
+sub-sea currents and actual speed of the vehicle. Therefore a number
+of values are possible for the start times and duration of the
+sampling all of which are valid combinations for desired outcomes.
 
 \subsection{\eu Plan Representation}
 \label{sec:europa:pr}
