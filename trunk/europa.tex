@@ -1,6 +1,13 @@
 \subsection{Architecture}
 \label{sec:europa:arch}
 
+\comment{I think we should expand on this section which, as the
+  reviewer notes, the inter-relationships between the elements in Fig
+  \ref{fig:europa-architecture} below is not fully captured. I think
+  an illustrative example of how these components work together might
+  be very useful. This might also help the sub-section end less
+  abruptly than it is currently.}
+
 \eu is implemented as a library that encapsulates all elements
 described above making them accessible via modeling and Application
 Programming Interface (API) layers.  A user will typically use the
@@ -12,7 +19,9 @@ process.
 \begin{figure}[b]
 \centering
 \includegraphics[scale=0.5]{figs/EUROPA-Architecture.pdf}
-\caption{\small The \eu software architecture.}
+\caption{\small The \eu software architecture.\comment{Is there a
+    better block diagram we can use to respond to review comment on
+    page 2?}}
 \label{fig:europa-architecture}
 \end{figure}
 
@@ -53,7 +62,7 @@ modules that have been found to be useful in many domains:
 \begin{enumerate}
 
 \item \textit{Temporal Network}: Extensions to the \texttt{CRE} module to
-  reason about temporal constraints
+  reason about temporal constraints.
 
 \item \textit{Resources}: Extensions to the \texttt{CRE}, \texttt{PDB}
   and Solver modules to provide reasoning and search for metric
@@ -476,10 +485,10 @@ quantities flowing through that network. Computing the maximum flow
 then, yields the maximum resource usage and thus a lower bound on the
 resource level; computing a minimum flow will similarly yield an upper
 bound. Since maximum flow on a temporal network can be computed in
-polynomial time, \eu takes advantage of this algorithm to efficiently
-compute upper and lower bound envelopes on the resource
-level. Fig. \ref{fig:resenvelopes} shows an example of such a resource
-computation.
+polynomial time \comment{definition needed?}, \eu takes advantage of
+this algorithm to efficiently compute upper and lower bound envelopes
+on the resource level. Fig. \ref{fig:resenvelopes} shows an example of
+such a resource computation.
 
 \begin{figure}
 \centering
