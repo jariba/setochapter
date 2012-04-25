@@ -80,7 +80,7 @@ highlight are general purpose as noted in Section \ref{sec:intro}.
 
 \begin{figure}[b]
 \centering
-  \includegraphics[scale=0.35]{figs/shopping_europa.pdf}
+  \includegraphics[scale=0.45]{figs/shopping_europa.pdf}
   \caption{\small A potential plan for a robot shopping for groceries.}
 \label{fig:shop:shopping}
 \end{figure}
@@ -209,12 +209,12 @@ constraints. A complete treatment of this discipline is given in
 A constraint programming problem consists of a set of variables $V=
 {x_1,..,x_N}$, where each variable takes values from a domain
 $d_1,..,d_N$; in this chapter we will deal only with discrete and
-finite domains. Given a defined conjunctive set of constraints on the
-variables: $C=\{c_1(x_1,..,x_N), ..., c_K(x_1,..,x_N)\}$, the
-objective is to find one or more value assignments to $V$ where all
-constraints are satisfied. To solve a problem, \textsf{CP} techniques
-use logical inference to perform Constraint Propagation, which
-consists of two operations:
+finite domains. Given a defined conjunctive set of constraints
+\kcomment{\cite{gen87}} on the variables: $C=\{c_1(x_1,..,x_N), ...,
+c_K(x_1,..,x_N)\}$, the objective is to find one or more value
+assignments to $V$ where all constraints are satisfied. To solve a
+problem, \textsf{CP} techniques use logical inference to perform
+Constraint Propagation, which consists of two operations:
 
 \begin{enumerate}
 

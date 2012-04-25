@@ -61,9 +61,9 @@ the software development methodology leading to code bloat or worse.
 \cite{carreras06} provides a reasonably good overview of AUV control
 architectures that essentially is based on reactive control methods.
 
-\begin{figure}[htpb]
+\begin{figure}[!t]
  \centering
- \includegraphics[scale=0.3]{figs/planner-arch.pdf}
+ \includegraphics[scale=0.4]{figs/planner-arch.pdf}
  \caption{\small A general architectural block diagram for an AI based
    Planner.}
  \label{fig:planner}
@@ -160,15 +160,16 @@ controlled by task planning and execution. The very first planner
 \cite{green69} was an exercise in computational theorem proving with
 early state space planners popularized by \texttt{STRIPS}
 \cite{strips71} dominating the academic landscape. An early
-demonstration of planning as a situated agent was the highly
-influential \texttt{Shakey} the robot experiment
-\cite{shakey84}. Subsequent work driven largely by defense funding in
-the United States sequestered the discipline in academic labs
-principally applied for algorithmic development and if embedded then
-in testing within the confines of modest indoor settings. The leap to
-applying them for real world problem solving is relatively new and
-driven largely by NASA applications pioneered by \cite{mus94,mus98,
-  jonsson00, rajan00, chien05, bresina05}.
+demonstration of planning as a situated agent\footnote{\kcomment{By
+    \emph{situated} we emphasize that an agent is embedded within a
+    physical robot.}} was the highly influential \texttt{Shakey} the
+robot experiment \cite{shakey84}. Subsequent work driven largely by
+defense funding in the United States sequestered the discipline in
+academic labs principally applied for algorithmic development and if
+embedded then in testing within the confines of modest indoor
+settings. The leap to applying them for real world problem solving is
+relatively new and driven largely by NASA applications pioneered by
+\cite{mus94,mus98, jonsson00, rajan00, chien05, bresina05}.
 
 The dominant approach for building agent control systems utilize a
 $3$-layered architecture (see \cite{gat98} for a well thought out
@@ -248,9 +249,9 @@ learned with the HSTS technology as integrated for the RAX:
 \end{enumerate}
 
 It was with the demonstration of \texttt{RAX} $65$ Million miles in
-outer space, that temporal reasoning using methods came to the
-forefront of AI planning and for situated agents. Lessons learned from
-\texttt{RAX} led to the development of \texttt{IDEA}
+outer space, that temporal reasoning using \kcomment{planning} methods
+came to the forefront of AI Planning for situated agents. Lessons
+learned from \texttt{RAX} led to the development of \texttt{IDEA}
 \cite{mus02,mus04,Dias:2003ua,mus06} with the central theme of using
 planners collectively for problem solving arose. Another critical
 theme was iteratively and incremental plan repair of an anytime plan
