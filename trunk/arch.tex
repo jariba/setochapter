@@ -15,13 +15,18 @@ planning is embedded, planning consequently remains at an abstract
 level with the assumption that it would otherwise impede system
 reactiveness and that the environment can change at a faster rate than
 the planner can plan for. In such a situation, the agent may thrash
-\kcomment{(\ie as it works to complete a goal)}if
-the internal state of the plan gets out of synch with the actual state
-of the world. As a result the planning problem managed {\em in situ}
-has traditionally remained fairly detached from low-level
-control. Most adaptations at the lower-level reactive layers in
-contrast are managed by specialized components (for example
-\texttt{LAAS architecture} \cite{alami:1998p820,Ingrand07} and
+\footnote{\kcomment{In such an event as the planner works towards goal
+    satisfaction, the initial conditions leading to achieve that goal
+    are no longer valid. The planner then tries to achieve a different
+    goal which too has to be discarded similarly. And so on.}}  if the
+internal state of the plan gets out of synch with the actual state of
+the world.
+
+\kcomment{A important consequence of this has been that} the planning
+problem managed {\em in situ} has traditionally remained fairly
+detached from low-level control. Most adaptations at the lower-level
+reactive layers in contrast are managed by specialized components (for
+example \texttt{LAAS architecture} \cite{alami:1998p820,Ingrand07} and
 \texttt{CLARATy} \cite{Nesnas:2003do}) that rely on different
 representations for modeling local control behavior or worse do not
 have any explicit formal agent behavior model. The consequent
