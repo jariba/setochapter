@@ -75,6 +75,60 @@ modules that have been found to be useful in many domains:
 
 \end{enumerate}
 
+Before diving into the details of each module, a simple example illustrates how they interact at a high level:
+
+\begin{verbatim}
+
+class LightBulb extends Timeline
+{
+    predicate On  {}
+    predicate Off {}
+}
+
+class LightSwitch extends Timeline
+{
+    LightBulb myBulb_;
+
+    LightSwitch(LightBulb b)
+    {
+        myBulb_ = b;
+    }
+
+    action turnOn  { duration=1; }
+    action turnOff { duration=1; }
+}
+
+LightSwitch::turnOn
+{
+    met_by(condition object.myBulb_.Off);  // Bulb must be Off to be turned On
+    meets(effect object.myBulb_.On);   // Must be turned on through the switch
+}
+
+LightSwitch::turnOff
+{
+    met_by(condition object.myBulb_.On);   // Bulb must be On to be turned Off
+    meets(effect object.myBulb_.Off);      // Must be turned off through the switch
+}
+
+// Problem instance : turning the light off
+LightBulb bulb1 = new LightBulb();
+LightSwitch switch1 = new LightSwitch(bulb1);
+
+// At time 0, the bulb is on
+fact(bulb1.On initialCondition);
+eq(initialCondition.start,0);
+
+// We want the bulb to be off by time 10
+goal(bulb1.Off goal1);
+lt(0,goal1.start);
+lt(goal1.start,10);
+
+
+\end{verbatim}
+
+The snippet above is a NDDL model of a light bulb and a switch that controls it (NDDL is covered in more detail below), along with a problem instance that requires the light bulb to be off by time=10, given an initial state with the bulb on at time=0. The NDDL module allows \eu to ingest this model and problem description. Once the NDDL statements are parsed, the different object types, object instances and constraints are instantiated inside the Plan Database and Constraint Engine modules where they are available for both the user and the solver module to query and manipulate programmatically. This instantiation of the initial state constitutes the initial plan that \eu holds for this particular problem instance. 
+The user can then invoke functionality available in the solver module to modify or extend the initial plan in a way that eliminates any flaws (violated constraints, unsatisfied goals, oversubscribed resources) in the current plan. When actions are added to a plan, the Rules Engine module ensures that domain rules expressed in the model are enforced when \eu creates new action or predicate instances, for instance, if a LightSwitch::turnOn action is added to the plan, the RulesEngine  ensures that requirements for the existence of the conditions and effects of that action (that is, the corresponding LightBulb must be off before and on after the action) are posted through the PlanDatabase and ConstraintEngine modules.
+
 \subsection{Modeling in \eu}
 \label{sec:europa:modeling}
 
