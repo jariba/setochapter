@@ -6,10 +6,9 @@
 
 A prime motivation behind the \rx architecture was to design a
 controller which could bring automated planning closer to low-level
-control of the vehicle while maintaining its reactivity. 
-
-Traditionally planning has been deemed computationally expensive with
-planner performance restricting robot reactivity
+control of the vehicle while maintaining its reactivity. Traditionally
+planning has been deemed computationally expensive with planner
+performance restricting robot reactivity
 \cite{ghallab04,Dias:2003ua}. In control architectures where task
 planning is embedded, planning consequently remains at an abstract
 level with the assumption that it would otherwise impede system
@@ -19,7 +18,7 @@ the planner can plan for. In such a situation, the agent may thrash
     satisfaction, the initial conditions leading to achieve that goal
     are no longer valid. The planner then tries to achieve a different
     goal which too has to be discarded similarly. And so on.}}  if the
-internal state of the plan gets out of synch with the actual state of
+internal state of the plan gets out of sync with the actual state of
 the world.
 
 \kcomment{A important consequence of this has been that} the planning
@@ -37,9 +36,10 @@ to significant design and integration issues \cite{DS1report}.
 planning and execution in a single representational and computational
 framework with \kcomment{an} unified declarative model. Our approach
 with \rx builds on this design methodology albeit in a substantially
-systematic manner. The \rx architecture contributes to agent
-architectures over and beyond \texttt{IDEA} in the following
-\kcomment{significant} ways:
+systematic manner. 
+
+The \rx architecture contributes to agent architectures over and
+beyond \texttt{IDEA} in the following \kcomment{significant} ways:
 
 \begin{itemize}
 
@@ -47,14 +47,15 @@ architectures over and beyond \texttt{IDEA} in the following
   decision loops, called {\em reactors}. Each reactor has its own
   scope both functionally (one for example focusing on the conversion
   of high level waypoints into low-level commands) and temporally as
-  each reactor declares its planning look-ahead $\pi$ and expected
-  latency $\lambda$ before being able to produce \kcomment{a} plan to
-  the agent depending on where it is located in a reactor dependency
-  graph such as shown in Fig. \ref{fig:agent}. A reactor closer to the
-  hardware in the hierarchy, is expected to deliberate less and be
-  highly responsive to observations from the world. This implies lower
-  values of $\pi$ and $\lambda$ (see Section \ref{sec:arch:trex}
-  below).
+  each reactor declares its planning look-ahead ($\pi$) and expected
+  latency ($\lambda$) before being able to produce \kcomment{a} plan
+  to the agent depending on where it is located in a reactor
+  dependency graph such as shown in Fig. \ref{fig:agent}. A reactor
+  closer to the hardware in the hierarchy, is expected to deliberate
+  less and be highly responsive to observations from the world. This
+  implies lower values of $\pi$ and $\lambda$ (see Section
+  \ref{sec:arch:trex} below). \kcomment{In the current design, $\pi$
+    and $\lambda$ are application dependent and fixed at design time.}
 
 \item \emph{Coupling} a tighter integration between the planning
   process and world evolution to ensure that planning occurs
@@ -65,16 +66,16 @@ architectures over and beyond \texttt{IDEA} in the following
 \end{itemize}
 
 Systematic partitioned inference is a major contribution of
-\rxe. However that is not the focus of this chapter with details
+\rxe. However that is not the focus of this chapter; details are
 covered in \cite{py10, rajan12}. Coupled interaction between planning
-and the world on the other hand, has a significant implication on how
+and the world on the other hand, has a substantial impact on how
 planning can be integrated in such frameworks. In this chapter we show
-how using the \eu planner can be coupled to our framework by first
-linking concepts in temporal planning with the \rx framework. Note
-that in the following treatise, we call the formal semantic framework
-of \rx as the 'agent'. Reactors constitute an entity within this agent
-and are standalone blocks of inference. The scope, detail and number
-of reactors are application specific and outside the scope of this
+how using the \eu planner can be coupled to the \rx framework by first
+linking concepts in temporal planning with the framework. Note that in
+the following treatise, we call the formal semantic framework of \rx
+as the 'agent'. Reactors constitute an entity within this agent and
+are standalone blocks of inference. The scope, detail and number of
+reactors are application specific and outside the scope of this
 chapter.
 
 % on should integrate a
@@ -186,6 +187,17 @@ level this execution latency is used to define the {\em dispatch
   \end{equation*}
 \end{definition}
 
+\begin{figure}[!htbp]
+  \centering
+  \includegraphics[scale=0.35]{figs/token-disptch.pdf}
+  \caption{\small \kcomment{Dispatching a token occurs only when the request
+    start time overlaps a window. \texttt{Goal$_1$} therefore gets
+    dispatched from \texttt{reactor$_1$} to \texttt{reactor$_2$} but
+    not \texttt{Goal$_2$} to avoid early commitment.}}
+  \label{fig:reactor-lookahead}
+\end{figure}
+
+
 This window is used by \rx to identify when to dispatch a request to a
 {\em reactor} as a new goal. This happens only if the request start
 time -- represented as the interval of possible start times --
@@ -193,7 +205,10 @@ intersects this window. Requests further in the future are buffered by
 the agent until this time window advances for an overlap. This
 provides an elegant mechanism to request a change from the {\em
   external} state variable of a reactor while avoiding flooding the
-owner reactor of this state variable. 
+owner reactor of this state variable and avoiding early commitment.
+\kcomment{Fig. \ref{fig:reactor-lookahead} illustrates an example
+  between two reactors where one token is dispatched when overlapping
+  the dispatch window while another is not.}
 
 The choice of both the latency and look-ahead of a reactor can be
 delicate as one is dependent on the other. Needless to say, latency is
@@ -287,10 +302,11 @@ Given the above example, \rx abstracts reactor interaction by
 constraining them to state variables. Each reactor is therefore
 agnostic where its {\em external} state information is managed as long
 as this information is available and properly maintained for managing
-{\em internal} state information. This {\em internal} state in turn
-may be used by other reactors. Such a formalism also constrains
-reactor interaction to state information exchange which comes in two
-forms as illustrated in Fig. \ref{fig:trex:flow}:
+{\em internal} state information. % This {\em internal} state in turn
+% may be used by other reactors.
+Such a formalism also constrains reactor interaction to state
+information exchange which comes in two forms as illustrated in
+Fig. \ref{fig:trex:flow}:
 
 \begin{itemize}
 
@@ -303,9 +319,10 @@ forms as illustrated in Fig. \ref{fig:trex:flow}:
   tick. By doing so we propagate a consistent view of that state of
   the world throughout all the reactors as time
   advances. \kcomment{Observations can therefore be both sensor
-    measurements as well state passed up from other reactors. The
-    strict rules of timeline ownership enable a clear policy for
-    conflict resolution: observations dominate expectations.}
+    measurements as well as state information, passed up from other
+    reactors. The strict rules of timeline ownership enable a clear
+    policy for conflict resolution: observations dominate
+    expectations.}
 
 \item {\em Goal request on future state}: This information propagates
   \emph{down} in the reactor dependency graph. In order to satisfy own
@@ -384,12 +401,15 @@ execution in hardware.
 \begin{figure}[!htbp]
   \centering
   \vskip-1pc
-  \includegraphics[width=0.55\columnwidth]{figs/tick-cycle}
-  \caption{\small \rx reactor execution cycle: {\em Deliberation} is
+  \subfloat[\small \kcomment{A view of synchronization and deliberation within a
+  tick cycle.}]{\label{fig:sync-cycle}\includegraphics[width=0.35\columnwidth]{figs/sync-tick-cycle}} 
+  \qquad
+  \subfloat[\small A \rx reactor's execution cycle: {\em Deliberation} is
     interrupted by {\em synchronization} at the beginning of every
-    {\em tick} allowing integration of state information.}
-  \label{fig:tick-exec}
-  \vskip-0.8pc
+    {\em tick} allowing integration of state information.]{\label{fig:tick-exec}\includegraphics[width=0.45\columnwidth]{figs/tick-cycle}}
+  \caption{\small \kcomment{Detailed and abstracted views of
+      synchronization and deliberation within one tick cycle.}}
+  \label{fig:sync-plan-cycle}
 \end{figure}
 
 The manner in which the agent interleaves planning \texttt{step}s and
@@ -538,17 +558,17 @@ near the execution frontier.
 If they are not compatible, then {\em synchronization} identifies a
 plan inconsistency. This results in the retraction of decisions made
 during previous {\em deliberation} steps.  Such a relaxation can be
-viewed as a backtracking allowing the reactor to identify that its
-current plan has failed to execute triggering further deliberations
+viewed as a backtrack, allowing the reactor to identify that its
+current plan has failed to execute triggering further deliberation
 steps to find an alternate strategy.
 
 Finally, when the deliberation process has identified a complete
-solution for its current {\em internal} goals, a part of its plan that
-applies to its {\em external} timelines is sent as a request to \rx to
-handle their dispatch to corresponding reactors.  Synchronization
-eventually receives {\em external } observations that confirms plan
-execution, in turn recording execution progress by having the part of
-the plan observed restricted to observation start times.
+solution for its current goals, a part of its plan that applies to its
+{\em external} timelines is sent as a request to \rx to handle their
+dispatch to corresponding reactors.  Synchronization eventually
+receives {\em external } observations that confirms plan execution, in
+turn recording execution progress by having the part of the plan
+observed restricted to observation start times.
 
 Synchronization offers an important challenge for embedding planning
 in a situated agent, typically an assumption to restrict the problem
@@ -924,20 +944,23 @@ previous deliberation steps.
 
 Deliberation inside a reactor is based on \eu capabilities described
 in Section \ref{sec:europa:arch}. However this deliberation comes with
-some augmentation namely the reactor's deliberation latency and its
-plan look-ahead both expressed in ticks and that the agent needs to
-interleave deliberation with not just the synchronization but also
-with deliberation of other reactors\footnote{The current
-  implementation of \rx is running on a single process and it is the
-  responsibility of the agent itself to emulate reactor
-  multi-threading for deliberation and synchronization.}.  For this
-reason while the reactor relies on the \eu solver, it slices the
-execution of Algorithm \ref{alg:europa:solve} into atomic steps. This
-interruption occurs around the recursive call line \ref{li:recurse}
-while ensuring that the current partial plan is not inconsistant at
-any single step. This is managed by allowing the call to backtrack
-until a \textsf{DecisionPoInt} that is not exhausted (\ie
-$decision.hasNext()$ is \texttt{true}) is found in the call stack.
+some augmentation, namely the reactor's deliberation latency
+\kcomment{($\lambda$)} and its planning look-ahead \kcomment{($\pi$)}
+both expressed in ticks. \kcomment{In addition,} the agent needs to
+interleave deliberation with not just synchronization but also with
+the deliberation of other reactors\footnote{The current implementation
+  of \rx is running on a single process and it is the responsibility
+  of the agent itself to emulate reactor multi-threading for
+  deliberation and synchronization.}.  For this reason while the
+reactor relies on the \eu solver, it slices the execution of Algorithm
+\ref{alg:europa:solve} into atomic steps. This interruption occurs
+around the recursive call line \ref{li:recurse} while ensuring that
+the current partial plan is not inconsistant at any single step. This
+is managed by allowing the call to backtrack until a
+\textsf{DecisionPoInt} that is not exhausted (\ie $decision.hasNext()$
+is \texttt{true} \kcomment{and non empty}) is found in the call
+stack\footnote{\kcomment{The call stack refers to the sequence of
+    recursive function calls.}}.
 
 A critical aspect of this deliberation step is to ensure that at the
 exit of this call the $plan$ is not inconsistent. % Indeed, it is always
@@ -946,9 +969,9 @@ exit of this call the $plan$ is not inconsistent. % Indeed, it is always
 % made for synchronization.
 If the partial plan is found to be inconsistent during a deliberation
 step we either backtrack in the decision stack until a node of the
-tree is found with an alternate solution or the plan is relaxed since
-there is no other alternative solution. We do this by removing all
-goals while keeping only recent observations. 
+\kcomment{search} tree is found with an alternate solution or the plan
+is relaxed since there is no other alternative solution. We do this by
+removing all goals while keeping only recent observations.
 
 {\em Synchronization} and the dispatching of new {\em goals} from \rx
 can occur between two steps and alter the plan. These alterations
@@ -1030,42 +1053,40 @@ two effects:
 \subsubsection{Interleaving Synchronization and Execution}
 \label{sec:arch:intertwine}
 
-A key aspect of the \rx framework is interleaved plan and
+A key aspect of the \rx framework is interleaved planning and
 execution. Both {\em synchronization} -- keeping track of execution --
 and {\em deliberation} -- dealing with reactor planning -- of one
-reactor are sharing the same {\em single} plan database which 
-they modify alternatively as the \rx agent schedule their execution.
+reactor \kcomment{share} the same {\em single} plan database which
+they modify alternatively as the \rx agent schedules their execution.
 
-As noted above, it is synchronization which drives planning, so the
-co-mingling between these two processes is critical to maintaining
-state within a robot especially when it is immersed in a dynamic
-environment. Further, it is important that \rx maintain
-% A core aspect of this reactor is that it takes advantage of the
-% specific sequencing enforced by the \rx architecture along with the
-% fact that only 
-one $plan$ structure shared between synchronization and planning. This
-allows these two processes to not only be interleaved for agent
-responsiveness, but ensures a viable mechanism to communicate.
+As \kcomment{shown in Section \ref{sec:arch:synch}}, it is
+synchronization which drives planning; so the co-mingling between
+these two processes is critical to maintaining state within a robot
+especially when it is immersed in a dynamic environment. Further, it
+is important that \rx maintain one $plan$ structure shared between
+synchronization and \kcomment{deliberation}. This allows these two
+processes to not only be interleaved for agent responsiveness, but
+ensures a viable mechanism to communicate.
 
-% but also impact
-% each other via plan manipulation.
-
-As noted earlier, synchronization propagates {\em
+As \kcomment{also} noted earlier, synchronization propagates {\em
   external} observations when a new tick occurs. Earlier, we isolated
 the case when a reactor has no future goal or no plan to enforce. By
 doing so we were able to develop the way we augment the \eu solver to
-propagate {\em external} observations to identify {\em
-  internal} state. This allowed us to focus on synchronization as a
-state evaluation process that can be resolved within the \eu framework
-with few extensions. Similarly we presented deliberation as an
-abstraction without discussing the disruptive nature of
-synchronization and how it impacts the planning process. We first
-analyze the case when synchronization occurs after planning has
-completed (\ie the last step of deliberation results in a plan that is
-considered complete for the current look-ahead). As synchronization
-starts with a plan, this deliberation will not only be a model-derived
-estimation uniquely based on {\em external} observations but will also
-include reactor intentions specified in the available partial plan.
+propagate {\em external} observations to identify {\em internal}
+state. This allowed us to focus on synchronization as a state
+evaluation process that can be resolved within the \eu framework with
+few extensions. Similarly we presented deliberation as an abstraction
+without discussing the disruptive nature of synchronization and how it
+impacts the planning process. \kcomment{That discussion occurs here in
+  this section.}
+
+We first analyze the case when synchronization occurs after planning
+has completed (\ie the last step of deliberation results in a plan
+that is considered complete for the current look-ahead). As
+synchronization starts with a plan, this deliberation will not only be
+a model-derived estimation uniquely based on {\em external}
+observations but will also include reactor intentions specified in the
+available partial plan.
 
 Consider for example the Shopping Agent model where the timeline 
 \texttt{Agent.position} is {\em external} while \texttt{Agent} is
@@ -1086,8 +1107,10 @@ managing this state variable internally.
     \ref{fig:shop:exec0}.]{\label{fig:shop:exec1}\includegraphics[width=.7\columnwidth]{figs/shoping_exec_t1}}
     \caption{\small The Shopping example: Tokens in {\color{red}red}
       indicate observations, tokens in {\color{blue}blue} the goal
-      that this plan attempts to solve for. Arrows indicate temporal
-      constraints. }
+      that this plan attempts to solve for \kcomment{and tokens in
+        {\color{grey}grey} the result of deliberation}. Arrows
+      indicate temporal  constraints \kcomment{with $==$ indicating 'equality' and $\geq$
+        indicating 'greater than equal to' in timepoints}.}
   \label{fig:shop:exec}
 \end{figure}
 
@@ -1110,41 +1133,38 @@ constraints, making \texttt{Go} to start {\em exactly} at $\tau'$. In
 doing so, the \eu solver's focus on the execution frontier ($\tau'$ in
 Fig. \ref{fig:shop:exec1}) takes advantage of the existing plan to
 evaluate a solution that assumes that the observation is consistent
-with what was decided by the reactor.
-
-% \begin{figure}[!htb]
-%   \centering
-%   \includegraphics[width=0.7\columnwidth]{figs/shoping_exec_t1}
-%   \caption{Shopping example : Result of synchronization after the {\em
-%       Going} observation was received by the reactor with the plan
-%     showed in Fig. \ref{fig:shop:exec0}.}
-%   \label{fig:shop:exec1}
-% \end{figure}
-
-This choice is directed not only by heuristic choices made in the
-solver but also enforced by the heuristic order of the decision point
-resolution choices for the {\em current state flaw} shown in
+with what was decided by the reactor. \kcomment{In the event of
+  inconsistency, the (plan) expectations do not match the reality;
+  then partial plan failure within the reactor is initiated.} This is
+directed not only by heuristic choices made in the solver but also
+enforced by the heuristic order of the decision point resolution
+choices for the {\em current state flaw} \kcomment{as} shown in
 Proposition \ref{prop:csf:resolve}. As noted, the first two choices
 are biased towards a conservative view with respect to the existing
-plan. The heuristics first attempt to extend the previous observation
-for this {\em internal} timeline to avoid early commitment. If this
-fails \rx attempts to start the next existing token in the plan to
-advance plan execution. Both choices attempt to resolve state with the
-least amount of plan perturbation by constraining further the start
-and end time of existing tokens generated by previous deliberations
-steps. By doing so, in a nominal situation, synchronization remains
-limited to restrict time points in the plan and propagates their
-impact. Most of the computational effort of creating new tokens in the
-plan and scheduling them onto timelines are managed during
-deliberation steps. Consequently, most of the time synchronization is
-limited to very few nodes in the \eu search space often requiring no
-backtracking. Fig. \ref{fig:shop:exec} shows how the existing plan can
-support the synchronization process. The observation \texttt{Going}
-occurring at $\tau'$ is fully compatible with the token already present
-in our plan. By updating the plan and propagating equality constraints,
-the resolution of the {\em current state flaw} for the {\em Agent}
-timeline becomes obvious as a solution, as the token \texttt{Go} from
-the plan presents itself.
+plan.
+
+\kcomment{\subsubsection{Dealing with partial plan failures}}
+\label{sec:arch:partialfailures}
+
+The \kcomment{solver's} heuristics first attempt to extend the
+previous observation for this {\em internal} timeline to avoid early
+commitment. If this fails \rx attempts to start the next token in the
+plan to advance plan execution. Both choices attempt to resolve state
+with the least amount of plan perturbation by constraining further the
+start and end time of existing tokens generated by previous
+deliberations steps. By doing so, in a nominal situation,
+synchronization remains limited to restricting time points in the plan
+and propagates their impact. Most of the computational effort of
+creating new tokens in the plan and scheduling them onto timelines are
+managed during deliberation steps. Consequently, most of the time
+synchronization is limited to very few nodes in the \eu search space
+often requiring no backtracking. Fig. \ref{fig:shop:exec} shows how
+the existing plan can support the synchronization process. The
+observation \texttt{Going} occurring at $\tau'$ is fully compatible
+with the token already present in our plan. By updating the plan and
+propagating equality constraints, the resolution of the {\em current
+  state flaw} for the {\em Agent} timeline becomes obvious as a
+solution, as the token \texttt{Go} from the plan presents itself.
 
 Synchronization may become computationally more expensive when we need
 to identify a new token to be injected into the plan (the third choice
@@ -1195,8 +1215,8 @@ goals.
 
 \begin{figure}[!b]
   \centering
-  \subfloat[Conflicting Observation]{\label{fig:shop:relax1}\includegraphics[width=0.7\columnwidth]{figs/shoping_exec_relax-1}}\\
-  \subfloat[Relaxed Partial Plan]{\label{fig:shop:relax2}\includegraphics[width=0.7\columnwidth]{figs/shoping_exec_relax-2}}
+  \subfloat[\small Conflicting Observation]{\label{fig:shop:relax1}\includegraphics[width=0.7\columnwidth]{figs/shoping_exec_relax-1}}\\
+  \subfloat[\small Relaxed Partial Plan]{\label{fig:shop:relax2}\includegraphics[width=0.7\columnwidth]{figs/shoping_exec_relax-2}}
   \caption{\small Illustration of a conflict during synchronization
     and the resulting relaxed plan for recovery.}
 \end{figure}

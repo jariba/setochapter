@@ -1,13 +1,6 @@
 \subsection{Architecture}
 \label{sec:europa:arch}
 
-\comment{I think we should expand on this section which, as the
-  reviewer notes, the inter-relationships between the elements in Fig
-  \ref{fig:europa-architecture} below is not fully captured. I think
-  an illustrative example of how these components work together might
-  be very useful. This might also help the sub-section end less
-  abruptly than it is currently.}
-
 \eu is implemented as a library that encapsulates all elements
 described above making them accessible via modeling and Application
 Programming Interface (API) layers.  A user will typically use the
@@ -35,21 +28,20 @@ new constraints can be easily and efficiently plugged in. The
 \textbf{Plan Database} (\texttt{PDB}) manages object and token
 types. It also maintains the state of partial plans in terms of
 object, variable and token instances. This constitutes the data
-foundation on which end user applications and automated problem solvers
- are built. The \textbf{Rules Engine} (\texttt{RE})
-modularly adds the semantics of domain rules that describe
-dependencies between tokens. The \textbf{Solver Module} provides the
-framework for flaw detection and resolution that is needed to
-implement search algorithms for planning. The \textbf{API Layer}
-provides access to services from all the different modules in a
-programmatic way so that \eu can be easily embedded into specialized
-applications.
+foundation on which end user applications and automated problem
+solvers are built. The \textbf{Rules Engine} (\texttt{RE}) modularly
+adds the semantics of domain rules that describe dependencies between
+tokens. The \textbf{Solver Module} provides the framework for flaw
+detection and resolution that is needed to implement search algorithms
+for planning. The \textbf{API Layer} provides access to services from
+all the different modules in a programmatic way so that \eu can be
+easily embedded into specialized applications.
 
 Describing problem domains and problem instances in terms of objects,
 variables and domain rules in a programmatic way is cumbersome to the
 extent of being impractical; this motivated the creation of modeling
 languages that support those definitions in a much more natural and
-compact way. \texttt{NDDL} (New Domain Description Language
+compact way. \nd (New Domain Description Language
 [pronounced ``noodle'']) \cite{NDDL} is the main modeling language for
 \eu and will be described in detail in the Modeling section
 below. Another, \texttt{ANML} is a language under development that
@@ -75,7 +67,8 @@ modules that have been found to be useful in many domains:
 
 \end{enumerate}
 
-Before diving into the details of each module, a simple example illustrates how they interact at a high level:
+\kcomment{Before going into the details of each module, a simple
+  example illustrates how they interact at a high level:}
 
 \begin{verbatim}
 
@@ -126,8 +119,31 @@ lt(goal1.start,10);
 
 \end{verbatim}
 
-The snippet above is a NDDL model of a light bulb and a switch that controls it (NDDL is covered in more detail below), along with a problem instance that requires the light bulb to be off by time=10, given an initial state with the bulb on at time=0. The NDDL module allows \eu to ingest this model and problem description. Once the NDDL statements are parsed, the different object types, object instances and constraints are instantiated inside the Plan Database and Constraint Engine modules where they are available for both the user and the solver module to query and manipulate programmatically. This instantiation of the initial state constitutes the initial plan that \eu holds for this particular problem instance. 
-The user can then invoke functionality available in the solver module to modify or extend the initial plan in a way that eliminates any flaws (violated constraints, unsatisfied goals, oversubscribed resources) in the current plan. When actions are added to a plan, the Rules Engine module ensures that domain rules expressed in the model are enforced when \eu creates new action or predicate instances, for instance, if a LightSwitch::turnOn action is added to the plan, the RulesEngine  ensures that requirements for the existence of the conditions and effects of that action (that is, the corresponding LightBulb must be off before and on after the action) are posted through the PlanDatabase and ConstraintEngine modules.
+\kcomment{The snippet above is a \nd (covered in more detail in
+  Section \ref{sec:europa:modeling}) model of a light bulb and a
+  switch that controls it, along with a problem instance that requires
+  the light bulb to be off by time$=10$, given an initial state with
+  the bulb on at time$=0$. The \nd module allows \eu to ingest this
+  model and the problem description. Once the \nd statements are
+  parsed, different object types, object instances and constraints are
+  instantiated inside the \texttt{PDB} and \texttt{CRE} modules where
+  they are available for both the user and the solver module to query
+  and manipulate programmatically. This instantiation of the initial
+  state constitutes the initial plan that \eu holds for this
+  particular problem instance.
+ 
+  The user can then invoke functionality available in the solver
+  module to modify or extend this initial plan in a way that
+  eliminates any flaws (violated constraints, unsatisfied goals,
+  oversubscribed resources). When actions are added to a plan, the
+  \texttt{RE} module ensures that domain rules expressed in the model
+  are enforced when \eu creates new action or predicate instances. For
+  instance, if a \texttt{LightSwitch::turnOn} action is added to the
+  plan, the \texttt{RE} ensures that requirements for the existence of
+  the conditions and effects of that action (that is, the
+  corresponding \texttt{LightBulb} must be off before and on after the
+  action) are posted through the \texttt{PDB} and \texttt{CRE}
+  modules.  }
 
 \subsection{Modeling in \eu}
 \label{sec:europa:modeling}
@@ -136,21 +152,20 @@ The user can then invoke functionality available in the solver module to modify 
 be applied to different domains and problems, simply by providing
 different models and goals. Consequently the expressiveness of the
 language for models, goals and plans is of great importance. For \eue,
-\texttt{NDDL} allows the user to specify the different components of a
-problem domain in a precise and concise manner. Among the main
-features that make \texttt{NDDL} a powerful tool for describing
-problem domains are that it is object oriented. \texttt{NDDL} supports
-classes and inheritance in similar fashion to popular Object-Oriented
-languages like Java and C++. It also supports polymorphism for some of
-the planning components. Using object classes and instances is a
-time-tested approach to naturally describe problem domains
-\cite{rumbaugh}. It offers declarative constructs to define
-constraints and causality dependencies between actions and effects and
-finally it offers procedural constructs to populate \eus \texttt{PDB}
-with specific problem instances expressed in terms of objects,
-variables, constraints, facts and goals. To articulate the most important
-elements of \texttt{NDDL}, we show how the Shopping Agent problem
-could be modeled:
+\nd allows the user to specify the different components of a problem
+domain in a precise and concise manner. Among the main features that
+make \nd a powerful tool for describing problem domains are that it is
+object oriented. \nd supports classes and inheritance in similar
+fashion to popular Object-Oriented languages like Java and C++. It
+also supports polymorphism for some of the planning components. Using
+object classes and instances is a time-tested approach to naturally
+describe problem domains \cite{rumbaugh}. It offers declarative
+constructs to define constraints and causality dependencies between
+actions and effects and finally it offers procedural constructs to
+populate \eus \texttt{PDB} with specific problem instances expressed
+in terms of objects, variables, constraints, facts and goals. To
+articulate the most important elements of \nde, we show how
+the Shopping Agent problem could be modeled:
 
 \begin{verbatim}
 
@@ -226,7 +241,7 @@ can be mapped to \eus representation:
 
 \begin{description}
 
-\item[\textbf{Object Types}:] \texttt{NDDL} supports an object-oriented
+\item[\textbf{Object Types}:] \nd supports an object-oriented
   approach, where common data and behavior can be abstracted as a
   class. In this case, we have the \textit{Product} class represent
   the products that the Shopping Agent needs, \textit{Location}
@@ -235,7 +250,7 @@ can be mapped to \eus representation:
   product can be purchased at a location. The Shopping Agent itself is
   represented by an \textit{Agent} class, which relies on the
   \textit{AgentLocation} class to keep track of where the agent is at
-  any point in time. \texttt{NDDL} supports a single rooted class
+  any point in time. \nd supports a single rooted class
   hierarchy so that state and behavior can be extended through
   inheritance. We take advantage of that feature by making
   \textit{AgentLocation} inherit from \eus built-in \textit{Timeline}
@@ -305,9 +320,9 @@ Agent::Buy {
 }
 \end{verbatim}
 
-Domain rules can be defined in \texttt{NDDL} in the context of a
-predicate or an action. In the example above we can see the main
-elements of a rule definition:
+Domain rules can be defined in \nd in the context of a predicate or an
+action. In the example above we can see the main elements of a rule
+definition:
 
 \begin{description}
 
@@ -465,12 +480,11 @@ and resource constraint types so that a large number of problem
 domains can be modeled without having to introduce new constraint
 types. Tables \ref{tab:calconst}, \ref{tab:setconst},
 \ref{tab:objhierarchy} and \ref{tab:misc} show the main constraint
-types included in \eus Constraint Library.
+types included in \eus Constraint Library.  Temporal and resource
+constraints are especially important to model real-world planning
+domains.
 
 \input{constraints-table}
-
-Temporal and resource constraints are especially important to model
-real-world planning domains. 
 
 \eu uses variables to explicitly represent timepoints for plan
 actions and states. Constraints among timepoints provide a natural
@@ -495,8 +509,10 @@ temporal constraints is a straight implementation of this algorithm.
 
 \begin{figure}[!htb]
   \centering
-  \subfloat[\small A Simple Temporal Network (STN)]{\label{fig:stn1}\includegraphics[width=0.4\columnwidth]{figs/stn-graph.pdf}}
-  \subfloat[\small Resulting distance graph from \ref{fig:stn1}.]{\label{fig:stn2}\includegraphics[width=0.4\columnwidth]{figs/distance-graph.pdf}}
+  \subfloat[\small A Simple Temporal Network (STN). \kcomment{Nodes correspond
+  to variables and their domains and arc's the \emph{constraint} or
+  distance between them.}]{\label{fig:stn1}\includegraphics[width=0.4\columnwidth]{figs/stn-graph.pdf}}
+  \subfloat[\small The resulting distance graph from \ref{fig:stn1}.]{\label{fig:stn2}\includegraphics[width=0.4\columnwidth]{figs/distance-graph.pdf}}
   \caption{\small An illustration of a STN and its corresponding
     distance graph.}
   \label{fig:stn}
@@ -504,10 +520,10 @@ temporal constraints is a straight implementation of this algorithm.
 
 Most real-world planning problems need to deal with plans made up of
 actions that typically depend upon limited resources (\eg fuel,
-storage capacity, battery state of charge, data buffers).  \eu
-provides built-in support for resource computation. In \eus
-representation resource object types come in three forms with related
-constraints. \textbf{Reservoir} resources can have both
+storage capacity, battery state of charge, data buffers etc).  % \eu
+% provides built-in support for resource computation.
+In \eus representation, resource object types come in three forms with
+related constraints. \textbf{Reservoir} resources can have both
 \texttt{consume(resource,time,quantity)} and
 \texttt{produce(resource,time,quantity)} constraints; production and
 consumption is instantaneous. \textbf{Reusable} resources on the other
@@ -523,13 +539,13 @@ lower bound, or when instantaneous production or consumption exceeds a
 specific threshold.
 
 Since \eu supports a flexible temporal representation, where time is
-represented by intervals, instead of single values, determining
-whether a resource is the source of a plan flaw or a constraint
-violation in general is substantially more difficult than just
-computing a profile of the resource and checking against some limits.
-With temporal flexibility, a number of resource profiles could be
-possible depending on precisely when each production/consumption event
-occurs out of a range of possible values that are in the domain of the
+represented by intervals, instead of singletons, determining whether a
+resource is the source of a plan flaw or a constraint violation in
+general is substantially more difficult than just computing a profile
+of the resource and checking against some limits.  With temporal
+flexibility, a number of resource profiles could be applicable
+depending on precisely when each production/consumption event occurs
+out of a range of possible values that are in the domain of the
 variables that represent the temporal extent for the event.
 \cite{Muscettola04,Muscettola06} proposed an algorithm where the
 variables that represent the time for production/consumption events
@@ -539,14 +555,14 @@ quantities flowing through that network. Computing the maximum flow
 then, yields the maximum resource usage and thus a lower bound on the
 resource level; computing a minimum flow will similarly yield an upper
 bound. Since maximum flow on a temporal network can be computed in
-polynomial time \comment{definition needed?}, \eu takes advantage of
-this algorithm to efficiently compute upper and lower bound envelopes
-on the resource level. Fig. \ref{fig:resenvelopes} shows an example of
-such a resource computation.
+polynomial time \cite{corman}, \eu takes advantage of this algorithm
+to efficiently compute upper and lower bound envelopes on the resource
+level. Fig. \ref{fig:resenvelopes} shows an example of such a resource
+computation.
 
 \begin{figure}
 \centering
-\includegraphics[scale=0.3]{figs/europa-resource-envelopes.png}
+\includegraphics[scale=0.2]{figs/europa-resource-envelopes.png}
 \caption{\small An example of resource envelopes computed by \eu.}
 \label{fig:resenvelopes}
 \end{figure}
@@ -702,15 +718,16 @@ in Algorithm \ref{alg:europa:solve}.
   Flaw $flaw \leftarrow chooseFlaw(plan)$ \; \label{li:selectflaw}
   \lIf{ $\emptyset = flaw$ }{\Return \texttt{true} \;} \label{li:noflaw}
   \BlankLine
-  DecisionPoint $decision \leftarrow makeDecisionPoint(flaw, plan)$ \; \label{li:decisionpt}
+  DecisionPoint $decision \leftarrow makeDecisionPoint(flaw, plan)$ \comment{\{\emph{potential branching point(s)}\}}\;\label{li:decisionpt}
   \While{ $decision.hasNext()$ }{ \label{li:decisionloop}
     PartialPlan $pp \leftarrow decision.executeNext()$ \; \label{li:decide}
     \lIf{ $solve(pp)$ }{ \Return \texttt{true} \; } \label{li:recurse}
-    \lElse{ $decision.undo()$ \; } \label{li:backtrack}
+    \lElse{ $decision.undo()$ \comment{\{\emph{possible backtracking point}\}}\; } \label{li:backtrack}
    }
    \Return \texttt{false} \; \label{li:noplan}
  }
-\caption{$\mathrm{bool} ~ solve(plan)$}
+\caption{$\mathrm{bool} ~ solve(plan)$\kcomment{: To deliberate and
+    generate partial plans}}
 \label{alg:europa:solve}
 \end{algorithm}
 
