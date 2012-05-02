@@ -9,36 +9,35 @@ of a terrestrial personal robot \cite{pr2, Meeussen:2010dn}. The
 development of \rx has been targeted at surveying a number of
 oceanographic features which are dynamic and spatio-temporally
 unpredictable. Typically this requires our AUVs to balance the goals
-of coverage spatially while opportunistically following features of
-scientific interest and to do so while being aware of its own
-limitations in terms of resources (\eg the battery state of charge)
-and overall proximity to other observational assets for obtaining
-scientific ground-truth. We are interested in representational
-frameworks that allow robots to pursue long-term objectives while
-choosing short-term gain and can gracefully deal with exogenous or
-endogenous change.
+of spatial coverage while opportunistically following features of
+scientific interest and to do so while being aware of its own resource
+limitations (\eg the battery state of charge) and overall proximity to
+other observational assets for obtaining scientific ground-truth. We
+are interested in representational frameworks that allow robots to
+pursue long-term objectives while choosing short-term gain and can
+gracefully deal with exogenous or endogenous change.
 
 To enable this responsiveness to external observations, the agent has
 to be able to synthesize plans insitu and to re-plan without human
-intervention. To do so we use a temporal constraint-based planner with
-a demonstrated legacy of having flown on NASA space missions. Our
+intervention. \rx uses a temporal constraint-based planner with a
+demonstrated legacy of having flown on NASA space missions. Our
 autonomy architecture brings three key innovations for AUV control:
 in-situ plan synthesis, the use of flexible plan representations with
 a sound theoretical basis and systematic compositional control with
-the use of partitioned networks doing so with a demonstrated
-capability at sea in novel ocean observation methods.
+the use of partitioned networks and doing so with a demonstrated
+capability at sea \kcomment{for} novel ocean observation methods.
 
 The next few sections will cover \eu in a bottom-up fashion, going
-from the generic theoretical framework that underlies \eue, to the
-specific representation, modeling and algorithms implemented by it.  A
-brief introduction to Constraint Programming and Constraint-Based
-Planning is provided followed by the specific representation that \eu
-uses to undertake Constraint-Based Planning.  Subsequently, we provide
-an overview of \eus architecture and how it can be embedded in a
-planning application such as \rxe. Finally, \eus modeling, inference
-and search mechanisms are covered in detail so that the reader can
-understand how \rx can perform deliberative planning and react to
-execution events by embedding and customizing \eu.
+from its \kcomment{general} theoretical framework, to the specific
+representation, modeling and algorithms implemented by it.  A brief
+introduction to Constraint Programming and Constraint-Based Planning
+is provided followed by the specific representation that \eu uses to
+undertake Constraint-Based Planning.  Subsequently, we provide an
+overview of \eus architecture and how it can be embedded in a planning
+application such as \rxe. Finally, \eus modeling, inference and search
+mechanisms are covered in detail so that the reader can
+\kcomment{appreciate} how \rx can perform \kcomment{deliberation while
+  being responsive to events in the real-world}.
 
 \subsection{Automated Planning}
 \label{sec:planningfound}
@@ -57,26 +56,26 @@ execution events by embedding and customizing \eu.
 
 Planning as an activity is ingrained in human decision-making
 \cite{berthoz} and its generalization into a computational framework
-demonstrating machine intelligence long targeted by pioneers in
-computer science \cite{computersthought}. Early work in this context
-focused on logical theorem proving by computer \cite{green69} which
-has formed the basis of much of the discipline of AI Planning. The
-emphasis in these early attempts was to logically derive the existence
-proof of a trajectory of actions for a hypothetical robot (moving
-blocks, chess pieces, furniture etc) to achieve a specific goal given
-specific initial conditions. Two important properties of
-\emph{Soundness}\footnote{A planning algorithm is sound if invoked on
-  a problem $P$ returns a plan which is a solution for $P$.} and
-\emph{Completeness}\footnote{A planning algorithm is complete if
-  invoked on a solvable problem $P$ is guaranteed to return a
-  solution.} along with derived results for algorithmic complexity
-\cite{corman} were a defining cornerstone for understanding how
-different computational paradigms could actually be tractable first in
-simulation and subsequently in actual robotic platforms. In this
-chapter our emphasis is to focus on embedded AI Planning and the
-execution of plans on an embedded \kcomment{marine robotic}
-platform. While the platform is domain specific, the techniques we
-highlight are general purpose as noted in Section \ref{sec:intro}.
+demonstrating machine intelligence \kcomment{has for long been}
+targeted by pioneers in computer science
+\cite{computersthought}. Early work in this context focused on logical
+theorem proving by computer \cite{green69} which has formed the basis
+of much of the discipline. The emphasis in these early efforts was to
+logically derive the existence proof of a trajectory of actions for a
+hypothetical robot (moving blocks, chess pieces, furniture etc) to
+achieve a specific goal given specific initial conditions. Two
+important properties of \emph{Soundness}\footnote{A planning algorithm
+  is sound if invoked on a problem $P$ returns a plan which is a
+  solution for $P$.} and \emph{Completeness}\footnote{A planning
+  algorithm is complete if invoked on a solvable problem $P$ is
+  guaranteed to return a solution.} along with derived results for
+algorithmic complexity \cite{gareyjohnson,corman} were a defining
+cornerstone for understanding how different computational paradigms
+could actually be tractable first in simulation and subsequently in
+actual robotic platforms. In this chapter our emphasis is to focus on
+embedded AI Planning and the execution of plans on an embedded
+\kcomment{marine robotic} platform. The techniques we highlight are
+general purpose as noted in Section \ref{sec:intro}.
 
 \begin{figure}[b]
 \centering
@@ -92,14 +91,14 @@ planning we start with an example.
 {\small
   \begin{quote}
     In the near future, a personal robot sets out to buy a gallon of
-    milk This involves a number of tasks: obtain keys, obtain wallet,
+    milk. This involves a number of tasks: obtain keys, obtain wallet,
     start car, drive to store, find and obtain milk, purchase milk,
     etc.  The embedded planner has to have a ``model'' of the world in
-    which it lives and has to use the task primitives in this model to
-    structure the actions so it achieves its goal. Constraints control
-    when certain tasks can or cannot occur. For example the robot must
-    obtain the keys and wallet \emph{before} driving to the store and
-    pick up the milk \emph{before} purchasing it.
+    which it 'lives' and has to use the task primitives in this model
+    to structure the actions so it achieves its goal. Constraints
+    control when certain tasks can or cannot occur. For example the
+    robot must obtain the keys and wallet \emph{before} driving to the
+    store and pick up the milk \emph{before} purchasing it.
 \end{quote}
 
 For such a robot the milk buying plan at the store might look like
@@ -110,22 +109,14 @@ which has a rich legacy from NASA missions \cite{mus98,rajan00,
   jonsson00,aichang04, bresina05}. \eu is a versatile Constraint-based
 Temporal Planner which continues to be deployed on a diverse set of
 applications including recently, planning for the International Space
-Station \cite{barreiro09}. We motivate this section with some problem
-domains this planner can handle and then proceed to go into detail.
+Station \cite{barreiro09}. We first motivate this section with some
+problem domains this planner has handled.
 
 \paragraph{} {\em Constraint Satisfaction}: A canonical problem in
-dealing with constraints is the $N$-Queens problem in which chess queens
-must be placed on an  $N \times N$ chessboard so no queens attack the other. % Fig.
-% \ref{fig:nqueens-1} shows an example of a random positioning of queens
-% on a  $N$x$N$ chessboard. Queens in violation of the non-attack constraint
-% are highlighted in red.
-% \begin{figure} \centering
-%   \includegraphics[scale=0.35]{figs/Example-NQueens0.jpg}
-%   \caption{\small N-Queens problem. Queens in violation of the
-%     non-attack constraint are highlighted in red.}
-% \label{fig:nqueens-1}
-% \vskip+0.1cm
-% \end{figure}
+dealing with constraints is the $N$-Queens problem in which chess
+queens must be placed on an $N \times N$ chessboard so no queen can
+attack the other. 
+
 If we define $N \times N$ variables Q$_{rc}$, $r \in [1,N]$, $c \in
 [1,N]$, Q$_{rc} = 1$ if cell $r,c$ in the chessboard is occupied by a
 Queen, $0$ otherwise. Then the following constraints need to be
@@ -154,17 +145,17 @@ and a specialized search procedure.
 \end{figure}
 
 
-\paragraph{} \textit{Scheduling}: In the Resource Constrained Project
-Scheduling Problem (\texttt{RCPSP}) \cite{Bruckera99}, a project
-consisting of a set of activities must be scheduled in a way that
-satisfies minimum and/or maximum temporal separation constraints. The
-activity schedule must also respect fixed limits on the availability
-of resources required to perform each activity. In addition to
-satisfying temporal and resource constraints, it is common for the
-user to want to minimize makespan \cite{ghallab04} so that the entire
-project is finished as early as possible. Fig. \ref{fig:rcpsp-1} shows
-an example of a a solution provided by \eu for an \texttt{RCPSP}
-instance with 10 activities, 5 resources and 30 temporal constraints.
+\paragraph{} \textit{Scheduling}: The Resource Constrained Project
+Scheduling Problem (\texttt{RCPSP}) \cite{Bruckera99}, consists of a
+set of activities that must be scheduled in a way that satisfies
+minimum and/or maximum temporal separation constraints. The activity
+schedule must also respect fixed limits on the availability of
+resources required to perform each activity. In addition to satisfying
+temporal and resource constraints, it is common for the user to want
+to minimize makespan \cite{ghallab04} so that the entire project is
+finished as early as possible. Fig. \ref{fig:rcpsp-1} shows an example
+of a a solution provided by \eu for an \texttt{RCPSP} instance with
+$10$ activities, $5$ resources and $30$ temporal constraints.
 
 \begin{figure}[t]
 \centering
@@ -178,13 +169,13 @@ instance with 10 activities, 5 resources and 30 temporal constraints.
 
 \paragraph{} \textit{Planning}: The Shopping Agent Problem
 \cite{russelnorvig} is a variation of the problem with which we
-started this chapter.  In this problem, an agent needs to purchase a
-set of products (milk, drill, etc) that are available at specific
-locations (supermarket, hardware store, etc). The agent is subject to
-temporal (must complete tasks by specific deadlines) and resource
-(fuel, carrying capacity, etc) constraints and it needs to synthesize
-actions that need to be performed to find and acquire the required
-items, as well as when to perform each of those actions.
+started this chapter.  An agent needs to purchase a set of products
+(milk, drill, etc) that are available at specific locations
+(supermarket, hardware store, etc). The agent is subject to temporal
+(must complete tasks by specific deadlines) and resource (fuel,
+carrying capacity, etc) constraints and it needs to synthesize actions
+that need to be performed to find and acquire the required items, as
+well as when to perform each of those actions.
 Fig. \ref{fig:shopping-1} shows a solution produced by \eu for such a
 problem instance.
 
@@ -200,11 +191,11 @@ a core building block.
 \label{sec:europa:cp}
 
 Constraint Satisfaction Programming (also known as Constraint
-Programming or \textsf{CP}) is a discipline that provides a generic
-framework for representing, solving and making logical inference on
-constraints. A complete treatment of this discipline is given in
-\cite{marriott98,apt03} with concise introductions provided in
-\cite{bartak99,lustig01}.
+Programming or \textsf{CP}) is \kcomment{an AI} discipline that
+provides a generic framework for representing, solving and making
+logical inference on constraints. A complete treatment of this
+discipline is given in \cite{marriott98,apt03} with concise
+introductions provided in \cite{bartak99,lustig01}.
 
 A constraint programming problem consists of a set of variables $V=
 {x_1,..,x_N}$, where each variable takes values from a domain
@@ -218,14 +209,15 @@ Constraint Propagation, which consists of two operations:
 
 \begin{enumerate}
 
-\item \textbf{Bounds propagation} infers upper and lower variable
+\item \textbf{Bounds propagation} inferring upper and lower variable
   bounds. For example, from the constraints $x_1 + x_2 \leq 2$ \& $x_i
   \geq 0$, we can infer $[0,2]$ bounds for $x_1$ and $x_2$.
 
-\item \textbf{Domain reduction} infers a valid set of values for a
-  variable.  For example, for constraints allDifferent($x_1,x_2,x_3$),
-  $x_i \geq 0$ \& $x_i \leq 4$, if $x_1 = 1$ and $x_2 = 3$ we can
-  infer that the valid and reduced domain for $x_3$ is $\{2,4\}$.
+\item \textbf{Domain reduction} inferring a valid set of values for a
+  variable.  For example, for constraints
+  \texttt{allDifferent}($x_1,x_2,x_3$), $x_i \geq 0$ \& $x_i \leq 4$,
+  if $x_1 = 1$ and $x_2 = 3$ we can infer that the valid and reduced
+  domain for $x_3$ is $\{2,4\}$.
 
 \end{enumerate}
 
@@ -242,59 +234,60 @@ there are no variable domain changes. The \texttt{AC-3} algorithm
 approach by ignoring constraints whose variables were not affected
 since the last iteration. Fig. \ref{fig:constraintnet} shows a set of
 constraints on $3$ variables ($x$, $y$ and $z$) represented as a
-constraint network, and their domains before arc consistency is
+constraint network and their domains before arc consistency is
 enforced.  After the \texttt{AC-3} algorithm is executed, the domains
 for the variables would be pruned to x=$\{2$\}, y=$\{2$\}, z=$\{2$\}.
 
 \begin{figure}[!t]
 \centering
 \includegraphics[scale=0.3]{figs/constraint-net.pdf}
-\caption{\small Variables and Constraints represented as a Constraint Network}
+\caption{\small Variables and Constraints represented as a Constraint
+  Network \kcomment{before arc consistency is enforced}.}
 \label{fig:constraintnet}
 \end{figure}
 
 Arc Consistency and other more stringent consistency definitions can
 be used to efficiently prove that a \textsf{CP} problem is
-unsatisfiable. However, they generally cannot prove that a \textsf{CP}
-problem is satisfiable and provide specific variable assignments that
-constitute solutions. To do so, search algorithms like global
-backtracking \cite{hooker05} or local search are used; these use
-consistency as an efficient way to prune the search space
+\emph{unsatisfiable}. However, they generally cannot prove that a
+\textsf{CP} problem is satisfiable and provide specific variable
+assignments that constitute solutions. To do so, search algorithms
+like global backtracking \cite{hooker05} or local search are used.
+These use consistency as an efficient way to prune the search space
 \cite{cp06}. In theory, solving a \textsf{CP} problem is NP-Hard
-\cite{ghallab04}, but often in practice a number of consistency and
-search algorithms can be used.
+\cite{ghallab04}, but often in practice \kcomment{heuristic methods
+  provide viable ways to generate efficient solutions}.
 
 \textsf{CP} is usually implemented as part of a programming language
 and constraints are usually represented as objects \cite{puget95}. Any
 constraint that the user is able to reason about can be introduced
-into the system and, as long as the constraint propagation protocols
+into the system and as long as the constraint propagation protocols
 specified by the host \textsf{CP} system are enforced, it will be
 indistinguishable from any other "primitive'' \textsf{CP} constraint,
 such as $\leq$ or $\geq$.
 
+
 \subsection{Constraint-Based Planning}
 \label{sec:europa:cp}
 
-The most common planning formulations use a propositional
-representation, where the state of the world is represented by a set
+The most common planning formulations use propositional
+\kcomment{logic}, where the state of the world is represented by a set
 of propositions (statements that can be true or false), and operators
 change the truth values of these propositions \cite{gen87}. Although
-these formulations are powerful and have allowed researchers to
-develop numerous contributions in automated planning, there are many
-classes of problem domains that are difficult to represent using this
-formalism. In particular, it is hard to represent time, resources,
-mutual exclusion and concurrency using propositions \cite{ghallab04}.
-Constraint Programming is a framework that lends itself well to
-represent and reason about all of those elements \cite{ghallab94}.
-Consequently, there has been substantial effort in building automated
-planners that take advantage of \textsf{CP} techniques.  The most
-common approach in constraint-based planning has been to encode the
-entire planning problem as a \textsf{CP} problem, where action choices
-and relationships are represented as variables and/or constraints
+these formulations are powerful \kcomment{for descriptive semantics}
+in automated planning, there are classes of problem domains that are
+difficult to represent. In particular, it is hard to represent time,
+resources, mutual exclusion and concurrency.  Constraint Programming
+is a framework that lends itself well to represent and reason about
+these elements \cite{ghallab94} with the consequence that there has
+been substantial effort in building automated planners that
+\kcomment{leverage} \textsf{CP} techniques.  The most common approach
+in constraint-based planning has been to encode the entire planning
+problem as a \textsf{CP} problem, where action choices and
+relationships are represented as variables and/or constraints
 \cite{do01,vanbeek99,vossen99,wolfman99}.  The advantage of using a
 pure \textsf{CP} formulation is that standard solvers can be then used
-to solve the planning problem. However, this approach also has a
-couple of significant drawbacks:
+to solve the planning problem. However, this approach also has
+significant drawbacks:
 
 \begin{enumerate} 
 
@@ -315,19 +308,20 @@ couple of significant drawbacks:
   
 \end{enumerate}
 
-These drawbacks have been addressed by a number of planning frameworks
-like \texttt{Descartes} \cite{joslin95,joslin96}, \texttt{IxTet}
+These drawbacks have been addressed by a number of frameworks like
+\texttt{Descartes} \cite{joslin95,joslin96}, \texttt{IxTet}
 \cite{ghallab87,lemai04} and \texttt{CAIP} (Constraint-Based Interval
-and Attribute Planning) \cite{mus94,frank2003}.  These frameworks take
-advantage of a \textsf{CP} representation to deal with time and
-resources, at the same time maintaining an explicit representation of
-the elements relevant to planning (action choices, causal
-relationships, etc). This combination results in a planning approach
-that can deal with the type of constraints found in real-world
-problems while allowing for intuitive problem descriptions and a
-natural way to express search algorithms and heuristics. \eu is one
-such implementation of the \texttt{CAIP} framework, in which planning
-problems are specified in terms of:
+and Attribute Planning) \cite{mus94,frank2003}.  They take advantage
+of a \textsf{CP} representation to deal with time and resources,
+\kcomment{while} maintaining an explicit representation of the
+elements relevant to planning (action choices, causal relationships,
+etc). This combination results in a planning approach that can deal
+with the \kcomment{kind} of constraints found in real-world problems
+while allowing for intuitive problem descriptions and a natural way to
+express search algorithms and heuristics. \eu is one such
+implementation of the \texttt{CAIP} framework, \kcomment{others
+  include \cite{chien00, iaai-CestaCFO09}}. In \eu planning problems
+are specified in terms of:
 
 \begin{description}
 
@@ -350,11 +344,12 @@ problems are specified in terms of:
 \end{description}
 
 To generate plans, the \texttt{CAIP} framework uses a plan-space
-search approach \cite{ghallab04}, where a \emph{partial plan} is
-evolved until all open goals are achieved and all inconsistencies are
-removed. \kcomment{A partial plan is a subsequence of a plan which can
-  be refined into a plan structure.} The specific search algorithm
-used by \eu will be covered in \kcomment{further} detail below.
+search approach \cite{ghallab04}, where a \emph{partial
+  plan}\footnote{\kcomment{A partial plan is a subsequence of a plan
+    which can be refined into a plan structure.}} is evolved until all
+open goals are achieved and all inconsistencies are removed. The
+specific search algorithm used by \eu will be covered in
+\kcomment{further} detail below.
 
 
 %%% Local Variables: 
