@@ -5,14 +5,12 @@
 what we will call \eu in this chapter, is derived from the
 \texttt{HSTS} planner \cite{mus94} used on a number of ground-based
 demonstrations for space telescope scheduling as noted in Section
-\ref{sec:rabeyond}. \texttt{HSTS} was also the
-\texttt{LISP}-based\footnote{This was the first (and to our knowledge
-  only) software ever to been written in \texttt{LISP} to be flown in
-  space.} planner that was flown as part of the Remote Agent
-\texttt{RAX} experiment. Concurrent to \texttt{RAX} deployment, a C++
-version of the planner was implemented which went on to be used for
-the \texttt{MAPGEN} \cite{bresina05} system and continues to be used
-to date, in the mission-critical uplink process for the
+\ref{sec:rabeyond}. \texttt{HSTS} was also the \texttt{LISP}-based
+planner that was flown as part of the Remote Agent \texttt{RAX}
+experiment. Concurrent to \texttt{RAX} deployment, a C++ version of
+the planner was implemented \kcomment{at NASA Ames. This} went on to
+be used for the \texttt{MAPGEN} \cite{bresina05} system and continues
+to be used to date, in the mission-critical uplink process for the
 command/control of the Mars Exploration Rovers (\texttt{MER})
 mission. A vastly re-factored, higher performance open source version
 \cite{europapso} was named \eut and is the subject of this chapter and
@@ -23,18 +21,19 @@ there exists a specific implementation.
 \subsection{Introduction}
 \label{sec:euintro}
 
-\eu uses a \emph{domain model} written in a declarative language,
-together with initial conditions and goals (also in that specified
-language), to construct a set of temporal relations that must be true
-at start time. These models include assertions about the physics of
-the vehicle, i.e how it responds to external stimulus and internally
-driven goals. By propagating these relations forward using Simple
-Temporal Networks \cite{dechter91} and applying goal constraints, \eu
-can select a set of conditions that should be true in the future,
-where some of these conditions will correspond to actions the agent
-must take. The planner can backtrack and try another path during the
-search process if a goal cannot be reached while being capable of
-discarding unachievable goals.
+\eu uses a \emph{domain model} \kcomment{(see Fig. \ref{fig:planner})}
+written in a declarative language, together with initial conditions
+and goals (also in that specified language), to construct a set of
+temporal relations that must be true at start time. These models
+include assertions about the physics of the vehicle, i.e how it
+responds to external stimulus and internally driven goals. By
+propagating these relations forward using Simple Temporal Networks
+\cite{dechter91} and applying goal constraints, \eu can select a set
+of conditions that should be true in the future, where some of these
+conditions will correspond to actions the agent must take. The planner
+can backtrack and try another path during the search process if a goal
+cannot be reached while being capable of discarding unachievable
+goals.
 
 Traditionally robot execution has relied on dispatching commands at
 precise times. Such linear sequences of precisely timed commands give
@@ -47,10 +46,14 @@ interrupted. More recently, executives have been proposed and
 implemented that significantly broaden the way robots can be commanded
 \cite{mus98,alami:1998p820}. For example, the Remote Agent executive
 interpreted a \textit{temporally flexible plan} which represents each
-start time as a variable and contains an explicit network of bounded
-delay constraints between such
-variables. Fig. \ref{fig:flex-timelines} shows an example of a
-flexible partial plan.
+start time as a \kcomment{flexible timepoint} variable
+\kcomment{backed by} an explicit network of bounded delay constraints
+between such variables. \kcomment{These timepoints \cite{Dean88}
+  represent temporal intervals signifying a change in state and are of
+  the form $[lb,ub]$ (where $lb, ub \in N$) are temporal lower and
+  upper bounds respectively. Instead of specifying a fixed integer,
+  time is represented as an interval}. Fig. \ref{fig:flex-timelines}
+shows an example of a flexible partial plan.
 
 \begin{figure}[!htb]
 \centering
@@ -77,61 +80,62 @@ propagation the executive will respect global limits expressed in the
 plan (e.g., don't start a task until a certain condition has been
 satisfied but still satisfying some overall deadline). Such
 flexibility is critical when dealing with dynamic and uncertain
-conditions such as in the ocean, where precise timing of a robotic
-action might be indeterminate. Further, the advantage of flexibility
-can be contrasted with the consequences of the intrinsic inflexibility
-of traditional command sequences. Because they are inflexible,
-sequences must necessarily be designed considering worst case
-scenarios.
+conditions \kcomment{for robotic action in real-world environments},
+where precise timing of an action might be indeterminate. Further, the
+advantage of flexibility can be contrasted with the consequences of
+the intrinsic inflexibility of traditional command sequences. Because
+they are inflexible, sequences \kcomment{are brittle and therefore}
+must necessarily be designed considering worst case scenarios.
 
 \eu uses a \emph{state variable} representation
 \cite{mus94,jonsson00,py10} to describe the evolution of state over
-time. The instantiated history of such state variable evolution over a
+time. The instantiated history of such \kcomment{an} evolution over a
 temporal horizon we call \kcomment{as a} \emph{timeline} and
 \kcomment{one which represents} a single thread in the execution of a
 concurrent system. At any given time each thread can execute a single
-procedure.  Thus each timeline consists of a sequence of procedures
-which encapsulate and describe state evolution; we call these
-instantiated atomic entities \emph{tokens}.  A token therefore
+procedure\kcomment{, with} each timeline consisting of a sequence of
+procedures which encapsulate and describe state evolution. We call
+these instantiated atomic entities \emph{tokens}.  A token therefore
 describes a procedure invocation, the state variables on which it can
-occur, the parameter values of the procedure, and the time values
-defining the interval. We allow encapsulation of uncertainty within
-these tokens with a range of start and end times and parameters, all
-of which are encoded as variables. A constraint solver in turn
-manipulates these variables defined in a \eu domain model. For
-example, consider a scientific need to take water samples 100 meters
-from an environmental hotspot while an AUV is performing a Yo-Yo
-sawtooth pattern\footnote{\kcomment{Variability in the water column is
-    along the vertical dimension. Since the Dorado platform can only
-    move forward, the Yo-Yo pattern is the most efficient mechanism
-    for studying water column properties.}}  in the water-column. Two
-samples are needed if the feature's signal is above a threshold; one
-otherwise. The token that is capturing the sensory threshold has a
-parametric constraints to the token which fires the requisite water
-sampler. In addition, the start time of the water sampling procedure
-is highly dependant on the variability of sub-sea currents and actual
-speed of the vehicle. Therefore a number of values are possible for
-the start times and duration of the sampling all of which are valid
-combinations for desired outcomes.
+occur, the parameter values of the procedure, and the
+\kcomment{timepoints} defining the interval \kcomment{(see
+  Fig. \ref{fig:flex-timelines})}. We allow encapsulation of
+uncertainty within these tokens with a range of start and end times
+and parameters, all of which are encoded as variables. A constraint
+solver in turn manipulates these variables defined in an \eu domain
+model. For example, consider a scientific need to take water samples
+100 meters from an environmental hotspot while an AUV is performing a
+Yo-Yo sawtooth pattern\footnote{\kcomment{Variability in the water
+    column is along the vertical dimension. Since the Dorado platform
+    can only move forward, the Yo-Yo pattern is the most efficient
+    mechanism for studying water column properties.}}  in the
+water-column. Two samples are needed if the feature's signal is above
+a threshold; one otherwise. The token that is capturing the sensory
+threshold has a parametric constraints to the token which
+\kcomment{triggers} the requisite water sampler. In addition, the
+start time of the water sampling procedure is highly dependant on the
+variability of sub-sea currents and actual speed of the
+vehicle. Therefore a number of values are possible for the start times
+and duration of the sampling all of which are valid combinations for
+desired outcomes.
 
 \subsection{\eu Plan Representation}
 \label{sec:europa:pr}
 
-\eu follows the representation outlined by the \texttt{CAIP} framework
-augmenting with elements that are necessary for an efficient
-implementation of constraint-based planning. Below we describe briefly
-the main elements, followed by a detailed description for each of
-these elements and how together they constitute a rich
-representational paradigm for inference in Sections
-\ref{sec:europa:modeling}, \ref{sec:europa:inference} and
-\ref{sec:europa:search}.
+\eu follows the representation outlined by \texttt{CAIP} augmented
+with elements that are necessary for an efficient implementation of
+constraint-based planning. We briefly describe the main elements,
+followed by a detailed description for each of these elements and how
+together they constitute a rich representational paradigm for
+inference in Sections \ref{sec:europa:modeling},
+\ref{sec:europa:inference} and \ref{sec:europa:search}.
 
 \begin{enumerate}
 
 \item \textbf{Tokens} Temporally scoped entities that correspond to
-  Intervals in the \texttt{CAIP} framework, are used to represent
-  state and actions in time. A\textbf{Token State model} is defined to
-  support an efficient implementation of plan-space search algorithms.
+  Intervals in \texttt{CAIP} that are used to represent state and
+  actions in time. A\textbf{Token State model} is defined to support
+  an efficient implementation of plan-space search algorithms.
 
 \item \textbf{Domains, Variables and Constraint} are used to represent
   restrictions in the problem domain in terms of a \texttt{CP}
@@ -143,7 +147,7 @@ representational paradigm for inference in Sections
   
 \item \textbf{Objects} are used to represent problem domains in a more
   modular and scaleable way. \textbf{Timelines and Resources} are
-  built in implementations of Object types that appear frequently in
+  built in implementations of object types that appear frequently in
   real-world domains.
 
 \end{enumerate}
@@ -153,42 +157,40 @@ At the atomic level, the entities in the \eu plan representation are:
 \begin{description}
 
 \item[\textbf{Variables}] Values that need to be represented to
-  describe the problem domain and over which we may want to specify
-  constraints. In the Shopping Agent example, the times at which the
+  describe the problem domain \kcomment{over which constraints are
+    specified}.  In the Shopping Agent example, the times at which the
   agent needs to leave or be back, or executes a purchase, are all
-  instances where variables representing time is used.  As noted in
-  Section \ref{sec:europa:cp}, a variable can take values from a
-  domain. In \eu, domains are defined over a specific data type, the
-  primitive data types supported are, \textit{String},
+  instances where \emph{variables} representing time is used.  As
+  noted in Section \ref{sec:europa:cp}, a variable can take values
+  from a domain. In \eu, domains are defined over a specific data
+  type; the primitive data types supported are \textit{String},
   \textit{Boolean}, \textit{Numeric} and \textit{Object} (see
   below). Further, two types of variable Domains can be defined over a
-  data type, \textit{Enumerated} and \textit{Interval} (used only for
-  numeric data types, they are specified by a [LowerBound,UpperBound]
-  pair, for instance: [1,10], [5.0,100.0]). It is this latter ability
-  to represent and reason over numeric intervals that forms the basis
-  of representing flexible plans.
+  data type \textit{Enumerated} and \textit{Interval} (used only for
+  numeric data types, they are specified by a
+  $[LowerBound,UpperBound]$ pair, for instance: $[1,10]$,
+  $[5.0,100.0]$). It is this latter ability to represent and reason
+  over numeric intervals that forms the basis of representing flexible
+  plans.
 
-\item[\textbf{Constraints}] valid plans in most problem domains have
-  to satisfy a number of restrictions, for instance, a Shopping Agent
+\item[\textbf{Constraints}] Valid plans in most problem domains have
+  to satisfy a number of restrictions for instance, a Shopping Agent
   may only be able to perform one task at a time, may have limited
-  time or an energy or fuel budget to perform a task. In \eu, these
-  restrictions are represented by constraints, which can be defined
-  over any combination of variables in a domain. \eu provides a
-  \emph{Constraint Library} that implements a number of useful
-  constraints (temporal, resource, relational), while allowing the
-  possibility to add new constraints if required by a particular
-  domain.
+  time or an energy or fuel budget to perform a task. These
+  restrictions are represented by \emph{constraints}, which can be
+  defined over any combination of variables in a domain. \eu provides
+  a \emph{Constraint Library} that implements a number of useful
+  constraints (temporal, resource, relational) while allowing the
+  possibility to \kcomment{augment} with new constraints if required.
 
 \item[\textbf{Objects}] The items we wish to describe and refer to in
-  a domain are considered objects. % As in the case with object-oriented
-  % analysis and design, one can seek out the nouns in any domain
-  % description to find likely objects. ---- this seemed confusing
-  In the Shopping Agent example, we might consider the Agent, Products
-  and Locations all to be objects. Objects have state and behavior.
-  For example, a Shopping Agent can have its location, a bag that
-  contains the products it has already purchased (the bag can in turn
-  be another object) and behavior, as in going to a location to look
-  for a product, perform a purchase, return home, etc. all as objects.
+  a domain are considered objects.  In the Shopping Agent example, we
+  might consider the Agent, Products and Locations all to be
+  \emph{objects}. Objects have state and behavior.  For example, a
+  Shopping Agent can have its location, a bag that contains the
+  products it has already purchased (the bag can in turn be another
+  object) and behavior, as in going to a location to look for a
+  product, perform a purchase, return home, etc. all as objects.
   Those that have similar state and behavior can be described
   generically in terms of object types or classes. \eu allows the
   definition of classes similar to object-oriented programming
@@ -204,23 +206,23 @@ At the atomic level, the entities in the \eu plan representation are:
   objects and sets of properties to describe state and behavior. For
   example, one might use a predicate \texttt{At($a$,$l$)} to indicate
   that agent $a$ is at location $l$, or a predicate
-  \texttt{Buy($a$,$p$}) to indicate that agent $a$ is taking action to
-  buy product $p$. Note that $a$ is a variable which may have a number
-  of possible values in a problem with multiple agents. Similarly, $l$
+  \texttt{Buy($a$,$p$}) to indicate that agent $a$ is acting to buy
+  product $p$. Note that $a$ is a variable which may have a number of
+  possible values in a problem with multiple agents. Similarly, $l$
   and $p$ are variables whose values are the set of possible positions
   and products respectively. \eu can be used to create partial plans,
   where the domains of variables $a$ and $l$ can have more than one
-  possible value. Or they can be grounded plans, where single values
-  will be specified for each variable as showing in the N-queen's
-  problem.
+  possible value. Or they can be grounded \kcomment{representations},
+  where single values will be specified for each variable as shown in
+  the $N$-Queens problem.
 
-  In general, for an executable plan it is insufficient to state
-  predicates that describe required state or behavior without also
-  specifying some temporal extent over which each of those predicates
-  hold. Predicates that are always true can be thought to hold from
-  the beginning to the end of the planning horizon. However, in
-  practice, the temporal extent of interest must be defined with
-  timepoints \cite{Dean88} to represent its start and end.  In such
+  In general, for an executable plan it is insufficient to
+  \kcomment{define} predicates that describe required state or
+  behavior without also specifying some temporal extent over which
+  each of those predicates hold. Predicates that are always true can
+  be thought to hold from the beginning to the end of the planning
+  horizon. However, in practice, the temporal extent of interest must
+  be defined with timepoints to represent its start and end.  In such
   \kcomment{a} representation, one writes \texttt{At($a$,$s$,$e$,$l$)}
   to indicate that agent $a$ is at location $l$ from time $s$ to time
   $e$. In fact, this pattern of \kcomment{usage} to describe both
@@ -284,19 +286,19 @@ At the atomic level, the entities in the \eu plan representation are:
   instances of a class derived from \eus built-in timeline class will
   induce ordering requirements among its tokens to ensure no temporal
   overlap may occur among them \cite{mus94}. Fig. \ref{fig:europapr1}
-  below and several others after that illustrate how timelines are
+  and others \kcomment{in this chapter,} illustrate how timelines are
   used to represent state in a plan.
 
 \item \textit{Resources}: Metric resources, e.g. the energy of a
-  battery or the capacity of a cargo hold, are objects with an
-  explicit quantitative state in time and with a circumscribed range
-  of changes that can occur to impact that state i.e. produce,
-  consume, use, change.  Resources are such a common requirement for \eu
-  users that built-in object types (with their corresponding token
-  types to denote production, consumption, etc) are provided.
-  Instances of classes derived from a resource will induce ordering
-  requirements on their tokens in order to ensure that the level of
-  the resource remains within specified limits.
+  battery or the capacity of a cargo hold are objects with an explicit
+  quantitative state in time and with a circumscribed range of changes
+  that can occur to impact that state i.e. produce, consume, use,
+  change.  Resources are a common enough requirement for \eu users
+  that built-in object types (with their corresponding token types to
+  denote production, consumption, etc) are provided.  Instances of
+  classes derived from a resource will induce ordering requirements on
+  their tokens in order to ensure that the level of the resource
+  remains within specified limits.
 
 \end{enumerate}
 
@@ -305,18 +307,20 @@ At the atomic level, the entities in the \eu plan representation are:
   must be performed. As a result, \eu internally represents goals as
   tokens.  Goals can be posted explicitly, for example, when a user
   asks the Shopping Agent to own a specific product by a specific
-  time, or implicitly when subgoals are created as a result of domain
-  rules. For instance, when the Shopping Agent must get to a location
-  where a product is available before it is able to purchase it: in
-  this case the original goal of purchasing the product spawns a
-  subgoal of being at a specific location without which the purchase
-  will not occur as defined in the domain model.  Looking at how a
-  simple Shopping Agent goal would be addresed by \eu helps illustrate
-  how Token States support the planning process.  Let's assume the
-  planner starts with a partial plan that places the Shopping agent at
-  home at time $0$ with no products in possession. Let's also assume
-  that goals are posted for the Agent to own a drill by time $10$ and
-  to be home by time $20$ as shown in Fig. \ref{fig:europapr1}
+  time, or implicitly when subgoals are created as a consequence of
+  domain rules. For instance, the Shopping Agent must get to a
+  location where a product is available before it is able to purchase
+  it. In this case the original goal of purchasing the product spawns
+  a \emph{subgoal} of being at a specific location without which the
+  purchase will not occur as defined in the domain model.  
+
+  Looking at how a simple Shopping Agent goal would be addresed by \eu
+  helps illustrate how Token States support the planning process.
+  Let's assume the planner starts with a partial plan that places the
+  Shopping agent at home at time $0$ with no products in
+  possession. Let's also assume that goals are posted for the Agent to
+  own a drill by time $10$ and to be home by time $20$ as shown in
+  Fig. \ref{fig:europapr1}
   
   \begin{figure}[t]
     \centering 
@@ -333,12 +337,12 @@ At the atomic level, the entities in the \eu plan representation are:
 
   Note that the tokens \texttt{Own(Drill)} and \texttt{At(Home)} that
   represent the goals are not immediately placed on the
-  \texttt{AgentBag} or \texttt{AgentLocation} timelines since \eu must
-  first determine whether it can achieve those \kcomment{goals} and
-  how. When the goals are posted and before any decisions are made,
-  the \texttt{Own(Drill)} and \texttt{At(Home)} tokens are created in
-  an \texttt{INACTIVE} state. \eu then considers the partial plan and
-  evaluates two possible alternatives:
+  \texttt{AgentBag} or \texttt{AgentLocation} timelines, since \eu
+  must first determine whether it can achieve those \kcomment{goals}
+  and how. When the goals are posted and before any decisions are
+  made, the \texttt{Own(Drill)} and \texttt{At(Home)} tokens are
+  created in an \texttt{INACTIVE} state. \eu then considers the
+  partial plan and evaluates two possible alternatives:
 
 \begin{enumerate}
 
@@ -356,24 +360,24 @@ At the atomic level, the entities in the \eu plan representation are:
 
 When a token is merged, all restrictions imposed on the merged token
 are transferred to the active token upon which it is merged. Merging a
-token requires finding a target active token that is compatible. Two
-tokens are merge-compatible if they are instances of the same
-predicate and there are no empty intersections between corresponding
-token variables.  The effect of merging is illustrated in
-Fig. \ref{fig:europapr:merge}. The goal to be home by time $20$ is
-satisfied by merging with the initial state that said that the Agent
-is home at time $0$.  The merge is possible because the tokens are of
-the same type \texttt{At}, and intersecting the domains for all of
-their variables doesn't yield an empty domain (which represents an
-inconsistency), in this case the token variables are the location,
-which is \texttt{Home} in both cases, and the temporal variables
-(start, end, duration), which can be intersected without causing an
+token requires finding a target \texttt{ACTIVE} token that is
+compatible. Two tokens are merge-compatible if they are instances of
+the same predicate and there are no empty intersections between
+corresponding token variables.  The effect of merging is illustrated
+in Fig. \ref{fig:europapr:merge}. The goal to be home by time $20$ is
+satisfied by merging with the initial state that \kcomment{indicated}
+that the Agent is home at time $0$.  The merge is possible because the
+tokens are of the same \texttt{At} type and intersecting the domains
+for all of their variables doesn't yield an empty domain (representing
+an inconsistency). In this case the token variables are the location,
+which is \texttt{Home} in both cases and the temporal variables start,
+end and duration, which can be intersected without causing an
 inconsistency. After the token representing the goal is merged onto
 the token representing the initial state, the resulting token
-represents not only the fact that the Agent must be \texttt{At(Home)}
-by time 0 but also \texttt{At(Home)} at time $20$, this is reflected
-in the new constraints on the token's start and end variables as
-depicted in Fig. \ref{fig:europapr:merge}.
+represents not only that the Agent must be \texttt{At(Home)} by time
+$0$ but also \texttt{At(Home)} at time $20$, This is reflected in the
+new constraints on the token's start and end variables as depicted in
+Fig. \ref{fig:europapr:merge}.
 
 When a token is activated, all domain rules associated with its type
 are evaluated, which may lead to new subgoals being generated. In our
@@ -389,11 +393,10 @@ decision to merge the goal to be \texttt{At(Home)} by time $20$ with
 the initial state was not appropriate since the Agent will have to get
 away from \texttt{Home} to be able to buy the drill which is
 inconsistent with the constraints that resulted after the merge. As a
-result that decision will have to be retracted at some point and the
-alternative to activate or merge with a different token will have to
-be considered.
+result that decision will have to be retracted and the alternative to
+activate or merge with a different token will need to be considered.
 
-If, after looking at all possibilities, neither activating nor merging
+If after looking at all possibilities, neither activating nor merging
 work, a token may be \texttt{REJECTED}. This is possible only for
 goals posted by the end user and specified as optional. Subgoals
 generated as a result of token activation cannot be rejected. If a
@@ -403,7 +406,7 @@ retracted.
 
 As can be seen from the above example, during the search for a plan, a
 token's state can go from \texttt{INACTIVE} to \texttt{ACTIVE, MERGED}
-or \texttt{REJECTED}, as shown in Fig. \ref{fig:europapr:states}.
+or \texttt{REJECTED} as shown in Fig. \ref{fig:europapr:states}.
 
 \begin{figure} \centering
   \includegraphics[scale=0.45]{figs/europa-pr-states.jpg}
