@@ -99,8 +99,9 @@ time. Each such instance is represented by a {\em tick} with a fixed
 duration; in our implementation of \rx on the Dorado AUV, we use a
 tick of $1$ second. In order to identify its state a reactor can
 subscribe to {\em external} state variables owned by other reactors,
-for which it will receive new updates when the owner reactor generates
-its {\em internal} state.
+for which it will receive updates when the owner reactor
+\kcomment{makes changes} to its {\em internal} state \kcomment{due to
+  deliberation or an exogenous state update}.
 
 % \begin{figure}[!htbp]
 %   \centering
@@ -118,17 +119,32 @@ the current state information across all reactor state variables
 through the {\em synchronization} process.  The sequencing of the
 reactors synchronization is identified by traversing a reactor
 dependency graph from the least dependent -- ones with no {\em
-  external} state variables -- to the most, \ie which typically do not have
-{\em internal} state variables. Fig. \ref{fig:agent} shows an example
-of such a dependency graph implemented as a directed acyclic graph.
+  external} state variables -- to the most, \ie which typically do not
+have {\em internal} state variables. Conversely each reactor can
+request a future change on one of its {\em external} state variables
+which will be transformed as an {\em internal} goal to the owner
+reactor(s).  Such \emph{goal dispatching} is expected to produce a
+deliberation phase for the receiving reactor which can cyclically in
+turn, produce a plan impacting its {\em external} state variables'
+future that will propagate \kcomment{down the hierarchy} following the
+same mechanism. Fig. \ref{fig:agent} shows an example of such a
+dependency graph implemented as a directed acyclic graph.
 
-Conversely each reactor can request a future change on one of its {\em
-  external} state variables which will be transformed as an {\em
-  internal} goal to the owner reactor(s).  Such \emph{goal
-  dispatching} is expected to produce a deliberation phase for the
-receiving reactor which can cyclically in turn, produce a plan
-impacting its {\em external} state variables' future that will
-propagate down following the same mechanism.
+
+\begin{figure}[b]
+  \centering
+  \includegraphics[scale=0.45]{figs/token-disptch.pdf}
+  \caption{\small \kcomment{Dispatching a token occurs only when the
+      request start time overlaps a window. \texttt{Goal$_1$}
+      therefore gets dispatched from \texttt{Reactor$_1$} to
+      \texttt{Reactor$_2$} but not \texttt{Goal$_2$} to avoid early
+      commitment. Tokens from \texttt{Reactor$_1$} are 'dispatched'
+      for execution to \texttt{Reactor$_2$} only when necessary while
+      meeting the conditions in Definition \ref{def:dispatch}. $\tau$
+      signifies the execution frontier as time moves from left to
+      right in the illustration.}}
+  \label{fig:reactor-lookahead}
+\end{figure}
 
 In such a process, one challenge is to avoid being overwhelmed by
 goals that may threaten the ability of a reactor to process and
@@ -147,7 +163,7 @@ towards the scope of the agent lifetime:
 
 \item $\pi$ is the planning \emph{look-ahead} of the reactor. which is
   indicative of the number of ticks in the future this reactor is
-  looking ahead during deliberation.
+  looking \kcomment{towards} deliberation.
 
 \end{itemize}
 
@@ -165,17 +181,18 @@ variable as follow:
     \lambda_{exec}(e) 
   \end{equation*}
   Where  $exts(r)$ is the set of the state variables which are
-  {\em externals} to $r$. 
+  {\em external} to $r$. 
 \end{definition}
 
 For intertwined plan execution, the concept of execution latency is
 critical at the agent level since it can impact the
-planning/deliberation process on {\em external} state variables of a
+planning/deliberation process on external state variables of a
 reactor. For simplicity we abstract it out as being equivalent to the
 reactor latency implying that we assume that all {\em external}
 timelines of this reactor have $\lambda_{exec} = 0$. At the \rx agent
 level this execution latency is used to define the {\em dispatch
-  window} of the same state variable.
+  window} of the same state variable \kcomment{(see \cite{py10} for formal
+proofs)}.
 
 \begin{definition}
   \label{def:dispatch}
@@ -187,16 +204,6 @@ level this execution latency is used to define the {\em dispatch
   \end{equation*}
 \end{definition}
 
-\begin{figure}[!htbp]
-  \centering
-  \includegraphics[scale=0.35]{figs/token-disptch.pdf}
-  \caption{\small \kcomment{Dispatching a token occurs only when the request
-    start time overlaps a window. \texttt{Goal$_1$} therefore gets
-    dispatched from \texttt{reactor$_1$} to \texttt{reactor$_2$} but
-    not \texttt{Goal$_2$} to avoid early commitment.}}
-  \label{fig:reactor-lookahead}
-\end{figure}
-
 
 This window is used by \rx to identify when to dispatch a request to a
 {\em reactor} as a new goal. This happens only if the request start
@@ -205,17 +212,16 @@ intersects this window. Requests further in the future are buffered by
 the agent until this time window advances for an overlap. This
 provides an elegant mechanism to request a change from the {\em
   external} state variable of a reactor while avoiding flooding the
-owner reactor of this state variable and avoiding early commitment.
-\kcomment{Fig. \ref{fig:reactor-lookahead} illustrates an example
-  between two reactors where one token is dispatched when overlapping
-  the dispatch window while another is not.}
-
-The choice of both the latency and look-ahead of a reactor can be
-delicate as one is dependent on the other. Needless to say, latency is
-highly dependent on exogenous paramaters such as the host computers
-computing power and the number of reactors needing to deliberate at
+owner reactor of this state variable \kcomment{and avoiding early
+  commitment.} The choice of both the latency and look-ahead of a
+reactor can be delicate as one is dependent on the other. Latency is
+dependent on exogenous paramaters such as the \kcomment{computer power
+  of the host} and the number of reactors needing to deliberate at
 once, among others. As the design stands, these variables should be
-evaluated carefully by the system designer balancing agent efficacy.
+evaluated carefully by the system designer balancing agent
+efficacy. Fig. \ref{fig:reactor-lookahead} illustrates an example
+between two reactors where one token is dispatched when overlapping
+the dispatch window while another is not.}
 
 % efficacy of the agent to find and execute a
 % global strategy they are just indicative and a failure from a reactor
@@ -286,51 +292,47 @@ applies in two ways:
   along with useful \texttt{Sensor\_Data}, both being provided by the
   \texttt{Vehicle} reactor.
 
-\item The future objectives a reactor has on \textsf{Internal} state
-  will likely imply sub-objectives to be reported to the owner of its
-  {\em external} state variables depending on their current
-  values. Should the \textsf{Pilot} want to visit a specific
+\item The future objectives a reactor has on its \emph{internal} state
+  variables will likely imply sub-objectives to be reported to the
+  owner of its {\em external} state variables depending on their
+  current values. Should the \textsf{Pilot} want to visit a specific
   \textsf{Waypoint} -- given its current position as provided by
   \textsf{Sensor\_Data}, it can identify a sequence of
   \textsf{Nav\_cmd} states that should eventually help it reach this
-  location. %\comment{this explanation could do with a figure which I
-    %believe we have used previously}
+  location. 
 
 \end{itemize}
 
 Given the above example, \rx abstracts reactor interaction by
 constraining them to state variables. Each reactor is therefore
 agnostic where its {\em external} state information is managed as long
-as this information is available and properly maintained for managing
-{\em internal} state information. % This {\em internal} state in turn
-% may be used by other reactors.
-Such a formalism also constrains reactor interaction to state
-information exchange which comes in two forms as illustrated in
-Fig. \ref{fig:trex:flow}:
+as this information is available and maintained for managing {\em
+  internal} state information.  Such a formalism also constrains
+reactor interaction to state information exchange which comes in two
+forms as illustrated in Fig. \ref{fig:trex:flow}:
 
 \begin{itemize}
 
-\item {\em Observation on current state values}: This information
-  propagates \emph{up} in the reactor dependency graph at the
+\item {\em Observation on current state values}: This propagates
+  \emph{up} in the reactor dependency graph \kcomment{during} the
   synchronization phase and occurs at the beginning of every
   tick. During this phase the agent provides updates to each reactor
-  on their {\em external} state variables for this tick so they can
-  compute their {\em internal} state variable values for this same
-  tick. By doing so we propagate a consistent view of that state of
-  the world throughout all the reactors as time
-  advances. \kcomment{Observations can therefore be both sensor
-    measurements as well as state information, passed up from other
-    reactors. The strict rules of timeline ownership enable a clear
-    policy for conflict resolution: observations dominate
-    expectations.}
+  on their {\em external} state variable(s) to \kcomment{enable
+    computation of} their {\em internal} state variable values for
+  this same tick. By doing so we propagate a consistent view of world
+  state throughout the reactors as time advances. \kcomment{Further,
+    observations can be both sensor measurements as well as state
+    information, passed up from other reactors. The strict rules of
+    timeline ownership enable a clear policy for conflict resolution:
+    observations dominate expectations.}
 
 \item {\em Goal request on future state}: This information propagates
-  \emph{down} in the reactor dependency graph. In order to satisfy own
-  {\em internal} objectives, a reactor may have a plan that relies on
-  future values of one of its {\em external} state. When such a plan
-  is identified the agent ensures that this part of the plan is
-  provided as a goal to the owner of the given {\em external} state
-  variable(s). 
+  \emph{down} in the reactor dependency graph. In order to satisfy its
+  own {\em internal} objectives, a reactor may have a plan that relies
+  on future values of one \kcomment{(or more)} of its {\em external}
+  state. When such a plan is identified the agent ensures that this
+  part of the plan is provided as a goal to the owner of the given
+  {\em external} state variable(s).
 
 \end{itemize}
 
@@ -344,10 +346,10 @@ have an explicit representation of time (such as but not limited to
 \subsection{The Execution Cycle}
 \label{sec:arch:exec}
 
-The overall execution cycle of the agent is also abstracted out as a
-continuous planning/deliberation cycle between all reactors. At the
-agent interface level, each reactor provides only two abstract calls
-that conceptualize execution:
+% The overall execution cycle of the agent is also abstracted out as a
+\kcomment{Within \rx planning/deliberation is a continuous} cycle
+between all reactors. At the agent interface level, each reactor
+provides only two abstract calls that conceptualize execution:
 
 \begin{itemize}
 
@@ -358,46 +360,47 @@ that conceptualize execution:
 \item \texttt{step} that accepts new goals requested (if any) on the
   {\em internal} timeline of a reactor and will execute one step of
   deliberation. In the context of \eu for example, one deliberation
-  step corresponds to a single flaw resolution (Section
-  \ref{sec:europa:arch}) while ensuring that the resulting plan is not
-  inconsistent. Backtracking is included in the step should it be such
-  a case.  The returned value by the \texttt{step} function is a
-  boolean which indicates whether the reactor needs an extra step to
-  deliberate or if this last step resulted in a complete plan within
-  the reactor's look-ahead. The part of the plan that covers the
-  reactor's {\em external} timelines is provided to be dispatched as a
-  goal.
+  step corresponds \kcomment{to the resolution of} a single flaw
+  (Section \ref{sec:europa:arch}) while ensuring that the resulting
+  plan is not inconsistent. Backtracking is included in the step
+  should it be \kcomment{necessary}.  The returned value by the
+  \texttt{step} function is a boolean which indicates whether the
+  reactor needs an extra step to deliberate or if this last step
+  resulted in a complete plan within the reactor's
+  look-ahead. \kcomment{Subsequently} the part of the plan that covers
+  the reactor's {\em external} timelines is dispatched as a goal.
 
 \end{itemize}
 
 Both these functions have different scope and temporal constraints.
-The \texttt{synchronize} call is considered as atomic and will focus
-only on state inference for the current tick by identifying the
-current value of {\em internal} state variables from the latest
-updates on {\em external} state variables. This process propagates up
-in the reactor dependency graph at every tick to ensure that all
-reactors are aware of the current state of the world. \texttt{step}
-relates to a single decision step of the planning process focused on
-the future evolution of state variables; it can take multiple steps
-spanning multiple ticks for a reactor to produce a plan that is both
-complete and valid. How the reactor identifies that its plan is
-complete and valid is its responsibility and depends on the way each
-reactor resolves its plan at each {\em step}. The general idea is that
-the reactor is able to find a valid strategy in order to satisfy as
-many of its {\em internal} goals as possible. For \eue, this means
-that the solver is unable to identify any further flaws to be resolved
-in the plan.
+The \texttt{synchronize} call is considered as atomic and focuses on
+state inference for the current tick by identifying the current value
+of {\em internal} state variables from the latest updates on {\em
+  external} state variables. This process propagates up in the reactor
+dependency graph at every tick to ensure that all reactors are aware
+of current world state. \texttt{step} relates to a single decision
+step of the planning process focused on the future evolution of state
+variables; it can take multiple steps spanning multiple ticks for a
+reactor to produce a plan that is both complete and valid. How the
+reactor identifies that its plan is complete and valid is its
+responsibility and depends on the way each reactor resolves its plan
+at each {\em step}. The general idea is that the reactor is able to
+find a valid strategy in order to satisfy as many of its {\em
+  internal} goals as possible. For \eue, this means that the solver is
+unable to identify any further flaws to be resolved in the
+plan. \kcomment{Fig. \ref{fig:sync-cycle} illustrates the distinction
+  between a tick, \texttt{step} and synchronization within the tick.}
 
-When such plan is identified, its {\em external} timeline(s) are then
-dispatched to the corresponding reactors which own these times and
-which in turn can start their own deliberation \texttt{step}s to
-satisfy these new objectives. Consequently execution occurs as these
-goals and plans propagate down in the reactor hierarchy until they
-eventually become goals for the lowest level reactor which -- instead
-of deliberating -- may just transform this goal into a command for
-execution in hardware.
+When such a plan is identified, \kcomment{the reactors} {\em external}
+timeline(s) are then dispatched to their \kcomment{respective reactor
+  owners,} which in turn can start their own deliberation
+\texttt{step}s to satisfy these new objectives. Consequently execution
+occurs as these goals and plans propagate down in the reactor
+hierarchy until they eventually become goals for the lowest level
+reactor which -- instead of deliberating -- may just transform this
+goal into a command for execution in hardware.
 
-\label{sec:delib-exec-as}
+% \label{sec:delib-exec-as}
 \begin{figure}[!htbp]
   \centering
   \vskip-1pc
@@ -407,8 +410,9 @@ execution in hardware.
   \subfloat[\small A \rx reactor's execution cycle: {\em Deliberation} is
     interrupted by {\em synchronization} at the beginning of every
     {\em tick} allowing integration of state information.]{\label{fig:tick-exec}\includegraphics[width=0.45\columnwidth]{figs/tick-cycle}}
-  \caption{\small \kcomment{Detailed and abstracted views of
-      synchronization and deliberation within one tick cycle.}}
+    \caption{\small \kcomment{Detailed and abstracted views of
+        synchronization and deliberation within one and multiple tick
+        cycles.}}
   \label{fig:sync-plan-cycle}
 \end{figure}
 
@@ -431,7 +435,7 @@ automated planning. For example in Fig. \ref{fig:agent}, apart from
 other reactor (in blue) is a different instance of an \eu reactor
 differentiated only by their model and \eu solver configurations.
 
-\subsubsection{Handling Failure in \rx}
+\subsubsection{Handling \kcomment{Reactor} Failure in \rx}
 \label{sec:rx-reactor-failure}
 
 The critical task of a \rx reactor is to successfully identify its
@@ -445,11 +449,28 @@ destruction. As the agent destroys the faulty reactor, a special
 observation, \texttt{Failed}, is produced on all {\em internal}
 timelines. Reactors which declare these very state variables as {\em
   external}, are informed of the failure of this timeline.  All goals
-exchanged between reactors are considered \emph{rejectable} by the
-reactor that manages them. As a result in such a situation, the
-failure to find a plan for these goals, is \emph{not} considered a
-critical failure of the reactor. It will only result \kcomment{in}
-these goals being ignored until newer goals are received.
+exchanged between reactors \kcomment{and these timelines} are
+\kcomment{then} considered \emph{rejectable} by the reactor that
+manages them. As a result in such a situation, the failure to find a
+plan for these goals, is \emph{not} considered a critical failure of
+the reactor. It will only result \kcomment{in} these goals being
+ignored until newer goals are received.
+
+
+\begin{figure}[b]
+  \centering \subfloat[\small When the \texttt{Sampling} reactor fails
+  to synchronize, it is removed from the reactor dependency graph
+  along with all its {\em internal} timelines while generating a
+  \texttt{Failed} observation.]{\includegraphics[width=0.35\columnwidth]{figs/AUV-fail0.pdf}
+  \label{fig:fail0}}
+  \qquad
+  \subfloat[\small In the worst case this \texttt{Failed} observation may imply
+  other reactors that depend on the \texttt{Sampling} reactor might fail to
+  synchronize too leading to a bottom-up destruction of ``faulty'' reactors.]{
+    \includegraphics[width=0.35\columnwidth]{figs/AUV-fail1}\label{fig:fail1}}
+  \caption{\small Impact of the \texttt{Sampling} reactor failure in
+    the AUV agent \kcomment{from} Fig. \ref{fig:agent}.}
+\end{figure}
 
 Take for example our AUV agent from Fig. \ref{fig:agent}, and assume
 that the \texttt{Sampling} reactor failed to synchronize. In such a
@@ -459,13 +480,13 @@ observation as illustrated in Fig. \ref{fig:fail0}.  The
 \texttt{Survey controller} will receive this \texttt{Failed}
 observation on its {\em external} \texttt{Sampling\_policy} timeline
 which indicates that this state variable is no longer managed by its
-owner reactor. This leads to two potential outcomes based on how the
-reactor is implemented:
+owner reactor. This leads to two \emph{potential} outcomes based on
+how the reactor is implemented:
 
 \begin{enumerate}
 
-\item The \texttt{Survey controller} model allows it to integrate the
-  \texttt{Failed} observation. For example it can identify that,
+\item The \texttt{Survey controller} model \kcomment{could} integrate
+  the \texttt{Failed} observation. For example it can identify that,
   subsequent use of the water sampler is no longer possible.  The \rx
   agent can continue to navigate since \texttt{Pilot} is still
   available. In such a case the agent structure remains as in
@@ -479,21 +500,6 @@ reactor is implemented:
   Fig. \ref{fig:fail1}.
 
 \end{enumerate}
-
-\begin{figure}[b]
-  \centering
-  \subfloat[\small When the \texttt{Sampling} reactor fails to
-  synchronize, it is removed from the reactor dependency graph along
-  with all its {\em internal} timelines while generating a \texttt{Failed} observation]{\includegraphics[width=0.35\columnwidth]{figs/AUV-fail0.pdf}
-  \label{fig:fail0}}
-  \qquad
-  \subfloat[\small In the worst case this \texttt{Failed} observation may imply
-  other reactors that depend on the \texttt{Sampling} reactor might fail to
-  synchronize leading to a bottom-up destruction of ``faulty'' reactors.]{
-    \includegraphics[width=0.35\columnwidth]{figs/AUV-fail1}\label{fig:fail1}}
-  \caption{\small Impact of the \texttt{Sampling} reactor failure in
-    the AUV agent \kcomment{from} Fig. \ref{fig:agent}}
-\end{figure}
 
 Even in the worst of the two cases presented above, we note that a
 reactor failure only propagates \emph{up} in the reactor dependency
@@ -1104,7 +1110,7 @@ managing this state variable internally.
   synchronization.]{\label{fig:shop:exec0}\includegraphics[width=0.7\columnwidth]{figs/shoping_exec_t0}} \\
   \subfloat[\small Result of synchronization after the {\em Going}
   observation was received by the reactor with the plan showed in
-    \ref{fig:shop:exec0}.]{\label{fig:shop:exec1}\includegraphics[width=.7\columnwidth]{figs/shoping_exec_t1}}
+    Fig. \ref{fig:shop:exec0}.]{\label{fig:shop:exec1}\includegraphics[width=.7\columnwidth]{figs/shoping_exec_t1}}
     \caption{\small The Shopping example: Tokens in {\color{red}red}
       indicate observations, tokens in {\color{blue}blue} the goal
       that this plan attempts to solve for \kcomment{and tokens in
@@ -1215,8 +1221,8 @@ goals.
 
 \begin{figure}[!b]
   \centering
-  \subfloat[\small Conflicting Observation]{\label{fig:shop:relax1}\includegraphics[width=0.7\columnwidth]{figs/shoping_exec_relax-1}}\\
-  \subfloat[\small Relaxed Partial Plan]{\label{fig:shop:relax2}\includegraphics[width=0.7\columnwidth]{figs/shoping_exec_relax-2}}
+  \subfloat[\small Conflicting Observation.]{\label{fig:shop:relax1}\includegraphics[width=0.7\columnwidth]{figs/shoping_exec_relax-1}}\\
+  \subfloat[\small Relaxed Partial Plan.]{\label{fig:shop:relax2}\includegraphics[width=0.7\columnwidth]{figs/shoping_exec_relax-2}}
   \caption{\small Illustration of a conflict during synchronization
     and the resulting relaxed plan for recovery.}
 \end{figure}
