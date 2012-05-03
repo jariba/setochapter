@@ -6,22 +6,22 @@
 
 A prime motivation behind the \rx architecture was to design a
 controller which could bring automated planning closer to low-level
-control of the vehicle while maintaining its reactivity. Traditionally
-planning has been deemed computationally expensive with planner
-performance restricting robot reactivity
+control of the vehicle while \kcomment{ensuring}
+reactivity. Traditionally planning has been deemed computationally
+expensive with planner performance restricting robot reactivity
 \cite{ghallab04,Dias:2003ua}. In control architectures where task
 planning is embedded, planning consequently remains at an abstract
 level with the assumption that it would otherwise impede system
 reactiveness and that the environment can change at a faster rate than
 the planner can plan for. In such a situation, the agent may thrash
-\footnote{\kcomment{In such an event as the planner works towards goal
-    satisfaction, the initial conditions leading to achieve that goal
-    are no longer valid. The planner then tries to achieve a different
-    goal which too has to be discarded similarly. And so on.}}  if the
-internal state of the plan gets out of sync with the actual state of
-the world.
+\footnote{\kcomment{In such an event even as the planner works towards
+    goal satisfaction, the initial conditions leading to achieve that
+    goal are no longer valid. The planner then tries to achieve a
+    different goal which too has to be discarded similarly. And so
+    on.}}  if the internal state of the plan gets out of sync with the
+actual state of the world.
 
-\kcomment{A important consequence of this has been that} the planning
+\kcomment{An important consequence of this has been that} the planning
 problem managed {\em in situ} has traditionally remained fairly
 detached from low-level control. Most adaptations at the lower-level
 reactive layers in contrast are managed by specialized components (for
@@ -35,8 +35,8 @@ to significant design and integration issues \cite{DS1report}.
 \texttt{IDEA} mitigated most of these issues by tightly integrating
 planning and execution in a single representational and computational
 framework with \kcomment{an} unified declarative model. Our approach
-with \rx builds on this design methodology albeit in a substantially
-systematic manner. 
+builds on this design methodology albeit in a substantially systematic
+manner.
 
 The \rx architecture contributes to agent architectures over and
 beyond \texttt{IDEA} in the following \kcomment{significant} ways:
@@ -44,29 +44,29 @@ beyond \texttt{IDEA} in the following \kcomment{significant} ways:
 \begin{itemize}
 
 \item \emph{Partitioning} the global planning problem into multiple
-  decision loops, called {\em reactors}. Each reactor has its own
-  scope both functionally (one for example focusing on the conversion
-  of high level waypoints into low-level commands) and temporally as
-  each reactor declares its planning look-ahead ($\pi$) and expected
-  latency ($\lambda$) before being able to produce \kcomment{a} plan
-  to the agent depending on where it is located in a reactor
-  dependency graph such as shown in Fig. \ref{fig:agent}. A reactor
-  closer to the hardware in the hierarchy, is expected to deliberate
-  less and be highly responsive to observations from the world. This
-  implies lower values of $\pi$ and $\lambda$ (see Section
-  \ref{sec:arch:trex} below). \kcomment{In the current design, $\pi$
-    and $\lambda$ are application dependent and fixed at design time.}
+  decision loops called {\em reactors}. Each reactor has its own scope
+  both functionally (one for example focusing on the conversion of
+  high level waypoints into low-level commands) and temporally as each
+  reactor declares its planning look-ahead ($\pi$) and expected
+  latency ($\lambda$) before being able to produce \kcomment{a} plan.
+  \kcomment{These parameters depend} on where \kcomment{a reactor} is
+  located in a dependency graph such as \kcomment{the one} shown in
+  Fig. \ref{fig:agent}. A reactor closer to the hardware in the
+  hierarchy, is expected to deliberate less and be highly responsive
+  to observations from the world. This implies lower values of $\pi$
+  and $\lambda$ (see Section \ref{sec:arch:trex} below). \kcomment{In
+    the current design, $\pi$ and $\lambda$ are application dependent
+    and fixed at design time.}
 
 \item \emph{Coupling} a tighter integration between the planning
-  process and world evolution to ensure that planning occurs
-  \emph{during continuous} state update in the {\em same}
-  \kcomment{plan} database used for planning. By doing so, the planner
-  is better informed in its deliberation despite a larger latency than
-  the changing world.
+  process and world evolution \kcomment{with the use of the {\em same}
+    \kcomment{plan} database}. By doing so, the planner is better
+  informed in its deliberation despite a larger latency than the
+  changing world.
 \end{itemize}
 
 Systematic partitioned inference is a major contribution of
-\rxe. However that is not the focus of this chapter; details are
+\rxe. However that is not the focus of this chapter with details
 covered in \cite{py10, rajan12}. Coupled interaction between planning
 and the world on the other hand, has a substantial impact on how
 planning can be integrated in such frameworks. In this chapter we show

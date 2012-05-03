@@ -2,19 +2,16 @@
 \label{sec:europa:arch}
 
 \eu is implemented as a library that encapsulates all elements
-described above making them accessible via modeling and Application
-Programming Interface (API) layers.  A user will typically use the
-modeling facilities to inject a problem domain description and the
-API to extract and manipulate plans and to obtain information about
-plan flaws and constraint violations at any stage of the planning
-process.
+\kcomment{previously described} and available via modeling and
+Application Programming Interfaces (APIs).  A user will typically use
+modeling facilities to inject a problem domain description and the API
+to extract and manipulate plans and to obtain information about plan
+flaws and constraint violations at any stage of the planning process.
 
 \begin{figure}[b]
 \centering
 \includegraphics[scale=0.5]{figs/EUROPA-Architecture.pdf}
-\caption{\small The \eu software architecture.\comment{Is there a
-    better block diagram we can use to respond to review comment on
-    page 2?}}
+\caption{\small The \eu software architecture.}
 \label{fig:europa-architecture}
 \end{figure}
 
@@ -22,30 +19,30 @@ Fig. \ref{fig:europa-architecture} shows the main architectural
 components in \eu and their relationships. The \textbf{Constraint
   Reasoning Engine} (\texttt{CRE}) manages domain types, variables and
 constraints that define relationships among them. It also provides an
-efficient arc consistency mechanism \cite{mackworth77}. The
-\texttt{CRE} is designed so that specialized reasoning algorithms for
-new constraints can be easily and efficiently plugged in. The
-\textbf{Plan Database} (\texttt{PDB}) manages object and token
-types. It also maintains the state of partial plans in terms of
-object, variable and token instances. This constitutes the data
-foundation on which end user applications and automated problem
-solvers are built. The \textbf{Rules Engine} (\texttt{RE}) modularly
-adds the semantics of domain rules that describe dependencies between
-tokens. The \textbf{Solver Module} provides the framework for flaw
-detection and resolution that is needed to implement search algorithms
-for planning. The \textbf{API Layer} provides access to services from
-all the different modules in a programmatic way so that \eu can be
-easily embedded into specialized applications.
+efficient arc consistency mechanism \cite{mackworth77} designed so
+that specialized reasoning algorithms for new constraints can be
+easily and efficiently plugged in. The \textbf{Plan Database}
+(\texttt{PDB}) manages object and token types. It also maintains the
+state of partial plans in terms of object, variable and token
+instances. This constitutes the data foundation on which end user
+applications and automated problem solvers are built. The
+\textbf{Rules Engine} (\texttt{RE}) adds the semantics of domain rules
+that describe dependencies between tokens. The \textbf{Solver Module}
+provides the framework for flaw detection and resolution that is
+needed to implement search algorithms for planning. The \textbf{API
+  Layer} provides access to services from all the different modules in
+a programmatic way so that \eu can be easily embedded into specialized
+applications.
 
 Describing problem domains and problem instances in terms of objects,
-variables and domain rules in a programmatic way is cumbersome to the
-extent of being impractical; this motivated the creation of modeling
-languages that support those definitions in a much more natural and
-compact way. \nd (New Domain Description Language
-[pronounced ``noodle'']) \cite{NDDL} is the main modeling language for
-\eu and will be described in detail in the Modeling section
-below. Another, \texttt{ANML} is a language under development that
-provides a more intuitive syntax \cite{smith08}.
+variables and domain rules is cumbersome to the extent of being
+impractical; this motivated the creation of modeling languages that
+support those definitions in a much more natural and compact way. \nd
+(New Domain Description Language [pronounced ``noodle'']) \cite{NDDL}
+is the \kcomment{primary} modeling language for \eu described in
+Section \ref{sec:europa:modeling}. Another, \texttt{ANML}
+\cite{smith08} is a language under development that provides a more
+intuitive syntax \kcomment{and out of scope for this chapter}.
   
 In an effort to mimimize the amount of work that a user needs to
 perform to solve specific problems, \eu also bundles extension
@@ -57,18 +54,18 @@ modules that have been found to be useful in many domains:
   reason about temporal constraints.
 
 \item \textit{Resources}: Extensions to the \texttt{CRE}, \texttt{PDB}
-  and Solver modules to provide reasoning and search for metric
-  resources.
+  and \textbf{Solver Module} to provide reasoning and search for
+  metric resources.
 
 \item \textit{Chronological Backtracking Solver}: A general purpose
   built-in solver to provide the ability to plan out-of-the-box.
   Problems that require challenging search may require specialized
-  solvers to be built as explained in Section \ref{sec:europa:search}.
+  solvers to be built as noted in Section \ref{sec:europa:search}.
 
 \end{enumerate}
 
 \kcomment{Before going into the details of each module, a simple
-  example illustrates how they interact at a high level:}
+  example illustrates how they interact at an abstract level:}
 
 \begin{verbatim}
 
@@ -119,25 +116,25 @@ lt(goal1.start,10);
 
 \end{verbatim}
 
-\kcomment{The snippet above is a \nd (covered in more detail in
+\kcomment{The example above is a \nd (covered in more detail in
   Section \ref{sec:europa:modeling}) model of a light bulb and a
-  switch that controls it, along with a problem instance that requires
-  the light bulb to be off by time$=10$, given an initial state with
-  the bulb on at time$=0$. The \nd module allows \eu to ingest this
-  model and the problem description. Once the \nd statements are
-  parsed, different object types, object instances and constraints are
-  instantiated inside the \texttt{PDB} and \texttt{CRE} modules where
-  they are available for both the user and the solver module to query
-  and manipulate programmatically. This instantiation of the initial
-  state constitutes the initial plan that \eu holds for this
-  particular problem instance.
+  switch that controls it along with a problem instance that requires
+  the light bulb to be \texttt{off} by time$=10$, given an initial
+  state with the bulb \texttt{on} at time$=0$. The \nd module allows
+  \eu to ingest this model and the problem description. Once the \nd
+  statements are parsed, different object types, object instances and
+  constraints are instantiated inside the \texttt{PDB} and
+  \texttt{CRE} modules where they are available for the user and the
+  solver modules to query and manipulate programmatically. This
+  instantiation of the initial state constitutes the initial plan that
+  \eu holds for this particular problem instance.
  
   The user can then invoke functionality available in the solver
   module to modify or extend this initial plan in a way that
   eliminates any flaws (violated constraints, unsatisfied goals,
   oversubscribed resources). When actions are added to a plan, the
-  \texttt{RE} module ensures that domain rules expressed in the model
-  are enforced when \eu creates new action or predicate instances. For
+  \texttt{RE} ensures that domain rules expressed in the model are
+  enforced when \eu creates new action or predicate instances. For
   instance, if a \texttt{LightSwitch::turnOn} action is added to the
   plan, the \texttt{RE} ensures that requirements for the existence of
   the conditions and effects of that action (that is, the
@@ -155,17 +152,18 @@ language for models, goals and plans is of great importance. For \eue,
 \nd allows the user to specify the different components of a problem
 domain in a precise and concise manner. Among the main features that
 make \nd a powerful tool for describing problem domains are that it is
-object oriented. \nd supports classes and inheritance in similar
-fashion to popular Object-Oriented languages like Java and C++. It
-also supports polymorphism for some of the planning components. Using
-object classes and instances is a time-tested approach to naturally
-describe problem domains \cite{rumbaugh}. It offers declarative
-constructs to define constraints and causality dependencies between
-actions and effects and finally it offers procedural constructs to
-populate \eus \texttt{PDB} with specific problem instances expressed
-in terms of objects, variables, constraints, facts and goals. To
-articulate the most important elements of \nde, we show how
-the Shopping Agent problem could be modeled:
+object oriented. It supports classes and inheritance in similar
+fashion to popular object-oriented languages like Java and C++. It
+also supports polymorphism for some planning components. Using object
+classes and instances is a time-tested approach to naturally describe
+problem domains \cite{rumbaugh}. It offers declarative constructs to
+define constraints and causality dependencies between actions and
+effects and it offers procedural constructs to populate \eus
+\texttt{PDB} with specific problem instances expressed in terms of
+objects, variables, constraints, facts and goals. 
+
+To articulate the most important elements of \nde, we show how the
+Shopping Agent problem could be modeled:
 
 \begin{verbatim}
 
@@ -236,8 +234,8 @@ class Agent {
 }
 \end{verbatim}
 
-In the model above one can see how the main elements of a problem domain
-can be mapped to \eus representation:
+The model above the main elements of a problem domain can be mapped to
+\eus representation in the \kcomment{following manner}:
 
 \begin{description}
 
@@ -250,13 +248,13 @@ can be mapped to \eus representation:
   product can be purchased at a location. The Shopping Agent itself is
   represented by an \textit{Agent} class, which relies on the
   \textit{AgentLocation} class to keep track of where the agent is at
-  any point in time. \nd supports a single rooted class
-  hierarchy so that state and behavior can be extended through
-  inheritance. We take advantage of that feature by making
-  \textit{AgentLocation} inherit from \eus built-in \textit{Timeline}
-  class which doesn't allow predicates to overlap in time for the same
-  object instance. This feature is used for instance, to ensure that
-  an agent can only be at one place at a time in our example.
+  any point in time. \nd supports a single rooted class hierarchy so
+  that state and behavior can be extended through inheritance. We take
+  advantage of that feature by making \textit{AgentLocation} inherit
+  from \eus built-in \textit{Timeline} class which does not allow
+  predicates to overlap in time for the same object instance. This
+  feature is used for instance, to ensure that an agent can only be at
+  one place at a time in our example.
 
 \item[\textbf{Variable Types and Instances}:] All object attributes
   are represented as variables in this model. For instance, it uses
@@ -321,8 +319,8 @@ Agent::Buy {
 \end{verbatim}
 
 Domain rules can be defined in \nd in the context of a predicate or an
-action. In the example above we can see the main elements of a rule
-definition:
+action. In the example above, the main elements of a rule definition
+\kcomment{are as follows}:
 
 \begin{description}
 
@@ -353,8 +351,8 @@ definition:
 
 \end{description}
 
-With that specification for the Shopping Agent domain, a particular
-problem instance could be stated as follows:
+With the specification for the Shopping Agent domain \kcomment{above},
+a particular problem instance could be stated as:
 
 \begin{verbatim}
 
@@ -417,18 +415,18 @@ This problem instance consists of \textbf{Variables} and
 are used to specify the planning horizon (\texttt{horizonStart} and
 \texttt{horizonEnd}) and objects are used to specify locations,
 products, product-location associations and the Shopping Agent that we
-want to plan for. Facts are used to specify the current state of the
-world, do not need any support and are represented as tokens in the
-\texttt{PDB}. In this case we use facts to specify that the Shipping
-Agent is initially at home. Goals are also represented as tokens in
-the \texttt{PDB}. Different from facts, goals trigger inference in \eu
-which determines whether flaws (unresolved subgoals, overloaded
-resources, etc.) need to be resolved; if so, search modules can be
-invoked to resolve those flaws as part of the deliberation
-process. Finally, constraints are restrictions on and between facts
-and goals. In the example above, we use temporal constraints to
-specify when facts hold and when the goals should be accomplished. In
-the model above, \texttt{before} and \texttt{after} are \texttt{Allen
+want to plan for. Facts, represented as tokens in the \texttt{PDB},
+are used to specify the current state of the world \kcomment{and} do
+not need any support. In this \kcomment{example} we use facts to
+specify that the Shipping Agent is initially at home. Goals are also
+represented as tokens in the \texttt{PDB}. Different from facts, goals
+trigger inference in \eu which determine whether flaws (unresolved
+subgoals, overloaded resources, etc.) need to be resolved; if so,
+search modules can be invoked to resolve those flaws as part of the
+deliberation process. Finally, constraints are restrictions on and
+between facts and goals. In the example above, we use temporal
+constraints to specify when facts hold and when goals need to be
+accomplished. \texttt{before} and \texttt{after} are \texttt{Allen
   Algebra} \cite{allen84} operators, which \eu supports to specify
 temporal relations between tokens (specifically between their start
 and end timepoints). The algebra is particularly effective in dealing
@@ -449,63 +447,63 @@ Fig. \ref{fig:allen-algebra}
 \label{sec:europa:inference}
 
 In \eue, all variables and constraints from a problem domain
-description are stored inside the \texttt{CRE}.  The \texttt{CRE}
-provides a framework where any number of constraint types can
-collaborate to perform inference and prune variable domains using
-Bounds Propagation and Domain Reduction techniques \cite{marriott98}. 
-\eu uses a Propagator pattern which keeps track of a set of
-constraint instances of the same type and is responsible for ensuring
-variables are updated through inference whenever a relevant change occurs
- (variable domain modifications or constraint addition/deletion).
+description are stored inside the \texttt{CRE}.  It provides a
+framework where any number of constraint types can collaborate to
+perform inference and prune variable domains using Bounds Propagation
+and Domain Reduction techniques \cite{marriott98}.  \eu uses a
+Propagator pattern which keeps track of a set of constraint instances
+of the same type and is responsible for ensuring variables are updated
+through inference whenever a relevant change occurs (variable domain
+modifications or constraint addition/deletion).
 
 In a planning problem, variable or constraint changes can come
 directly from an end user (by introducing new activities or goals and
 relating them to the rest of the plan through constraints, by changing
-the start or end time of an activity, etc), or from an automated planner (by
-expanding subgoals, introducing precedence constraints to resolve
-mutual exclusion conflicts, etc). When these changes occur, each
-propagator is only able to ensure consistency for the constraints that
-are associated with it.  To maintain global consistency, the
+the start or end time of an activity, etc), or from an automated
+planner (by expanding subgoals, introducing precedence constraints to
+resolve mutual exclusion conflicts, etc). When these changes occur,
+each propagator is only able to ensure consistency for the constraints
+that are associated with it.  To maintain global consistency, the
 \texttt{CRE} implements a variant of the \texttt{AC-3} algorithm
-\cite{mackworth77} where propagators are invoked repeatedly until
-the constraint network returns to a quiescent state.
+\cite{mackworth77} where propagators are invoked repeatedly until the
+constraint network returns to a quiescent state.
+
+\input{constraints-table}
 
 \subsubsection{Constraint Formulation}
 \label{sec:europa:constraints}
 
 An \eu user can introduce new constraint types by implementing
-specialized constraint and propagator classes; however, \eu provides a
+specialized constraint and propagator classes. However \eu provides a
 built-in constraint library with a range of arithmetic, temporal, set
 and resource constraint types so that a large number of problem
-domains can be modeled without having to introduce new constraint
-types. Tables \ref{tab:calconst}, \ref{tab:setconst},
+domains can be modeled. Tables \ref{tab:calconst}, \ref{tab:setconst},
 \ref{tab:objhierarchy} and \ref{tab:misc} show the main constraint
 types included in \eus Constraint Library.  Temporal and resource
 constraints are especially important to model real-world planning
 domains.
 
-\input{constraints-table}
-
-\eu uses variables to explicitly represent timepoints for plan
-actions and states. Constraints among timepoints provide a natural
-way to express domain axioms. For example, in order to state that
-activity $A$ must occur before activity $B$ we can say that the end
-timepoint of $A$ is $leq$ the start timepoint of $B$.
-\cite{dechter91} proposed that constraints among timepoints can be
-grouped together to form a Simple Temporal Network
-(\texttt{STN}). Such a network can be transformed into a Distance
-Graph (\texttt{DG}) where the outward arc from a node represents the
-maximum distance from the source node to the target node.
-Fig. \ref{fig:stn} illustrates an \texttt{STN} with $2$ variables and
-a single constraint along with the resulting \texttt{DG}.
-\cite{dechter91} also showed that shortest path algorithms could be
-used to propagate values in the network and discover a negative cycle:
+\eu uses variables to explicitly represent timepoints for plan actions
+and states. Constraints among timepoints provide a natural way to
+express domain axioms. For example, in order to state that activity
+$A$ must occur before activity $B$ we can say that the end timepoint
+of $A$ is $leq$ the start timepoint of $B$.  \cite{dechter91} proposed
+that constraints among timepoints can be grouped together to form a
+Simple Temporal Network (\texttt{STN}). Such a network can be
+transformed into a Distance Graph (\texttt{DG}) where the outward arc
+from a node represents the maximum distance from the source node to
+the target node.  \kcomment{They} also show that shortest path
+algorithms \kcomment{(see \cite{corman} for a review)} could be used
+to propagate values in the network and discover a negative cycle:
 namely a path from a node to itself that has a path length less than
-$0$. If such a cycle exists, the network is inconsistent. It was
-further shown that a single-source shortest path algorithm was
-sufficient to detect a negative cycle and provide sufficient
-propagation to yield a backtrack-free search. \eus propagator for
-temporal constraints is a straight implementation of this algorithm.
+$0$. If such a cycle exists, the network is \kcomment{provably}
+inconsistent. It was further shown that a single-source shortest path
+algorithm was sufficient to detect a negative cycle and provide
+sufficient propagation to yield a backtrack-free search. \eus
+propagator for temporal constraints is an implementation of such a
+single-source algorithm. Fig. \ref{fig:stn} illustrates an
+\texttt{STN} with $2$ variables and a single constraint along with the
+resulting \texttt{DG}.
 
 \begin{figure}[!htb]
   \centering
@@ -513,8 +511,8 @@ temporal constraints is a straight implementation of this algorithm.
   to variables and their domains and arc's the \emph{constraint} or
   distance between them.}]{\label{fig:stn1}\includegraphics[width=0.4\columnwidth]{figs/stn-graph.pdf}}
   \subfloat[\small The resulting distance graph from \ref{fig:stn1}.]{\label{fig:stn2}\includegraphics[width=0.4\columnwidth]{figs/distance-graph.pdf}}
-  \caption{\small An illustration of a STN and its corresponding
-    distance graph.}
+  \caption{\small An illustration of a Simple Temporal Network
+    (\texttt{STN}) and its corresponding distance graph.}
   \label{fig:stn}
 \end{figure}
 
@@ -530,49 +528,45 @@ consumption is instantaneous. \textbf{Reusable} resources on the other
 hand, have constraints that use a quantity of the resource for a
 specific duration (\texttt{uses(resource,start,duration,quantity)}),
 which are then subsequently released. \textbf {Unary} resources are
-reusables with capacity$ = 1$, which allows \eu to perform run time
+reusables with capacity$=1$, which \kcomment{accounts for} runtime
 savings in comparison to the generic reusable class. Configuration
 options are offered such that in addition to the usual constraint
 violations when a resource is completely depleted, plan flaws can be
-generated whenever a resource level is outside a specific upper or
-lower bound, or when instantaneous production or consumption exceeds a
-specific threshold.
+generated whenever a resource level is outside a specific bound, or
+when instantaneous production or consumption exceeds a specific
+threshold.
 
-Since \eu supports a flexible temporal representation, where time is
-represented by intervals, instead of singletons, determining whether a
-resource is the source of a plan flaw or a constraint violation in
-general is substantially more difficult than just computing a profile
-of the resource and checking against some limits.  With temporal
-flexibility, a number of resource profiles could be applicable
-depending on precisely when each production/consumption event occurs
-out of a range of possible values that are in the domain of the
-variables that represent the temporal extent for the event.
-\cite{Muscettola04,Muscettola06} proposed an algorithm where the
+Determining whether a resource is the source of a plan flaw or a
+constraint violation in general is substantially more difficult in
+\eus flexible representation, than just computing a profile of the
+resource and checking against some limits.  With temporal flexibility,
+a number of resource profiles could be applicable depending on
+precisely when each production/consumption event occurs out of a range
+of possible values that are in the domain of the variables that
+represent the temporal extent for the event.
+\cite{Muscettola04,Muscettola06} propose an algorithm where the
 variables that represent the time for production/consumption events
 are placed in a temporal network, similar to the network used by the
 temporal propagator; constraints on the resource can then be seen as
-quantities flowing through that network. Computing the maximum flow
-then, yields the maximum resource usage and thus a lower bound on the
-resource level; computing a minimum flow will similarly yield an upper
-bound. Since maximum flow on a temporal network can be computed in
-polynomial time \cite{corman}, \eu takes advantage of this algorithm
-to efficiently compute upper and lower bound envelopes on the resource
-level. Fig. \ref{fig:resenvelopes} shows an example of such a resource
-computation.
+quantities \emph{flowing} through that network. Computing the maximum
+flow then, yields the maximum resource usage and thus a lower bound on
+the resource level; computing a minimum flow will similarly yield an
+upper bound. They show that such upper and lower bound envelopes on
+the resource level can be computed in polynomial time
+\cite{corman}. Resource envelopes can be useful when trying to
+evaluate plan brittleness in the face of changing activity durations
+or start times. They can also be useful when searching for plans;
+however they are relatively expensive to compute. Therefore their
+ability to prune the search space must be weighted against the ability
+to search faster \cite{6007772, morris11}. Fig. \ref{fig:resenvelopes}
+shows an example of such a resource computation.
 
 \begin{figure}
 \centering
 \includegraphics[scale=0.2]{figs/europa-resource-envelopes.png}
-\caption{\small An example of resource envelopes computed by \eu.}
+\caption{\small An example of resource envelopes \cite{Muscettola04,Muscettola06} computed by \eu.}
 \label{fig:resenvelopes}
 \end{figure}
-
-Resource envelopes can be useful when trying to evaluate plan
-brittleness in the face of changing activity durations or start
-times. They can also be useful when searching for plans; however they
-are relatively expensive to compute. Therefore their ability to prune
-the search space must be weighted against the ability to search faster
-\cite{6007772, morris11}.
 
 
 \subsection{Search in \eu}
@@ -589,18 +583,17 @@ inference and search mechanisms can be used to look for a problem
 solution.
 
 Since temporal intervals may extend indefinitely in both positive and
-negative directions, for problems with a temporal dimension it is also
-common to specify a \emph{planning horizon} when invoking a solver;
-any decisions that fall completely outside of the horizon can be
-ignored. This is useful to ignore activities that may occur far in the
-future or in the past to be relevant for a particular plan, ensuring
-that the solver is making as few commitments as necessary and reducing
-the complexity of plan generation.  The \emph{planning horizon} is
-also useful when dealing with recurrent activities; consider for
-instance a model where a medical checkup has to occur every $3$
-months. The user can model a recurring activity and then use the
-horizon to ensure that a finite number of medical checkup activities
-are generated as part of a plan.
+negative directions \kcomment{(\eg $[-\infty,+\infty]$)}, for problems
+with a temporal dimension it is also common to specify a
+\emph{planning horizon} when invoking a solver. Any decisions that
+fall completely outside of the horizon can be ignored, ensuring that
+the solver is making as few commitments as necessary and reducing plan
+generation complexity.  The \emph{planning horizon} is also useful
+when dealing with recurrent activities. Consider for instance a model
+where a medical checkup has to occur every $3$ months. The user can
+model a recurring activity and then use the horizon to ensure that a
+finite number of medical checkup activities are generated as part of a
+plan.
 
 \subsubsection{Flaw Resolution}
 \label{sec:europa:flaws}
@@ -629,10 +622,10 @@ any time are:
 
 \end{enumerate}
 	
-The initial partial plan is the state of \eus Plan Database after the
+The initial partial plan is the state of \eus \texttt{PDB} after the
 initial state has been instantiated. This results in a set of
 variable, object and token instances. Inference then takes place to
-detect flaws in the partial plan; the three kinds of flaws that can be
+detect flaws in the partial plan. The three kinds of flaws that can be
 detected are:
 
 \begin{description}
@@ -642,32 +635,31 @@ detected are:
   selection from their domain.
 
 \item[\textbf{Open Condition}:] an open condition is an
-  \texttt{INACTIVE} token. \texttt{INACTIVE} tokens can be generated
-  by explicitly posted goals, or when a token is activated, rules may
-  cause the creation of \texttt{INACTIVE} slave tokens as described
-  in Section \ref{sec:europa:pr}. Open Conditions can be resolved in
-  three ways:
+  \texttt{INACTIVE} token which can be generated by explicitly posted
+  goals or during token activation when rules may cause the creation
+  of \texttt{INACTIVE} slave tokens as described in Section
+  \ref{sec:europa:pr}. Open Conditions can be resolved in three ways:
 
   \begin{description}
 
   \item[\textbf{Merging}:] An \texttt{INACTIVE} token is merged with a
-    matching \texttt{ACTIVE} token already in the plan. A token $a$ is said to
-    match another token $a?$ iff $a$ and $a?$ unify \cite{russelnorvig}
-    and the temporal constraints involving $a$ are satisfied by
-    $a?$. Thus, $a$ and $a?$ can be considered the same token
-    without the need to introduce $a$ in the plan. Consequently, the
-    domain rules associated with $a$ are not introduced into the
+    matching \texttt{ACTIVE} token already in the plan. A token $a$ is
+    said to match another token $a?$ iff $a$ and $a?$ unify
+    \cite{russelnorvig} and the temporal constraints involving $a$ are
+    satisfied by $a?$. Thus, $a$ and $a?$ can be considered the same
+    token without the need to introduce $a$ in the plan. Consequently,
+    the domain rules associated with $a$ are not introduced into the
     planning process, since they are already triggered when $a?$ was
-    introduced in the plan.
+    \kcomment{instantiated} in the plan.
 
-  \item[\textbf{Activation}:] A token $a$ is introduced in the
-    current plan associating it with the appropriate timeline, without
+  \item[\textbf{Activation}:] A token $a$ is introduced in the current
+    plan associating it with the appropriate timeline, without
     choosing a specific time slot; if its timing causes a problem a
     Threat flaw will be triggered (see below).  The domain rules
     associated with $a$ are applied and the subgoal activities
-    resulting from those domain rules are introduced as \texttt{INACTIVE}
-    tokens.  This results in a number of open condition flaws,
-    corresponding to the new subgoal activities.
+    resulting from those domain rules are introduced as
+    \texttt{INACTIVE} tokens.  This results in a number of open
+    condition flaws corresponding to the new subgoal activities.
 
   \item[\textbf{Rejection}:] Some goals may be optional; if so its
     corresponding flaw may be resolved by discarding the
@@ -695,21 +687,21 @@ that of binding variables as is common in Constraint Satisfaction
 Problems. This is advantageous when a solver applies heuristics for
 ordering choices since it provides a richer context in which to make
 decisions.  Furthermore, it aids in reducing the amount of work done
-by a solver so that only the necessary refinements are made leaving a
-partial plan with sufficient flexibility. For example, one can bypass
-committing unbound timepoint variables since threats will force a
-solver to impose ordering restrictions on these variables.  Thus the
-planning process may yield partially-ordered plans for which all
-possible extensions are provably valid.
+by a solver so that only the necessary refinements are made,
+\kcomment{ensuring} a partial plan with sufficient flexibility. For
+example, one can bypass committing unbound timepoint variables since
+threats will force a solver to impose ordering restrictions on these
+variables.  Thus the planning process may yield partially-ordered
+plans for which all possible extensions are provably valid.
 
-The Plan Space Planning algorithm described above can be implemented
-in multiple ways depending on the approach chosen for flaw and
-resolver selection and for backtracking. \eus built-in solver
-implements a chronological backtracking algorithm that is summarized
-in Algorithm \ref{alg:europa:solve}.
+The Plan Space Planning algorithm described can be implemented in
+multiple ways depending on the approach chosen for flaw and resolver
+selection and for backtracking. \eus built-in solver implements a
+chronological backtracking algorithm that is summarized in Algorithm
+\ref{alg:europa:solve}.
 
 
-\begin{algorithm}[H]
+\begin{algorithm}
 \KwIn{PartialPlan $plan$}
 \KwOut{\texttt{true} if a plan solution was found, \texttt{false} otherwise}
 \Begin{
@@ -765,7 +757,7 @@ algorithm is described as:
   new planning problem. If successful, then success.
 
 \item[Line \textbf{\ref{li:backtrack}}:] Otherwise, retract the last
-  refinement operation and move on to try the next one.
+  refinement operation and move on to try the next.
 
 \item[Line \textbf{\ref{li:noplan}}:] Arriving here implies all
   options to resolve the flaw have been exhausted, including the case
@@ -780,26 +772,36 @@ pruned unnecessarily.  Dead-ends in the search are discovered through
 constraint propagation, a vehicle for evaluating the consistency of a
 partial plan and also for filtering infeasible values from
 consideration prior to commitment. Consistency testing is initiated by
-the \texttt{isInconsistent} procedure.
-
-The algorithm permits a heuristically controlled search by
-applying orderings for \texttt{chooseFlaw} and
-\texttt{makeDecisionPoint} resulting in a chronologically-backtracked
-search. Heuristics can be implemented by applying ordering/filtering
-policies for \texttt{chooseFlaw} and \texttt{makeDecisionPoint}, for
-instance, by dealing with earliest flaws first, or by making planning
-decisions (open condition flaws) before scheduling decision (threats).
+the \texttt{isInconsistent} procedure.  The algorithm permits a
+heuristically controlled search by applying orderings for
+\texttt{chooseFlaw} and \texttt{makeDecisionPoint} resulting in a
+chronologically-backtracked search. Heuristics can be implemented by
+applying ordering/filtering policies for \texttt{chooseFlaw} and
+\texttt{makeDecisionPoint}, for instance, by dealing with earliest
+flaws first, or by making planning decisions (open condition flaws)
+before scheduling decision (threats).
 
 It should be emphasized that while this algorithm is commonly employed
-by applications that embed  \eu, it is only one of many that could be
-implemented. As a simple example, consider the following solver for
-the $N$-Queens problem, where an integer variable V$_i$ represents the
-queen in column $i$; V$_1$ $= 3$ implies that the variable on column
-$1$ is placed on row $3$.  Non-attack constraints are posted as
-arithmetic constraints among the V$_i$ variables to ensure that all
-the rows and diagonals contain only one queen. 
+by applications that embed \eue, it is only one of many that could be
+implemented. As an example, consider the solver in Algorithm
+\ref{algo:n-queens} for the $N$-Queens problem, where an integer
+variable V$_i$ represents the queen in column $i$; V$_1$ $= 3$ implies
+that the variable on column $1$ is placed on row $3$.  Non-attack
+constraints are posted as arithmetic constraints among the V$_i$
+variables to ensure that all the rows and diagonals contain only one
+queen. The \texttt{CRE} can be used to compute the non-attack
+constraint violations, with \texttt{ce.getViolations()} a call on the
+\eu API. The \texttt{CRE} can also be used to pick the queen that has
+the most violations in \texttt{getQueenWithMaxViolation()} and to look
+ahead and see what moves are possible for a queen that would remove
+its violations in \texttt{getMoves()}.
 
-\begin{algorithm}[H]
+In similar fashion, the constraint violation and flaw reporting
+mechanisms that \eu provides can be used as building blocks that
+specialized or general purpose search algorithms can use to construct
+plans.
+
+\begin{algorithm}
   \KwIn{ConstraintEngine $ce$}
   \KwIn{int $maxIter$}
   \Begin{
@@ -822,20 +824,9 @@ the rows and diagonals contain only one queen.
       $curIter$\texttt{++} \;
     }
   }
-  \caption{$solveNQueens(ce, maxIter)$}
+  \caption{$solveNQueens(ce, maxIter)$\kcomment{: An $N$-Queens solver}}
+  \label{algo:n-queens}
 \end{algorithm}
-
-\eus Constraint Reasoning Engine or \texttt{CRE} can be used to compute the
-non-attack constraint violations, with \texttt{ce.getViolations()} a
-call on the \eu API. The \texttt{CRE} can also be used to pick the queen 
-that has he most violations in \texttt{getQueenWithMaxViolation()}, and to
-look ahead and see what moves are possible for a queen that would remove its
-violations in \texttt{getMoves()}. 
-
-In similar fashion, the constraint violation and flaw reporting
-mechanisms that \eu provides can be used as building blocks that
-specialized or general purpose search algorithms can use to construct
-plans.
 
 
 %%% Local Variables: 
