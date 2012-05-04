@@ -38,7 +38,7 @@ fly, more imaginative methods of sample acquisition were targeted.
   are still problem specific and determined empirically.}
 
 Our early work focused on observing and sampling within Intermediate
-Nephaloid Layers (INLs) \footnote{INLs are fluid sheets of suspended
+Nephaloid Layers (INLs)\footnote{INLs are fluid sheets of suspended
   particulate matter that originate from the sea floor
   \cite{mcphee-shaw2006}.} \cite{ryan10}. The location and scale of
 INLs in the water column, which depend upon seasonal and episodic
@@ -60,10 +60,11 @@ instance altering the navigation, the other in actuating a sampler.
 \centering
 \includegraphics[scale=0.65]{figs/inl.jpg}
 \caption{\small An Intermediate Nepheloid Layer (INL) detected by an
-  AUV mission in the Monterey Bay in August 2005, showing the location
-  of the AUV transect in the bay (left) and optical backscatter image
-  at the 420 Nm frequency showing the INLs patchy nature
-  (right). \emph{Image courtesy: John Ryan, MBARI}}
+  AUV mission \kcomment{using a scripted mission plan} in the Monterey
+  Bay in August 2005. It shows the location of the AUV transect in the
+  bay (left) and optical backscatter image at the 420 Nm frequency
+  showing the INLs patchy nature (right). \emph{Image courtesy: John
+    Ryan, MBARI}}
 \label{fig:inl}
 \end{figure}
 
@@ -84,23 +85,23 @@ well-known unsupervised method in classification the \emph{Kohonen
 \emph{reactively} acquire samples with plan alteration. In doing so we
 couple the immediacy of feature identification which is necessarily
 reactive, with the deliberation of an onboard temporal planner to
-actually trigger a sampler. This has two benefits. First, it goes to
-the core of having a deliberative approach to mission planning by
-balancing the immediate with that which is projected. Doing so allows
+trigger a sampler. This has two benefits. First, it goes to the core
+of having a deliberative approach to mission planning by balancing the
+immediate with that which is projected \cite{olaya11}. Doing so allows
 a more systematic approach in dealing with spatial factors in sampling
 large volumes. Second, it allows other sampling parameters which are
 not directly impacted by perception to be brought to bear; in our
 case, scientists would like to introduce constraints (spatial
 separation, feature bias, distribution of samples when tracking
 multiple features). These are critical not only for science but for
-informed decision making which pure reactive approaches simply cannot
-undertake.
+informed decision making which \kcomment{is challenging} for pure
+reactive approaches.
 
 While the early experiments in \cite{fox2007} coupled the classifier
 with the onboard planner, two further novel extensions to sampling
 were added. First, to enhance the classifier model by adding a
 temporal dimension with a Hidden Markov Model (HMM) \cite{rabiner86,
-  Rabiner89atutorial}.  An HMM is a sequential state transition model
+  Rabiner89atutorial}.  A HMM is a sequential state transition model
 in which the current state is not directly visible, but an
 observation, dependent on the state, is.  Each state has a probability
 distribution over the possible observations.  Therefore the sequence
@@ -114,18 +115,18 @@ filter on top of the clustering model \kcomment{from \cite{fox2007},}
 since it is not only derived from it, but it informs the planner of a
 potential trigger state only when the models' transition occurs to an
 appropriate state of recognition of the INL feature
-\cite{mcgann08b}. Not only was deliberation aided by direct perception
-of the state (of the INL) but temporal transition functions added a
+\cite{mcgann08b}. Not only is deliberation aided by direct perception
+of the state (of the INL) but temporal transition functions add a
 further level of validation between expected states in the INL
 model. This coupling of Machine Learned model with a deliberative
-planner is novel in the ocean sciences and is a continuing direction
-of investigation \cite{kumar11}.
+planner is novel in the ocean sciences and is a continuing target of
+investigation \cite{kumar11}.
 
 The second innovation involved dynamic resource allocation associated
 with the water samplers \cite{olaya11}. Using a priori sample
 utilities coupled with temporal and spatial information maintained by
 the deliberating planner in-situ, the algorithm dynamically generates
-a policy on sample acquisition during the course of the mission. In so
+a policy on sample acquisition during the course of a mission. In so
 doing, utility functions can be used to balance sparcity or abundance
 of the feature encountered with the availability of samplers
 dynamically. Coupled with periodic sub-sampled science data returned
@@ -158,15 +159,16 @@ temperature threshold ($t^{\circ}$) at a given depth ($d$). This goal is
 then appropriately packaged and sent to the AUV via satellite.
 
 \emph{Search}: After the mapping phase and on receipt of this message
-on the vehicle T-REX evaluates the goal, automatically synthesizes a
-set of waypoints by generating a plan and then dispatches the plan to
+on the vehicle \rx evaluates the goal, automatically synthesizes a set
+of waypoints by generating a plan and then dispatches the plan to
 execute by having the vehicle swim back and forth at depth $d$ all the
 while reactively evaluating when a temperature threshold $t^{\circ}$
 is crossed. In the process \rx checks both the depth and temperature
 sensed by the AUV; when the depth is around $d$ ($\pm 1$ meter to
 account for vehicle control uncertainty), it then compares the
-temperature read with $t^{\circ}$. When the comparison value changes \rx
-assumes that the front is identified and switches into the next phase.
+temperature read with $t^{\circ}$. When the comparison value changes
+\rx assumes that the front is identified and switches into the next
+phase.
 
 \emph{Sampling}: The vehicle undertakes a small transect around the
 identified front location while actuating water samplers, one at the
@@ -181,37 +183,39 @@ indicative of the frontal zone having left the survey domain.
 The novelty in this application was two-fold; in enabling the
 deliberation to decide when to trigger the phase changes and in
 showing viably how a human being coupled with a goal-oriented
-controller could do problem solving jointly. The approach, is general
-and can be adapted to any feature or scalar field.
+controller could \kcomment{enable joint} problem solving. The
+approach, is general and can be adapted to any feature or scalar
+field.
 
 \paragraph {Lagrangian Surveys:} More recent experiments with \rx
 controlling the Dorado AUV have centered on the \can (Controlled,
-Agile, and Novel Observing Network) program at MBARI. The fundamental
-science goals of the program are related to detecting and tracking of
-spatio-temporal coastal ocean features \cite{canon}. The dynamic
+Agile, and Novel Observing Network) program at MBARI \cite{canon}. The
+fundamental science goals of the program are related to detecting and
+tracking of spatio-temporal coastal ocean features. The dynamic
 features require a robotic platform to move with it, return water
 samples from across and within gradients and provide contextual
 observations to other drifting instruments. All of these observational
 strategies are tied to vehicle adaptation which is intrinsically tied
-to deliberation and difficult to accomplish otherwise.
+to deliberation and challenging to accomplish otherwise.
 
-Various adaptation methodologies in \can are still being
-investigated; however what has become a critical goal for the program
-has been to provide contextual environmental information about water
-patches. The form and content of such 'patches' varies; for instance
-initial attempts focused on Harmful Algal Blooms (HABs). They have
-large spatial ($>$ 50 km$^2$) and temporal (days to weeks) extent and
-are visible from space with visible coloring on the ocean surface. The
-direct impact of HABs is the introduction of toxins into the marine
-(and as a consequence human) food chain. In addition,
-\cite{anderson00} and \cite{hoagland06} estimate that the average
-economic impact resulting from HABs in the United States has been
+Various adaptation methodologies in \can are still being investigated;
+however what has become a critical goal for the program has been to
+provide contextual environmental information about water patches. The
+form and content of such 'patches' varies; for instance initial
+attempts focused on Harmful Algal Blooms (HABs). They have large
+spatial ($>$ 50 km$^2$) and temporal (days to weeks) extent and are
+visible from space with visible coloring on the ocean
+surface. \kcomment{The societal impact of HABs has been} in the
+introduction of toxins into the marine (and as a consequence human)
+food web, with \cite{anderson00} and \cite{hoagland06} estimating the
+consequent average economic impact in the United States to the tune of
 $\sim$\$75 million from 1987 to 2000. However, the processes behind
-bloom initiation, evolution and collapse is poorly understood in part
-due to the complex interactions between microbial communities and the
-surrounding environment. As a result, our capacity to assess the range
-of potential future scenarios that might result from ocean temperature
-changes, acidification, or nutrient shifts is highly limited.
+bloom initiation, evolution and collapse \kcomment{are} poorly
+understood in part due to the complex interactions between microbial
+communities and the surrounding environment. As a result, our capacity
+to assess the range of potential future scenarios that might result
+from ocean temperature changes, acidification, or nutrient shifts is
+highly limited.
 
 \begin{figure}[t]
 \centering
@@ -227,10 +231,11 @@ changes, acidification, or nutrient shifts is highly limited.
 To augment our understanding of such microbial communities, the Dorado
 with \rx has been utilized in a range of activities in a
 quasi-lagrangian mode. As the water mass is being tracked with a
-drifting instrument, the vehicle is expected to move around it. While
-our model \kcomment{supports} multiples patterns (square, lawn-mower,
-transect(s)\dots) with any possible dimension factor, the majority of
-at-sea deployments have used a square pattern ($3X3$
+drifting instrument, the vehicle is expected to move around it
+\kcomment{gathering data to provide environmental context}. While our
+model \kcomment{supports} multiple patterns of observation (square,
+lawn-mower, transect(s)\dots) with any possible dimension factor, the
+majority of at-sea deployments have used a square pattern ($3X3$
 km\textsuperscript{2} or a $1X1$ km\textsuperscript{2})\footnote{Often
   post-hoc reconstruction of the data set for visualization drives how
   much adaptation the vehicle can be allowed to undertake.}. Plan
@@ -240,7 +245,7 @@ point generated by a drifter. \kcomment{A drifter tracking application
   Support System (\ode; see below) \cite{das11}, to process the
   drifter location from its onboard GPS and used as a target for the
   Dorado vehicle to provide a configurable and dynamic track-line
-  enclosure to provide oceanographic context to the drifting body.}
+  enclosure to provide context to the drifting body.}
 Fig. \ref{fig:dta-setup} shows the general setup of our experiments
 which can be tailored with the use of various computational methods
 within the \texttt{DTA} app. GPS data from the free-floating drifter
@@ -248,12 +253,13 @@ is sent via satellite and processed onshore to determine a projection
 (speed and bearing) of the drifter. This data is sent to the AUV; at
 the completion of the current survey, the vehicle receives this data
 as a high-level goal which is decomposed and synthesized as a survey
-plan. Currently, the vehicle completes the survey without any further
-dynamic updates from the drifter. In order to minimize the range of
-errors that the survey needs to encapsulate (data latency or surface
-or sub-surface currents for those drifters which have a drogue) the
-estimation is a projection in time and space of the drifters centroid
-sent with this goal from the shore-side app.
+plan \kcomment{and subsequently executed}. Currently, the vehicle
+completes the survey without any further dynamic updates from the
+drifter. In order to minimize the range of errors that the survey
+needs to encapsulate (data latency or surface or sub-surface currents
+for those drifters which have a drogue) the estimation is a projection
+in time and space of the drifters centroid sent with this goal from
+the shore-side app.
 
 \begin{figure}[htpb]
 \centering
@@ -268,18 +274,18 @@ Typically this has meant that the vehicle computes a set of waypoints
 for the survey plan, moves to the start waypoint and then executes the
 survey even as the centroid is moving. Positional error of the vehicle
 and uncertainty in the speed and bearing of the vehicle\footnote{In
-  our September 2010 experiment as the drifter moved over the Davidson
-  Seamount \cite{clague10} deviation in the California current
-  resulted in visible directional change that can be seen in
-  Fig. \ref{fig:sep10-transects} at the end of the mission.} exist;
-however, the observations of the survey to retain the environmental
-context require a change in reference frames so that the patch-center
-tagged by a GPS-tracked drifter remains within the survey perimeter at
-all times \cite{das11b}.
+  our September 2010 experiment \cite{das11b} as the drifter moved
+  over the Davidson Seamount \cite{clague10} deviation in the
+  California current, resulted in visible directional change that can
+  be seen in Fig. \ref{fig:sep10-transects} near the end of the
+  mission.} exist; moreover, the observations of the survey to retain
+the environmental context require a change in reference frames so that
+the patch-center tagged by a GPS-tracked drifter remains within the
+survey perimeter at all times \cite{das11b}.
 
 \begin{figure*}
 \centering
-\subfloat[]{\label{fig:sep10-ship}\includegraphics[width=0.4\textwidth]{figs/sep10-canon-cruise.png}}
+\subfloat[]{\label{fig:sep10-ship}\includegraphics[width=0.44\textwidth]{figs/sep10-canon-cruise.png}}
 \subfloat[]{\label{fig:sep10-transects}\includegraphics[width=0.40\textwidth]{figs/september-iterations.pdf}}
   \caption{\small{The offshore \can ESP-drifter following cruise
       \cite{das11b}. Fig. \ref{fig:sep10-ship} shows the ESP drifter
@@ -290,7 +296,7 @@ all times \cite{das11b}.
 \label{fig:gulper}
 \end{figure*}
 
-These theoretic\kcomment{al} results were validated in a five-day long
+These theoretic\kcomment{al} results were validated in a five-day
 off-shore deployment carried out in September $2010$, $160$ kms off
 the California coast (Fig.~\ref{fig:sep10-ship}). A specialized
 drifter with a genomic sensor \cite{scholin09} hanging $20$ m below,
@@ -311,14 +317,14 @@ link which was transmitted to the vehicle for in-situ adaptation. \rx
 used this input to compute the $5$ waypoints necessary for an
 iteration of the box pattern, with the AUV traveling at constant
 velocity in the earth frame. Waypoints were computed once at the
-beginning of the survey with the AUV surfacing once for every survey,
-with each survey lasting $\sim1$ to $1.5$ hours. A total of 60 surveys
-were attempted over the course of the $5$
+beginning of the survey with the AUV surfacing once \kcomment{within
+  each} survey, with each survey lasting $\sim1$ to $1.5$ hours. A
+total of $60$ surveys were attempted over the course of $5$
 days. Fig. \ref{fig:sep10-transects} shows the overall transects over
 the course of the mission, with gaps in between days when the AUV was
-being recharged. Each deployment lasted $\sim12$ hours. The black dots
-in the figure show the beginning of each iteration when drifter
-updates were received by the AUV.
+being recharged on deck. Each deployment lasted $\sim12$ hours. The
+black dots in the figure show the beginning of each iteration when
+drifter updates were received by the AUV.
 
 
 \begin{figure}[t]
@@ -343,7 +349,7 @@ series of \can field experiments. The slower vehicle with a
 fluorometer tracked a targeted chlorophyll patch seeded by a
 GPS-enabled drifter, sending periodic updates of the patch centroid to
 shore via the \od following a setup similar to
-Fig.\ref{fig:dta-setup}, to the Dorado running \rxe.
+Fig. \ref{fig:dta-setup}, to the Dorado running \rxe.
 
 \begin{figure*}
 \centering 
@@ -362,15 +368,15 @@ Fig.\ref{fig:dta-setup}, to the Dorado running \rxe.
 More interesting experiments are being carried out as a basis to track
 more dynamic features such as ocean fronts \cite{fronts11} and
 tracking more capable drifting platforms. In particular experiments
-with a profiling CTD instrument, the \texttt{Wirewalker}
-\cite{rainville01,pinkel11} are resulting in new modalities of making
-Lagrangian and Eulerian observations. Fig. \ref{fig:sept11-wirewalker}
-shows one such experiment in September 2011 with a GPS-enabled
-\texttt{Wirewalker} was tracked by the Dorado running \rxe. We are
-currently investigating spatio-temporal correlations \cite{gneiting07}
-of CTD data obtained by the \texttt{Wirewalker} and tying it to the
-observations made in the contextual environment by the Dorado's
-sensors.
+with a profiling CTD (Conductivity, Temperature, Depth) instrument,
+the \texttt{Wirewalker} \cite{pinkel11} are resulting in new
+modalities of making Lagrangian and Eulerian
+observations. Fig. \ref{fig:sept11-wirewalker} shows one such
+experiment in September 2011 with a GPS-enabled \texttt{Wirewalker}
+was tracked by the Dorado running \rxe. We are currently investigating
+spatio-temporal correlations \cite{gneiting07} of CTD data obtained by
+the \texttt{Wirewalker} and tying it to the observations made in the
+contextual environment by Dorado's sensors \cite{graham12}.
 
 \paragraph {Mixed-Initiative Autonomy}
 
@@ -391,33 +397,33 @@ sensors.
 Large scale oceanographic field experiments akin to those targeted by
 \can are usually logistically constrained driven largely by ship
 schedules.  Once a feature set has been identified for scientific
-observation and science goals have been collated, the appropriate
-robotic assets need to be assigned and deployed for observation and
+observation and science goals have been collated, appropriate robotic
+assets need to be assigned and deployed for observation and
 sampling. This asset allocation in turn depends on parameters like
 sensor payload, the speed of the robot \situ in comparison to the
 spatio-temporal scales of the evolution of the phenomena being
 sampled, the number of assets in a class, the kinds of measurements
 needed (e.g synoptic or close-up), logistical considerations for
 deployments such as battery charge needed or distance/time to deploy,
-impact to long-range deployment plans among others. All drive the
+impact to long-range deployment plans, among others. All drive the
 strategy to balance short and long-term scientific and engineering
-needs. Our \can deliberations during the 2010 field season for example,
-were driven by all of the above \cite{das11}. Often these strategies
-were rebalanced during each decision-making cycle, especially in light
-of opportunistic science goals. For example, gliders running at $0.5$
-knots were often retargeted when surface support vessels noted the
-apparent dispersal of the bloom to subsurface layers when HABs were a
-\can target. However, their retargeting was carefully
-monitored to balance the long-term desire of obtaining time series
-within fixed tracks and with the need to ensure these assets were not
-exposed to strong currents. Powered AUVs were targeted to chase after
-advecting blooms, but the decision on their deployment locations and
-survey areas too close to the surf-zone were avoided. In
-patch-tracking experiments, the deployment of drifters close to shore
-and where depths of $20m$ or less were encountered, was avoided even
-when contrary to scientific intent. The need to obtain high-quality
-data for post-hoc analysis was also driven by the response time of
-data returned by experiment partners.
+needs. Our \can deliberations during the 2010 field season for
+example, were driven by all of the above \kcomment{factors}
+\cite{das11}. Often these strategies were rebalanced during each
+decision-making cycle, especially in light of opportunistic science
+goals. For example, gliders running at $0.5$ knots were often
+retargeted when surface support vessels noted the apparent dispersal
+of a bloom to subsurface layers when HABs were a \can target. However,
+their retargeting was carefully monitored to balance the long-term
+desire of obtaining time series within fixed tracks and with the need
+to ensure these assets were not exposed to strong currents. Powered
+AUVs were targeted after advecting blooms, but the decision on their
+deployment locations and survey areas too close to the surf-zone were
+avoided. In patch-tracking experiments, the deployment of drifters
+close to shore and where depths of $20m$ or less were encountered, was
+avoided even when contrary to scientific intent. The need to obtain
+high-quality data for post-hoc analysis was also driven by the
+response time of data returned by experiment partners.
 
 \begin{figure*}
 \centering
@@ -452,48 +458,49 @@ solving and inference between human and computational approaches. A
 viable example was shown in the command and control of the twin Mars
 rovers in \cite{aichang04,bresina05,bresina05a}\footnote{The MAPGEN
   system uses the same \eu planner used in \rxe. It continues to be
-  used routinely to this day on the MER mission.}.
+  used routinely to this day on mission-critical uplink process for
+  the MER mission.}.
 
 Additionally, our work on \od is driven by a vision of how marine
 field robotics will likely be conducted in the future and the
 necessary computational infrastructure that will augment decision
 making, onshore as well as on-board. We believe ultimately \od will
-combine capabilities inferential and data gathering and analysis
+combine inferential, data gathering, archiving and analysis
 capabilities and more uniquely, provide an event response capability
 that could trigger the deployment of a robot and/or adapt its sampling
 strategy, all from a scientist's desktop on shore. Data returned from
 robotic assets at sea will be filtered for signals associated with
 feature(s) of interest along with information on its contextual
 environment. The association between the signal and a prospective
-event will be undertaken through tagging by experts and machine
-learning techniques used in recommender systems
+event will be undertaken through tagging by experts and Machine
+Learning techniques used in recommender systems
 \cite{Adomavicius05}. Adaptive sampling strategies will then balance
-decision-making \situ with that done onshore with computational models
-and human agents, the subject of a new NSF project in which the
+decision-making \situ with \kcomment{those} onshore with computational
+models and human agents, the subject of a new NSF project in which the
 authors are participating.
 
 
-Operationally, the \od has become a software system that the
-scientist consults during a \can field campaign. S/he consults
-up-to-date model outputs, synoptic views of ocean color from remote
-sensing data and weather conditions for the next $24$-hour planning
-cycle and then queries the system to compute candidate sampling
-locations. In the near future, the \od will consult its situational
-awareness database, incorporate model outputs projecting these outputs
-into the space-time region of interest to generate candidate
-hypotheses with associated utility metrics. With the scientist's
-guidance the automated planner would then determine the most viable
-robotic option(s) to be dispatched (underwater, surface or aerial),
-given available resources, distance of travel, required payload and
-the environment. For instance, unpowered autonomous gliders would be
-chosen for longer-duration missions with smaller payload requirements
-in areas of moderate to weak ocean currents. The automated planner
-would balance these criteria to compute a viable trajectory plan for
-the selected vehicle. Vehicles with more controllability would be
-given a specified area to survey and the path generated \situ. Goals
-are communicated to the robot after analysis on shore for selective
-targeting of features by the conglomerate of vehicles in the ocean
-being tracked by the \od. Thus far, the \od has provided a simple
+Operationally, the \od has become a software system that the scientist
+consults during a \can field campaign. S/he consults up-to-date model
+outputs, synoptic views of ocean color from remote sensing data and
+weather conditions for the next $24$-hour planning cycle and then
+queries the system to compute candidate sampling locations. In the
+near future, the \od will consult its situational awareness database,
+incorporate model outputs projecting these outputs into the space-time
+region of interest to generate candidate hypotheses with associated
+utility metrics. With the scientist's guidance the automated planner
+would then determine the most viable robotic option(s) to be
+dispatched (underwater, surface or aerial), given available resources,
+distance of travel, required payload and the environment. For
+instance, gliders could be chosen for longer-duration missions with
+smaller payload requirements in areas of moderate to weak ocean
+currents. The automated planner would balance these criteria to
+compute a viable trajectory plan for the selected vehicle. Vehicles
+with more controllability would be given a specified area to survey
+and the path generated \situ. Goals are communicated to the robot
+after analysis on shore for selective targeting of features by the
+conglomerate of vehicles in the ocean \kcomment{that are} being
+tracked by the \od. \kcomment{To date}, the \od has provided a simple
 yet functional tool for scientists to use in the daily complex
 decision making and the following experiment and survey design
 needs. It has helped train scientists to think of expanding their
