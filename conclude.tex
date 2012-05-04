@@ -4,21 +4,22 @@
 % Final parting words summarizing the contribution of deliberation towards
 % vehicle autonomy.
 
-The Ocean Sciences are at a cusp, straddling between traditional
-ship-based exploration with newer observatory-based methods. In the
-United States the NSF funded Ocean Observatories Initiative \cite{ooi}
-and regional bodies such as \texttt{CeNCOOS} \cite{cencoos} are
-investing in new observational methods and technologies which propose
-to aid oceanographers by producing substantially higher-resolution
-data. These will use moorings, cabled observatories and glider fleets
-generating near real-time data from one or more locations as a
+The Ocean Sciences are at a cusp, straddling traditional ship-based
+exploration with newer observatory-based methods. In the United States
+the NSF funded Ocean Observatories Initiative \cite{ooi} and regional
+bodies such as \texttt{CeNCOOS} \cite{cencoos} are investing in new
+observational methods and technologies which \kcomment{aim} to aid
+oceanographers by producing substantially higher-resolution data
+products. These will use moorings, cabled observatories and glider
+fleets generating near real-time data from one or more locations as a
 continuous stream. The tack chosen by \can has been to complement such
 methods with the aim of developing methods for a \emph{portable
   mobile} observatory which is dependent on autonomous platforms. In
 this context what we advocate in this chapter is an initial step in
 making robotic platforms more adaptive, scaling them towards fleets of
-vehicles (underwater or on the surface) and most importantly using
-them to solve the larger challenge of Sampling spatio-temporal fields.
+vehicles (underwater \kcomment{and/}or on the surface) and most
+importantly using them to solve the larger challenge of sampling
+\kcomment{dynamic} spatio-temporal fields.
 
 While our trajectory of research in the oceanographic domain follows
 that in spacecraft autonomy, from onboard \cite{mus98} to
@@ -27,42 +28,47 @@ significantly different with the environment playing a far larger
 role. Moreover, prediction and projection of a future course of action
 for a robot given the level of uncertainty calls for representational
 and architectural methods which would enable adaptation at different
-levels of abstraction, from mission-planning to low level actuation. 
+levels of abstraction, from mission-planning to low level actuation
+\kcomment{and control}.
 
 Our efforts were initially targeted to full robotic autonomy; while
 this is an important goal that we continue to strive towards, it is
 increasingly clear that human-in-the-loop methods also have a sizable
-role to play in ocean exploration and by extension to Marine
-Robotics. Not only is an embedded \rx an important element of the
-effort towards smarter vehicles, but we are working towards an
-implementation of \rx which will perform multi-vehicle plan synthesis
-for the \od.
+role to play in ocean exploration and by extension to \kcomment{the
+  field of} Marine Robotics. Not only is an embedded
+\kcomment{deliberative agent} an important element of the effort
+towards smarter vehicles, but we are working towards an implementation
+of \rx which will perform multi-vehicle plan synthesis for the \ode.
 
-A key role that \rx has played and will continue to play is towards
+A key role that \rx has played and will continue to play, is towards
 \emph{event response} scenarios. In Section \ref{sec:results} we show
-the role Machine Learning (ML) techniques have played thus far in
-in-situ plan adaptation. This interaction between Planning and ML we
-believe will play a significant role going forward in the general
-theme of exploration and discovery. Interpretation of incoming sensor
-data to deal with scientific surprise and readapt for opportunistic
-science will be critical to dealing with persistent problem of
-undersampling the ocean\footnote{Walter Munk of the Scripps Institute
-  of Oceanography has famously stated \emph{``Most of the previous
-    century could be called a “century of undersampling”''} --
-  Testimony to the U.S. Commission On Ocean Policy, 18 April
-  2002}. Much of what we know of the ocean was derived by exploring in
-the blind. We anticipate longer duration robotic vehicles with enough
-onboard computational capacity to run deliberative agents such as \rx
-make water-column measurements and reliably track and characterize
-dynamic features. While our experiments have already shown such
-capabilities the exploration Vs. exploitation tradeoff is better
+the role Machine Learning techniques have played thus far in in-situ
+plan adaptation. This interaction between Planning and Machine
+Learning, we believe, will play a significant role going forward in
+exploration and discovery. Interpretation of incoming sensor data to
+deal with scientific surprise and \kcomment{re-adaptation} for
+opportunistic science will be critical to dealing with the persistent
+problem of undersampling the ocean\footnote{Walter Munk of the Scripps
+  Institute of Oceanography has famously stated \emph{``Most of the
+    previous century could be called a “century of undersampling”''}
+  -- Testimony to the U.S. Commission On Ocean Policy, 18 April
+  2002}. 
+
+Much of what we know of the ocean was derived by exploring in the
+blind. In the near future, we anticipate longer duration robotic
+vehicles with enough onboard computational capacity to run
+deliberative agents such as \rxe, make water-column measurements and
+reliably track and characterize dynamic features. While our
+\kcomment{own} experiments have already demonstrated such
+capabilities, the exploration Vs. exploitation tradeoff is better
 determined when vehicles can make choices over longer time periods
 (weeks and months) to study the impacts of bio-geochemical interaction
-driven by longer duration physical forcing.
+driven by longer duration physical forcing \kcomment{and climate
+  change}.
 
 Given our poor understanding of the coastal ocean in particular,
 mixed-initiative methods of command and control for Sampling with
 heterogenous assets is an important goal that is clearly at our
-doorstep. We believe deliberation is but a small yet critical part of
+doorstep. We believe deliberation is, but a small yet critical part of
 the solution to unfolding open research problems for AI and Marine
 Robotics.
