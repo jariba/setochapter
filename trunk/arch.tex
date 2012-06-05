@@ -133,7 +133,7 @@ dependency graph implemented as a directed acyclic graph.
 
 \begin{figure}[b]
   \centering
-  \includegraphics[scale=0.45]{figs/token-disptch.pdf}
+  \includegraphics[scale=2.5]{figs/token-disptch.jpeg}
   \caption{\small \kcomment{Dispatching a token occurs only when the
       request start time overlaps a window. \texttt{Goal$_1$}
       therefore gets dispatched from \texttt{Reactor$_1$} to
@@ -255,7 +255,7 @@ from its current set of objectives.
     control loops (rounded boxes) which are connected through state
     variables provided by one reactor ({\color{blue}blue} solid line)
     with multiple possible clients ({\color{green}green} dashed
-    lines).]{\includegraphics[scale=0.45]{figs/AUV-agent.pdf}
+    lines).]{\includegraphics[scale=2.65]{figs/AUV-agent.jpeg}
   \label{fig:agent}
   }
   \qquad
@@ -264,7 +264,7 @@ from its current set of objectives.
   transit as a bottom-up flow and apply to the execution frontier
   $\tau$.  Goal information flow from the top to the bottom and
   relates to desired future values of state variables.]{
-    \includegraphics[width=0.4\columnwidth]{figs/TREX_flow}
+    \includegraphics[width=0.4\columnwidth]{figs/TREX_flow.jpeg}
     \label{fig:trex:flow}
   }
 \caption{\small \rx reactors and shared state variables.}
@@ -405,11 +405,11 @@ goal into a command for execution in hardware.
   \centering
   \vskip-1pc
   \subfloat[\small \kcomment{A view of synchronization and deliberation within a
-  tick cycle.}]{\label{fig:sync-cycle}\includegraphics[width=0.35\columnwidth]{figs/sync-tick-cycle}} 
+  tick cycle.}]{\label{fig:sync-cycle}\includegraphics[width=0.35\columnwidth]{figs/sync-tick-cycle.jpeg}} 
   \qquad
   \subfloat[\small A \rx reactor's execution cycle: {\em Deliberation} is
     interrupted by {\em synchronization} at the beginning of every
-    {\em tick} allowing integration of state information.]{\label{fig:tick-exec}\includegraphics[width=0.45\columnwidth]{figs/tick-cycle}}
+    {\em tick} allowing integration of state information.]{\label{fig:tick-exec}\includegraphics[width=0.45\columnwidth]{figs/tick-cycle.jpeg}}
     \caption{\small \kcomment{Detailed and abstracted views of
         synchronization and deliberation within one and multiple tick
         cycles.}}
@@ -461,13 +461,13 @@ ignored until newer goals are received.
   \centering \subfloat[\small When the \texttt{Sampling} reactor fails
   to synchronize, it is removed from the reactor dependency graph
   along with all its {\em internal} timelines while generating a
-  \texttt{Failed} observation.]{\includegraphics[width=0.35\columnwidth]{figs/AUV-fail0.pdf}
+  \texttt{Failed} observation.]{\includegraphics[width=0.35\columnwidth]{figs/AUV-fail0.jpeg}
   \label{fig:fail0}}
   \qquad
   \subfloat[\small In the worst case this \texttt{Failed} observation may imply
   other reactors that depend on the \texttt{Sampling} reactor might fail to
   synchronize too leading to a bottom-up destruction of ``faulty'' reactors.]{
-    \includegraphics[width=0.35\columnwidth]{figs/AUV-fail1}\label{fig:fail1}}
+    \includegraphics[width=0.35\columnwidth]{figs/AUV-fail1.jpeg}\label{fig:fail1}}
   \caption{\small Impact of the \texttt{Sampling} reactor failure in
     the AUV agent \kcomment{from} Fig. \ref{fig:agent}.}
 \end{figure}
@@ -700,7 +700,7 @@ flaw can be defined as:
 
 \begin{figure}[!htbp]
   \centering
-  \includegraphics[width=0.5\columnwidth]{figs/synch-relation}
+  \includegraphics[width=0.5\columnwidth]{figs/synch-relation.jpeg}
   \caption{\small Illustration of synchronization flaws in a
     reactor. The reactor receives new observations when they are
     produced by the owner(s) of its internal timelines. The open
@@ -814,9 +814,9 @@ timeline does not depend on the future or more accurately that any
 choice made during this {\em synchronization} will not lead to a
 future inconsistency.  Such an assumption impacts the set of possible
 domains the reactor can support while remaining
-\kcomment{algorithmically} complete. Take for example this rule from
-our \texttt{Shopping} model:
+\kcomment{algorithmically} complete. 
 
+\begin{figure}[h!]
 \begin{verbatim}
  1 Agent::Go {
  2   met_by(condition object.location.At origin);
@@ -830,19 +830,25 @@ our \texttt{Shopping} model:
 10   eq(to, destination.loc);
 11 }
 \end{verbatim}
+\label{fig:nddl-sync}
+\caption{\small \nd rule from the Shopping Agent example with impact
+  on a future state.}
+\end{figure}
 
-While this model is perfectly acceptable for planning it becomes
-problematic when execution is taken into account especially since it
-puts a strong emphasis between an evolving plan and an unknown future;
-\texttt{Going} to a location and the {\em expected} future outcome of
-ending at this location, ties it strongly to the constraint in line
-$5$ above. For instance, assume that the \texttt{Agent.location} is
-{\em external} to the reactor which receives the observation
-\texttt{Going(Home,SuperMarket)} which synchronization has resolved by
-producing the observation \texttt{Go(Home, SuperMarket)} in the
-\texttt{Agent} timeline. This would imply that the only possible
-outcome on the \texttt{Agent.location} timeline, is to be
-\texttt{At(SuperMarket)} in the directly foreseeable future. 
+Take for example this rule from our \texttt{Shopping} model in
+Fig. \ref{fig:nddl-sync}. While this model is perfectly acceptable for
+planning it becomes problematic when execution is taken into account
+especially since it puts a strong emphasis between an evolving plan
+and an unknown future; \texttt{Going} to a location and the {\em
+  expected} future outcome of ending at this location, ties it
+strongly to the constraint in line $5$ above. For instance, assume
+that the \texttt{Agent.location} is {\em external} to the reactor
+which receives the observation \texttt{Going(Home,SuperMarket)} which
+synchronization has resolved by producing the observation
+\texttt{Go(Home, SuperMarket)} in the \texttt{Agent} timeline. This
+would imply that the only possible outcome on the
+\texttt{Agent.location} timeline, is to be \texttt{At(SuperMarket)} in
+the directly foreseeable future.
 
 In the real world the fact that the robot is \texttt{Going} to a
 certain location does not necessarily imply that it will succeed in
@@ -876,8 +882,7 @@ of relaxation will therefore allow the agent to use multiple
 \texttt{Going} tokens should the first token fail to reach the
 objective, as shown below:
 
-% \begin{minipage}[t]{\textwidth}
-% \begin{figure}
+\begin{figure}[tbp]
 \begin{verbatim}
  1 Agent::Go {
  2   met_by(condition object.location.At origin);
@@ -892,18 +897,17 @@ objective, as shown below:
 11   going meets destination;
 12 }
 \end{verbatim}
-% \label{lab:model:shopping}
-% \caption{\small Model fragment to enforce a \texttt{Going} end condition}
-% \end{figure}
-% \end{minipage}
+\caption{\small Model fragment to enforce a \texttt{Going} end condition}
+\label{lab:model:shopping}
+\end{figure}
 
-As the example above shows, synchronization involves a deliberation
-process. The risk is such that the search for a solution is not a
-simple sequence of decisions where the resolution can be easily
-identified by the solver as any other option would lead immediately to
-plan inconsistency. Since such a process is required by the \rx at
-\emph{every} tick for \emph{every} reactor the model needs to be
-designed carefully.
+As the example in Fig. \ref{lab:model:shopping} shows, synchronization
+involves a deliberation process. The risk is such that the search for
+a solution is not a simple sequence of decisions where the resolution
+can be easily identified by the solver as any other option would lead
+immediately to plan inconsistency. Since such a process is required by
+the \rx at \emph{every} tick for \emph{every} reactor the model needs
+to be designed carefully.
 
 Synchronization is the only critical task of a reactor. Such a process
 is used in order for the agent to identify its current state and
@@ -1005,7 +1009,7 @@ drastic. \kcomment{A possible list of alterations of the plan directly
 
 \begin{figure}[!htbp]
   \centering
-  \includegraphics[width=0.65\columnwidth]{figs/plan_window}
+  \includegraphics[width=0.65\columnwidth]{figs/plan_window.jpeg}
   \caption{\small The planning window of the deliberation solver and
     its relation to the {\em dispatch window}. The dark grey tokens
     with dashed borders are excluded from deliberation as they do not
@@ -1030,15 +1034,14 @@ into the future.  The planning window refines this filtering further,
 as tokens can be excluded dynamically from deliberation as their
 insertion in the plan and scheduling with other generated tokens can
 alter their temporal scope to be outside of the planning window.  This
-allows the planner to focus on its planning horizon and report
-decisions on flaws that are beyond this scope \comment{::is this last
-  sentence correct?}. As time advances, these potential future flaws
-will eventually be part of the planning window of the reactor and will
-be then resolved along with potentially new goals.  This in turn,
-results in an apparent \emph{continuous planning}
-\kcomment{\cite{myers99}} of the reactor. When there are no more flaws
-present in the current planning scope a partial plan solution is
-found. This has two effects:
+allows the planner to focus on its planning horizon and not report
+decisions on flaws that are beyond this scope. As time advances, these
+potential future flaws will eventually be part of the planning window
+of the reactor and will be then resolved along with potentially new
+goals.  This in turn, results in an apparent \emph{continuous
+  planning} \kcomment{\cite{myers99}} of the reactor. When there are
+no more flaws present in the current planning scope a partial plan
+solution is found. This has two effects:
 
 \begin{enumerate}
 
@@ -1104,10 +1107,10 @@ managing this state variable internally.
 \begin{figure}[!b]
   \centering
   \subfloat[\small A plan produced before
-  synchronization.]{\label{fig:shop:exec0}\includegraphics[width=0.7\columnwidth]{figs/shoping_exec_t0}} \\
+  synchronization.]{\label{fig:shop:exec0}\includegraphics[width=0.7\columnwidth]{figs/shoping_exec_t0.jpeg}} \\
   \subfloat[\small Result of synchronization after the {\em Going}
   observation was received by the reactor with the plan showed in
-    Fig. \ref{fig:shop:exec0}.]{\label{fig:shop:exec1}\includegraphics[width=.7\columnwidth]{figs/shoping_exec_t1}}
+    Fig. \ref{fig:shop:exec0}.]{\label{fig:shop:exec1}\includegraphics[width=.7\columnwidth]{figs/shoping_exec_t1.jpeg}}
     \caption{\small The Shopping example: Tokens in {\color{red}red}
       indicate observations, tokens in {\color{blue}blue} the goal
       that this plan attempts to solve for \kcomment{and tokens in
@@ -1220,8 +1223,8 @@ goals.
 
 \begin{figure}[!b]
   \centering
-  \subfloat[\small Conflicting Observation.]{\label{fig:shop:relax1}\includegraphics[width=0.7\columnwidth]{figs/shoping_exec_relax-1}}\\
-  \subfloat[\small Relaxed Partial Plan.]{\label{fig:shop:relax2}\includegraphics[width=0.7\columnwidth]{figs/shoping_exec_relax-2}}
+  \subfloat[\small Conflicting Observation.]{\label{fig:shop:relax1}\includegraphics[width=0.7\columnwidth]{figs/shoping_exec_relax-1.jpeg}}\\
+  \subfloat[\small Relaxed Partial Plan.]{\label{fig:shop:relax2}\includegraphics[width=0.7\columnwidth]{figs/shoping_exec_relax-2.jpeg}}
   \caption{\small Illustration of a conflict during synchronization
     and the resulting relaxed plan for recovery.}
 \end{figure}
