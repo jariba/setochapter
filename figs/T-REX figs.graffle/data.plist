@@ -4913,7 +4913,7 @@
 	<key>MasterSheets</key>
 	<array/>
 	<key>ModificationDate</key>
-	<string>2012-05-03 09:07:53 -0700</string>
+	<string>2012-06-05 08:19:47 -0700</string>
 	<key>Modifier</key>
 	<string>Kanna</string>
 	<key>NotesVisible</key>
@@ -10869,9 +10869,9 @@ Engine}</string>
 							<key>Color</key>
 							<dict>
 								<key>b</key>
-								<string>0.07911</string>
+								<string>0.652739</string>
 								<key>g</key>
-								<string>0.913766</string>
+								<string>0.843555</string>
 								<key>r</key>
 								<string>1</string>
 							</dict>
@@ -10916,9 +10916,9 @@ Engine}</string>
 							<key>Color</key>
 							<dict>
 								<key>b</key>
-								<string>0.07911</string>
+								<string>0.652739</string>
 								<key>g</key>
-								<string>0.913766</string>
+								<string>0.843555</string>
 								<key>r</key>
 								<string>1</string>
 							</dict>
@@ -10963,9 +10963,9 @@ Engine}</string>
 							<key>Color</key>
 							<dict>
 								<key>b</key>
-								<string>0.07911</string>
+								<string>0.652739</string>
 								<key>g</key>
-								<string>0.913766</string>
+								<string>0.843555</string>
 								<key>r</key>
 								<string>1</string>
 							</dict>
@@ -11010,9 +11010,9 @@ Engine}</string>
 							<key>Color</key>
 							<dict>
 								<key>b</key>
-								<string>0</string>
+								<string>0.508016</string>
 								<key>g</key>
-								<string>0.243049</string>
+								<string>0.834411</string>
 								<key>r</key>
 								<string>1</string>
 							</dict>
@@ -11057,9 +11057,9 @@ Engine}</string>
 							<key>Color</key>
 							<dict>
 								<key>b</key>
-								<string>0.166118</string>
+								<string>0.562159</string>
 								<key>g</key>
-								<string>0.415579</string>
+								<string>0.837227</string>
 								<key>r</key>
 								<string>1</string>
 							</dict>
@@ -11104,11 +11104,11 @@ Engine}</string>
 							<key>Color</key>
 							<dict>
 								<key>b</key>
-								<string>1</string>
+								<string>0.564431</string>
 								<key>g</key>
-								<string>0.100534</string>
+								<string>0.92304</string>
 								<key>r</key>
-								<string>0.242989</string>
+								<string>1</string>
 							</dict>
 						</dict>
 						<key>stroke</key>
@@ -11151,9 +11151,9 @@ Engine}</string>
 							<key>Color</key>
 							<dict>
 								<key>b</key>
-								<string>0.33559</string>
+								<string>0.64848</string>
 								<key>g</key>
-								<string>0.395833</string>
+								<string>0.739833</string>
 								<key>r</key>
 								<string>1</string>
 							</dict>
@@ -11198,11 +11198,11 @@ Engine}</string>
 							<key>Color</key>
 							<dict>
 								<key>b</key>
-								<string>0.546714</string>
+								<string>0.414139</string>
 								<key>g</key>
-								<string>1</string>
+								<string>0.768134</string>
 								<key>r</key>
-								<string>0.903117</string>
+								<string>1</string>
 							</dict>
 						</dict>
 						<key>stroke</key>
@@ -11245,9 +11245,9 @@ Engine}</string>
 							<key>Color</key>
 							<dict>
 								<key>b</key>
-								<string>0.276875</string>
+								<string>0.659956</string>
 								<key>g</key>
-								<string>0.701682</string>
+								<string>0.930946</string>
 								<key>r</key>
 								<string>1</string>
 							</dict>
@@ -11292,11 +11292,11 @@ Engine}</string>
 							<key>Color</key>
 							<dict>
 								<key>b</key>
-								<string>0.202233</string>
+								<string>0.3811</string>
 								<key>g</key>
-								<string>1</string>
+								<string>0.759909</string>
 								<key>r</key>
-								<string>0.661332</string>
+								<string>1</string>
 							</dict>
 						</dict>
 						<key>stroke</key>
@@ -11339,11 +11339,11 @@ Engine}</string>
 							<key>Color</key>
 							<dict>
 								<key>b</key>
-								<string>0.620002</string>
+								<string>0.704121</string>
 								<key>g</key>
-								<string>1</string>
+								<string>0.828396</string>
 								<key>r</key>
-								<string>0.847664</string>
+								<string>1</string>
 							</dict>
 						</dict>
 					</dict>
@@ -11382,11 +11382,11 @@ Engine}</string>
 							<key>Color</key>
 							<dict>
 								<key>b</key>
-								<string>1</string>
+								<string>0.500698</string>
 								<key>g</key>
-								<string>0.296696</string>
+								<string>0.816542</string>
 								<key>r</key>
-								<string>0.394194</string>
+								<string>1</string>
 							</dict>
 						</dict>
 					</dict>
@@ -11425,11 +11425,11 @@ Database}</string>
 							<key>Color</key>
 							<dict>
 								<key>b</key>
-								<string>1</string>
+								<string>0.497727</string>
 								<key>g</key>
-								<string>0.530059</string>
+								<string>0.61158</string>
 								<key>r</key>
-								<string>0.832961</string>
+								<string>1</string>
 							</dict>
 						</dict>
 					</dict>
@@ -11469,11 +11469,11 @@ Engine}</string>
 							<key>Color</key>
 							<dict>
 								<key>b</key>
-								<string>1</string>
+								<string>0.726668</string>
 								<key>g</key>
-								<string>0.953629</string>
+								<string>0.947628</string>
 								<key>r</key>
-								<string>0.880067</string>
+								<string>1</string>
 							</dict>
 						</dict>
 						<key>stroke</key>
@@ -15133,11 +15133,11 @@ Engine}</string>
 	<key>WindowInfo</key>
 	<dict>
 		<key>CurrentSheet</key>
-		<integer>3</integer>
+		<integer>4</integer>
 		<key>ExpandedCanvases</key>
 		<array/>
 		<key>Frame</key>
-		<string>{{66, 28}, {1187, 1000}}</string>
+		<string>{{207, 125}, {1187, 1000}}</string>
 		<key>ListView</key>
 		<true/>
 		<key>OutlineWidth</key>

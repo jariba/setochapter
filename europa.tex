@@ -10,7 +10,7 @@ flaws and constraint violations at any stage of the planning process.
 
 \begin{figure}[b]
 \centering
-\includegraphics[scale=0.5]{figs/EUROPA-Architecture.pdf}
+\includegraphics[scale=2.5]{figs/EUROPA-Architecture.jpeg}
 \caption{\small The \eu software architecture.}
 \label{fig:europa-architecture}
 \end{figure}
@@ -64,9 +64,10 @@ modules that have been found to be useful in many domains:
 
 \end{enumerate}
 
-\kcomment{Before going into the details of each module, a simple
-  example illustrates how they interact at an abstract level:}
+Before going into the details of each module, a simple example
+illustrates how they interact at an abstract level.
 
+\begin{figure}[h!]
 \begin{verbatim}
 
 class LightBulb extends Timeline
@@ -74,7 +75,6 @@ class LightBulb extends Timeline
     predicate On  {}
     predicate Off {}
 }
-
 class LightSwitch extends Timeline
 {
     LightBulb myBulb_;
@@ -83,23 +83,19 @@ class LightSwitch extends Timeline
     {
         myBulb_ = b;
     }
-
     action turnOn  { duration=1; }
     action turnOff { duration=1; }
 }
-
 LightSwitch::turnOn
 {
     met_by(condition object.myBulb_.Off);  // Bulb must be Off to be turned On
     meets(effect object.myBulb_.On);   // Must be turned on through the switch
 }
-
 LightSwitch::turnOff
 {
     met_by(condition object.myBulb_.On);   // Bulb must be On to be turned Off
     meets(effect object.myBulb_.Off);      // Must be turned off through the switch
 }
-
 // Problem instance : turning the light off
 LightBulb bulb1 = new LightBulb();
 LightSwitch switch1 = new LightSwitch(bulb1);
@@ -112,11 +108,12 @@ eq(initialCondition.start,0);
 goal(bulb1.Off goal1);
 lt(0,goal1.start);
 lt(goal1.start,10);
-
-
 \end{verbatim}
+\caption{\small \nd modeling example for a light bulb and switch control.}
+\label{fig:nddllight}
+\end{figure}
 
-\kcomment{The example above is a \nd (covered in more detail in
+\kcomment{Fig. \ref{fig:nddllight} is a \nd (covered in more detail in
   Section \ref{sec:europa:modeling}) model of a light bulb and a
   switch that controls it along with a problem instance that requires
   the light bulb to be \texttt{off} by time$=10$, given an initial
@@ -162,11 +159,9 @@ effects and it offers procedural constructs to populate \eus
 \texttt{PDB} with specific problem instances expressed in terms of
 objects, variables, constraints, facts and goals. 
 
-To articulate the most important elements of \nde, we show how the
-Shopping Agent problem could be modeled:
 
+\begin{figure}[tbp]
 \begin{verbatim}
-
 // Locations (Home, SuperMarket, etc.)
 class Location {
   string name;
@@ -174,68 +169,65 @@ class Location {
     name = _name;
   }
 }
-
-// Products (Milk, Banana, etc.) and
+// Products (Milk, Banana, etc.)
 class Product {
   string name;
   Product(string _name) {
-    name = _name;
+   name = _name;
   }
 }
-
 // ProductLocations (Banana can be found at SuperMarket, for example)
 class ProductLocation {
-  Location location;
-  Product product;
+   Location location;
+   Product product;
 
-  ProductLocation(Location _location, Product _product){
-    location = _location;
-    product = _product;
-  }
+   ProductLocation(Location _location, Product _product){
+     location = _location;
+     product = _product;
+   }
 }
-
-// Use built-in Timeline functionality to enforce that an agent:
-// a) Can't be at more than one place at a time.
-// b) Can't Go more than one place at a time.
-// c) Can't Go somewhere and be At somewhere at the same time.
+// Use build-in timeline functionality to enforce that an agent cannot
+// be at more than one place at one time
+// Go to more than one place at one time
+// Go somewhere and be At somewhere at the same time 
 class AgentLocation extends Timeline{
   predicate At {
     Location loc;
   }
-
   predicate Going {
     Location from;
     Location to;
-  }
+   }
 }
-
-// In addition to having a location timeline, the agent can buy and own things.  
-// Note that the actions and the location predicates can be concurrent 
-// so they can't be on the same Timeline
+// In addition to having a location timeline, the agent can buy and
+// own things. Note that the actions and the location predicates can
+// be concurrent so they cannot be on the same timeline.
 class Agent {
+
   AgentLocation location;
-
   Agent() {
-    location = new AgentLocation();
+   location = new AgentLocation();
   }
-
   action Buy {
-    Product product;
-  }
-  
+   Product product;
+  } 
   action Go {
-    Location from;
-    Location to;
+   Location from;
+   Location to;
   }
-  
   predicate Own {
-  	Product product;
+   Product product;
   }
 }
 \end{verbatim}
+\caption{\small \nd model of the Shopping Agent example.}
+\label{fig:nddlshop}
+\end{figure}
 
-The model above the main elements of a problem domain can be mapped to
-\eus representation in the \kcomment{following manner}:
+To articulate the most important elements of \nde, we show how the
+Shopping Agent problem could be modeled in
+Fig. \ref{fig:nddlshop}. The main elements of a problem domain can be
+mapped to \eus representation in the \kcomment{following manner}:
 
 \begin{description}
 
@@ -283,9 +275,9 @@ The model above the main elements of a problem domain can be mapped to
   
 \end{description}
 
+\begin{figure}[h!]
 \begin{verbatim}
 
-// Define the rules for our actions:
 Agent::Go {
   met_by(condition object.location.At origin);
   eq(from, origin.loc);
@@ -317,10 +309,13 @@ Agent::Buy {
   eq(purchase.product,product);
 }
 \end{verbatim}
+\caption{\small \nd rules for the Shopping Agent.}
+\label{fig:nddlshop-rules}
+\end{figure}
 
 Domain rules can be defined in \nd in the context of a predicate or an
-action. In the example above, the main elements of a rule definition
-\kcomment{are as follows}:
+action. In Fig. \ref{fig:nddlshop-rules}, the main elements of a rule
+definition \kcomment{are as follows}:
 
 \begin{description}
 
@@ -352,8 +347,10 @@ action. In the example above, the main elements of a rule definition
 \end{description}
 
 With the specification for the Shopping Agent domain \kcomment{above},
-a particular problem instance could be stated as:
+a particular problem instance could be stated as in
+Fig. \ref{fig:nddlshop-instance}.
 
+\begin{figure}[h!]
 \begin{verbatim}
 
 // Allocate instances
@@ -408,6 +405,10 @@ leq(horizonStart, atHomeForBreakfast.start);
 leq(atHomeForDinner.end, horizonEnd);
 
 \end{verbatim}
+\caption{\small \nd instance and goal specification for the Shopping Agent.}
+\label{fig:nddlshop-instance}
+\end{figure}
+
 
 This problem instance consists of \textbf{Variables} and
 \textbf{Objects}, \textbf{Facts}, \textbf{Goals} and
@@ -431,11 +432,11 @@ accomplished. \texttt{before} and \texttt{after} are \texttt{Allen
 temporal relations between tokens (specifically between their start
 and end timepoints). The algebra is particularly effective in dealing
 with interval arithmetic; its elements are summarized in
-Fig. \ref{fig:allen-algebra}
+Fig. \ref{fig:allen-algebra}.
 
 \begin{figure}[!t]
 \centering
-\includegraphics[scale=0.4]{figs/Allen-algebra.pdf}
+\includegraphics[scale=2.3]{figs/Allen-algebra.jpeg}
 \caption{\small Temporal relations defined within the planner are
   based on \texttt{Allen Algebra} \cite{allen84} relations shown
   above.}
@@ -509,8 +510,8 @@ resulting \texttt{DG}.
   \centering
   \subfloat[\small A Simple Temporal Network (\texttt{STN}). \kcomment{Nodes correspond
   to variables and their domains and arc's the \emph{constraint} or
-  distance between them.}]{\label{fig:stn1}\includegraphics[width=0.4\columnwidth]{figs/stn-graph.pdf}}
-  \subfloat[\small The resulting distance graph from \ref{fig:stn1}.]{\label{fig:stn2}\includegraphics[width=0.4\columnwidth]{figs/distance-graph.pdf}}
+  distance between them.}]{\label{fig:stn1}\includegraphics[width=0.5\columnwidth]{figs/stn-graph.jpeg}}
+  \subfloat[\small The resulting distance graph from \ref{fig:stn1}.]{\label{fig:stn2}\includegraphics[width=0.5\columnwidth]{figs/distance-graph.pdf}}
   \caption{\small An illustration of a \texttt{STN} and its
     corresponding distance graph.}
   \label{fig:stn}
@@ -563,7 +564,7 @@ shows an example of such a resource computation.
 
 \begin{figure}
 \centering
-\includegraphics[scale=0.2]{figs/europa-resource-envelopes.png}
+\includegraphics[scale=2]{figs/europa-resource-envelopes.jpeg}
 \caption{\small An example of resource envelopes \cite{Muscettola04,Muscettola06} computed by \eue.}
 \label{fig:resenvelopes}
 \end{figure}
