@@ -1,0 +1,70 @@
+\begin{figure}[h!]
+\begin{verbatim}
+
+// Locations (Home, SuperMarket, etc.)
+class Location {
+  string name;
+  Location(string _name){
+    name = _name;
+  }
+}
+
+// Products (Milk, Banana, etc.) and
+class Product {
+  string name;
+  Product(string _name) {
+    name = _name;
+  }
+}
+
+// ProductLocations (Banana can be found at SuperMarket, for example)
+class ProductLocation {
+  Location location;
+  Product product;
+
+  ProductLocation(Location _location, Product _product){
+    location = _location;
+    product = _product;
+  }
+}
+
+// Use built-in Timeline functionality to enforce that an agent:
+// a) Can't be at more than one place at a time.
+// b) Can't Go more than one place at a time.
+// c) Can't Go somewhere and be At somewhere at the same time.
+
+class AgentLocation extends Timeline{
+  predicate At {
+    Location loc;
+  }
+  predicate Going {
+    Location from;
+    Location to;
+  }
+}
+// In addition to having a location timeline, the agent can buy and own things.  
+// Note that the actions and the location predicates can be concurrent 
+// so they can't be on the same Timeline
+
+class Agent {
+  AgentLocation location;
+
+  Agent() {
+    location = new AgentLocation();
+  }
+  action Buy {
+    Product product;
+  }
+  action Go {
+    Location from;
+    Location to;
+  }
+  predicate Own {
+  	Product product;
+  }
+}
+
+\end{verbatim}
+\caption{\small \nd model of the Shopping Agent example.}
+\label{fig:nddlshop}
+\end{figure}

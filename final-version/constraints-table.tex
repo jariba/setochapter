@@ -1,0 +1,90 @@
+\begin{table*}[b]
+  \centering
+  \renewcommand{\arraystretch}{1.0}%{0.99}
+  \begin{tabular}{|l|l|p{7cm}|p{3cm}|}
+    \hline
+    \textbf{Constraint}& \textbf{Syntax}& \textbf{Description}& \textbf{Variable Types}\\
+    \hline
+    distanceSquares& distanceSquares(a,b,c)& c = sqrt(a+b) if a and b are singleton& Numeric intervals\\
+    \hline
+    calcDistance&calcDistance(a,b,c,d,e)& a is Euclidean distance between points (b,c) and (d,e)& Numeric intervals\\
+    \hline
+    sin& sin(a,b)& a = sin(b)& Numeric intervals\\
+    \hline
+    allDiff& allDiff(a,b,\ldots)& Restrict all domains so the intersection of any pair of domains is empty& Comparable\\
+    \hline
+    EqualMaximum& EqualMax(a,b,\ldots)& a = max(b,\ldots)& Numeric\\
+    \hline
+    EqualMinimum& EqualMin(a,b,\ldots)& a = min(b,\ldots)& Numeric\\
+    \hline
+    CountZeros& CountZeros(a,b,\ldots)& a is the count of the rest that can be zero& Numeric\\
+    \hline
+    CountNonZeros& CountNonZeros(a,b,\ldots)& a is the count of the rest that can be non-zero& Numeric\\
+    \hline
+    diffSquare& diffSquare(a,b,\ldots)& c = (a - b)$^2$ if a and b are singleton& Numeric intervals\\
+    \hline
+    card& card(a,b,\ldots)& a must be greater than or equal the count of the other variables that are true& Numeric\\
+    \hline
+  \end{tabular}
+  \caption{\small Calculation Constraints: These constraints enforce that one variable (usually $a$) is constrained by a calculation done on the remaining variables.}
+  \label{tab:calconst}
+\end{table*}
+
+%%%%%%%%%%%%%
+
+\begin{table*}[ht]
+  \centering
+  \renewcommand{\arraystretch}{1.0}%{0.99}
+  \begin{tabular}{|l|l|p{7.5cm}|p{3cm}|}
+    \hline
+    \textbf{Constraint}& \textbf{Syntax}& \textbf{Description}& \textbf{Variable Types}\\
+    \hline
+    subsetOf& subsetOf(a,b)& a is a subset of b& Comparable\\
+    \hline
+    memberImply& memberImply(a,b,c,d)& If a is a subset of b, then require that c is a subset of d& a and b comparable, c and d comparable\\
+    \hline
+    Lock& Lock(a,b)& Restrict a's domain to be contained in b's domain& Comparable\\
+    \hline
+  \end{tabular}
+  \caption{\small Set Constraints: These constraints are likely to be used for set comparisons etc. Note, however, that many of the other constraints could be used for sets (\ie Comparable variables) just as these constraints could be applied to numeric domains as well.}
+  \label{tab:setconst}
+\end{table*}
+
+%%%%%%%%%%%%%
+
+\begin{table*}[ht]
+  \centering
+  \renewcommand{\arraystretch}{1.0}%{0.99}
+  \begin{tabular}{|l|l|p{7cm}|p{3cm}|}
+    \hline
+    \textbf{Constraint}& \textbf{Syntax}& \textbf{Description}& \textbf{Variable Types}\\
+    \hline
+    commonAncestor& commonAncestor(a,b,c)& a and b must be contained by the same object in c (or by c itself)& a, b and c are all objects\\
+    \hline
+    hasAncestor& hasAncestor(a,b)& a must be contained by some object in b& a and b are objects\\
+    \hline
+  \end{tabular}
+  \caption{\small Object Hierarchy Constraints: These constraints are imposed on objects and tokens. These constraints are used to assert which object one or more tokens is contained by. Most often, the commonAncestor constraint is used to subgoal across timelines which must share a contained object in common.}
+  \label{tab:objhierarchy}
+\end{table*}
+
+%%%%%%%%%%%%%
+
+\begin{table*}[ht]
+  \centering
+  \renewcommand{\arraystretch}{1.0}%{0.99}
+  \begin{tabular}{|l|l|p{9.5cm}|p{3cm}|}
+    \hline
+    \textbf{Constraint}& \textbf{Syntax}& \textbf{Description}& \textbf{Variable Types}\\
+    \hline
+    UNARY& NA& Restrict a variable's domain; given a variable and a domain, intersect them. Note that this constraints is only available internally and not exposed in NDDL& Anything\\
+    \hline
+    or& or(a,b\ldots)& At least one of the variables must be true& Numeric\\
+    \hline
+    absVal& absVal(a,b)& a.lb $\geq$ 0, a.ub = max(abs(b.lb)), b.lb $\geq$ -a.lb, b.ub $\leq$ a.ub& Numeric\\
+    \hline
+  \end{tabular}
+ \caption{\small Miscellaneous Constraints}
+  \label{tab:misc}
+\end{table*}
+

@@ -1,0 +1,91 @@
+\documentclass[graybox,12pt]{svmult}
+
+\input{preamble}
+\setcounter{tocdepth}{3}
+
+
+% \titlerunning{Towards Deliberative Control of Autonomous Robots}
+% \authorrunning{K.Rajan et. al.}
+
+\title*{\textbf{\sc Towards Deliberative Control in Marine Robotics}}
+\author{\normalsize Kanna~Rajan\inst{1} \and Fr\'ed\'eric Py\inst{1}
+  \and Javier Barreiro\inst{2}}
+\institute{Monterey Bay Aquarium Research Institute, California
+  \emph{\{Kanna.Rajan, fpy\}@mbari.org}
+  \and
+  NASA Ames Research Center, Moffett Field, California
+  \emph{javier.barreiro@nasa.gov}}
+
+\begin{document}
+
+% \tableofcontents{}
+
+\maketitle
+
+\abstract{We describe a general purpose Artificial Intelligence based
+  control architecture that incorporates in-situ decision making for
+  autonomous underwater vehicles (AUVs). The Teleo-Reactive EXecutive
+  (\rxe) framework deliberates about future states, plans for actions
+  and executes generated activities while monitoring plans for
+  anomalous conditions. Plans are no longer scripted a priori but
+  synthesized onboard with high-level directives instead of low level
+  commands. Further, the architecture uses multiple control loops for
+  a 'divide and conquer' problem solving strategy allowing for
+  incremental computational model building, robust and focused failure
+  recovery, ease of software development and ability to use legacy or
+  non-native computational paradigms. Vehicle adaptation and sampling
+  occurs in situ with additional modules which can be selectively used
+  depending on the application in focus. Abstraction in problem
+  solving allows different applications to be programmed relatively
+  easily, with little to no changes to the core search engine thereby
+  making software engineering sustainable. The representational
+  ability to deal with time and resources coupled with Machine
+  Learning techniques for event detection allows balancing shorter
+  term benefits with longer term needs, an important need as AUV
+  hardware becomes more robust allowing persistent ocean sampling and
+  observation. \rx is in \kcomment{regular} operational use at MBARI,
+  providing scientists a new tool to sample and observe the dynamic
+  coastal ocean.}
+
+\input{intro.tex}
+
+\input{related.tex}
+
+\input{europa-basics.tex}
+
+\input{concepts.tex}
+
+\input{europa.tex}
+
+\input{arch.tex}
+
+\input{results.tex}
+
+\input{future.tex}
+
+\input{conclude.tex}
+
+\section{Acknowledgements}
+
+Rajan and Py are funded by a block grant from the David and Lucile
+Packard Foundation to MBARI. They thank their research collaborators
+John Ryan, Julio Harvey, Jim Bellingham and Robert Vrijenhoek at
+MBARI. The crew of the R/V \emph{Zephyr} and the DMO support team led
+by Hans Thomas has been invaluable. The authors also thank other
+members of the \eu team over the years, including Conor McGann, Ari
+J\'onsson, Jeremy Frank, Paul Morris, John Bresina, Michael Iatauro,
+Matthew Boyce and Tristan Smith.  They are grateful to Martha del
+Alto, David Korsmeyer and Steven Zornetzer all at NASA Ames
+\kcomment{who not only made \eu available as open source but
+  encouraged its use outside the agency}. Minh Bin Do (NASA Ames),
+William Yew Teck Tan (NUS, Singapore) and Rishi Graham (MBARI)
+provided valuable comments on early drafts; we are grateful for their
+help in making this manuscript more accessible. Finally, the authors
+are indebted to Nicola Muscettola \kcomment{(Google)} for his ideas
+and early efforts in Constraint-based Temporal Planning while at NASA
+Ames which forms the basis of much of this work.
+
+\bibliographystyle{IEEEtran}
+\bibliography{references}
+
+\end{document}
